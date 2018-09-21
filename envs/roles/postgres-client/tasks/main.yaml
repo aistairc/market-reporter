@@ -1,0 +1,11 @@
+---
+- name: install PostgreSQL client
+  apt:
+    pkg: "{{ item }}"
+    update_cache: yes
+    state: latest
+  become: yes
+  with_items:
+    - postgresql
+    - python3-psycopg2
+...

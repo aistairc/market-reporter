@@ -1,0 +1,25 @@
+.row.justify-content-center.align-items-center
+  form#form.form-horizontal(action='/')
+    fieldset#fieldset
+    .form-group
+      .form-inline.justify-content-start
+        button#btn-add.btn.btn-outline-secondary(type='button', style='margin-right: 10px;', onclick="addCondition('article_id', '=', '');") +
+    .form-group
+      .form-inline.justify-content-end
+        button#submit.btn.btn-outline-primary(type='button', onclick='search();') Search
+.row.justify-content-center(style='margin-top: 20px;')
+  h4.message= pagination.display_msg
+.row.justify-content-end
+  ul.pagination
+    if pagination.has_prev
+      li.page-item
+        a.jump-to-prev.page-link Prev
+    else
+      li.page-item.disabled
+        a.jump-to-prev.page-link Prev
+    if pagination.has_next
+      li.page-item
+        a.jump-to-next.page-link Next
+    else
+      li.page-item.disabled
+        a.jump-to-next.page-link Next

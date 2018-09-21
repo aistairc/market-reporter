@@ -1,0 +1,14 @@
+---
+ec2_config:
+  # Label to distinguish the instance from other (groups of) instances
+  instance_name: ec2-launched-by-ansible
+  # Choose a name of VPC (You can find a list of VPCs in VPC Dashboard)
+  vpc_name: vpc
+  # Deep Learning AMI (Ubuntu) Version 5.0 (Public image)
+  image: ami-e8a04697
+  # Tokyo
+  region: ap-northeast-1
+  volume_size: 256
+  instance_type: p2.8xlarge
+  security_group_name: ssh-only
+...

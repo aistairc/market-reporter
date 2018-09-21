@@ -1,0 +1,14 @@
+.row.justify-content-end
+  ul.pagination
+    if pagination.has_prev
+      li.page-item
+        a.jump-to-prev.page-link Prev
+    else
+      li.page-item.disabled
+        a.jump-to-prev.page-link Prev
+    if pagination.has_next
+      li.page-item
+        a.jump-to-next.page-link Next
+    else
+      li.page-item.disabled
+        a.jump-to-next.page-link Next

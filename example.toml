@@ -1,0 +1,115 @@
+[location]
+dir_resources = 'resources'
+dir_logs = 'logs'
+dir_output = 'output'
+
+[s3]
+use_s3 = true
+profile_name = 'default'
+bucket_name = 'BUCKETNAME'
+remote_dir_prices = 'finance/reuters/indices'
+remote_nikkei_headline_filenames = [
+    'finance/nikkei/fileservice_full_20160917_2011_dic6373_rule418_j.zip',
+    'finance/nikkei/fileservice_full_20160917_2012_dic6373_rule418_j.zip',
+    'finance/nikkei/fileservice_full_20160917_2013_dic6373_rule418_j.zip',
+    'finance/nikkei/fileservice_full_20160917_2014_dic6373_rule418_j.zip',
+    'finance/nikkei/fileservice_full_20160917_2015_dic6373_rule418_j.zip',
+    'finance/nikkei/fileservice_full_20161001_2016_dic6419_rule428_j.zip'
+]
+
+[reuters]
+username = 'USERNAME'
+password = 'PASSSWORD'
+
+[dataset]
+# left-close right-open interval
+train = ['2010-12-01 00:00:00+0900', '2015-10-01 00:00:00+0900']
+valid = ['2015-10-01 00:00:00+0900', '2016-04-01 00:00:00+0900']
+test = ['2016-04-01 00:00:00+0900', '2016-10-01 00:00:00+0900']
+
+[postgres]
+uri = 'postgresql://ubuntu@localhost:5432/DBNAME'
+
+[postgres-test]
+uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'
+
+[redis]
+host = 'localhost'
+port = 6379
+db = -1
+
+[redis-test]
+host = 'localhost'
+port = 6379
+db = -1
+
+[webapp]
+n_items_per_page = 50
+result = [
+    ['Base',
+     'output/base.csv'],
+    ['Extr',
+     'output/extr.csv']
+]
+
+[train]
+user_dict = 'user-dict.csv'
+n_epochs = 60
+learning_rate = 1e-4
+use_init_token_tag = true
+token_min_freq = 1
+rics = [
+    '.N225',
+    '.TOPX',
+    '.SPX',
+    '.DJI',
+    '.FTSE',
+    # '.FCHI',
+    # '.GDAXI',
+    # '.STOXX50',
+    '.HSI',
+    # '.SSE50',
+    # '.SSE180',
+    '.SSEC',
+    # '.CSI100',
+    # '.CSI300',
+    # '.JKSE',
+    'JPY=',
+    # 'EUR='
+    'EURJPY=',
+    # '.FOOD17.T',
+    # '.ENGY17.T',
+    # '.CNST17.T',
+    # '.CHEM17.T',
+    # '.PHAM17.T',
+    # '.ATMO17.T',
+    # '.STEL17.T',
+    # '.MACH17.T',
+    # '.ELEC17.T',
+    # '.ITSV17.T',
+    # '.PWGA17.T',
+    # '.TRAN17.T',
+    # '.TRAD17.T',
+    # '.RETL17.T',
+    # '.BANK17.T',
+    # '.FNCL17.T',
+    # '.RLTY17.T',
+    'JNIc1'
+]
+base_ric = ''
+use_standardization = true
+patience = 20
+
+[encoder]
+enc_hidden_size = 256
+base_ric_embed_size = 256
+ric_embed_size = 32
+enc_n_layers = 3
+word_embed_size = 128
+time_embed_size = 64
+
+[decoder]
+dec_hidden_size = 256
+
+[attention]
+attn_type = ''  # '', 'general', 'concat', and 'sum'

@@ -1,0 +1,66 @@
+extends layout
+
+block content
+  .container
+    .row.justify-content-center
+      form#form(method='POST')
+        fieldset
+          .row
+            h3 ID: {{article_id}}
+          .row
+            h3 Timestamp: {{timestamp}}
+          div(style='margin: 0; padding: 0; height: 20px;')
+          each i, evaluation in targets
+            .row
+              h4
+                span= i
+                | .
+                if evaluation.is_debug
+                  span(class='method-name')= '(' + evaluation.method_name + ')'
+                  | &nbsp;
+                span(lang='ja')= evaluation.text
+            .row(style='margin-left: 10px; margin-right: 10px;')
+              .form-group
+                .custom-control.custom-radio
+                  if evaluation.correctness == 1
+                    input.custom-control-input(id='radio-c-#{i}',
+                                               name='correctness-#{i}',
+                                               type='redio',
+                                               value='1',
+                                               checked)
+                  else
+                    input.custom-control-input(id='radio-c-#{i}',
+                                               name='correctness-#{i}',
+                                               type='redio',
+                                               value='1')
+                  label.custom-control-label(for='radio-c-#{i}') Correct
+                .custom-control.custom-radio
+                  if evaluation.correctness == 0
+                    input.custom-control-input(id='radio-nc-#{i}',
+                                               name='incorrectness-#{i}',
+                                               type='redio',
+                                               value='1',
+                                               checked)
+                  else
+                    input.custom-control-input(id='radio-nc-#{i}',
+                                               name='incorrectness-#{i}',
+                                               type='redio',
+                                               value='1')
+                  label.custom-control-label(for='radio-nc-#{i}') Incorrect
+          .form-group.row
+            label(for='input-fluency') Fluency
+            input#input-fluency.form-control(type='text', name='fluency', value='#{fluency}')
+            label(for='input-informativeness') Informativeness
+            input#input-informativeness.form-control(type='text', name='informativeness', value='#{informativeness}')
+            label(for='input-note') Note
+            input#input-note.form-control(type='text', name='note', value='#{note}')
+          .form-group.row.justify-content-end
+            .form-inline
+              button.btn.btn-outline-danger(type='button', style='margin-right: 10px', onclick='reset();') Reset
+              button#submit.btn.btn-outline-primary(type='submit') Submit
+    .col-md-1
+  div(style='margin: 0; padding: 0; height: 50px;')
+  include chart_and_prices
+
+block append scripts
+  script(src='/static/js/detail.js')

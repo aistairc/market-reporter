@@ -1,0 +1,35 @@
+ul#tab-index.nav.nav-tabs
+#tab-content.tab-content
+  #tab-others.tab-pane.fade
+    .container(style='margin: 20px; padding: 0;')
+      each ric_table_group in ric_table_groups
+        .row
+          each ric_table in ric_table_group
+            .col
+              if ric_table.is_dummy
+                div
+              else
+                table.table.table-striped
+                  caption
+                    span.ric= ric_table.ric
+                    | 
+                    | ({{ ric_table.description }})
+                  thead
+                    tr
+                      th UTC
+                      th= ric_table.currency
+                      th Δ
+                  tbody
+                    each timestamp, val, indicator in ric_table.rows
+                      tr
+                        td.timestamp= timestamp
+                        td.price= val
+                        td.indicator
+                          if indicator == '-'
+                            i.material-icons remove
+                          if indicator == '↑'
+                            i.material-icons.positive arrow_upward
+                          if indicator == '→'
+                            i.material-icons arrow_forward
+                          if indicator == '↓'
+                            i.material-icons.negative arrow_downward

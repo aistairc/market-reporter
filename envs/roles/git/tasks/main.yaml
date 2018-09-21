@@ -1,0 +1,10 @@
+---
+- name: install git
+  apt:
+    pkg: "{{ item }}"
+    update_cache: yes
+    state: latest
+  become: yes
+  with_items:
+    - git
+...

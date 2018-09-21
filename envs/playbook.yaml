@@ -1,0 +1,15 @@
+---
+- hosts: localhost
+  vars_files:
+    - ec2-vars.yaml
+  roles:
+    - launch-ec2
+- hosts: launched
+  roles:
+    - apt
+    - git
+    - gcc
+    - postgres-client
+    - postgres-server
+    - redis
+...

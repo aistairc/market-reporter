@@ -1,0 +1,11 @@
+
+---
+- name: install Redis
+  apt:
+    pkg: "{{ item }}"
+    update_cache: yes
+    state: latest
+  become: yes
+  with_items:
+    - redis-server
+...

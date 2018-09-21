@@ -1,0 +1,53 @@
+extends layout
+
+block content
+  .container
+    include search_header
+    .row.justify-content-center.align-items-center
+      table.table.table-striped
+        thead
+          tr
+            th
+              span Status
+              br
+              span Note
+            th
+              span ID
+              br
+              span Phase
+            th Timestamp in JST
+            th Headline
+        tbody
+          each article in articles
+            tr
+              td.phase
+                span
+                  if article.is_finished
+                    i.material-icons done
+                  elif article.is_target
+                    i.material-icons flag
+                  else
+                    span
+                br
+                span
+                  if article.note == ''
+                    span
+                  else
+                    i.material-icons(onclick='alert("#{article.note}");') comment
+              td.article-id
+                a(href='article/#{article.article_id}')= article.article_id
+                br
+                span.phase= article.phase
+              td.timestamp= article.jst
+              td.headline
+                ol(style='margin-bottom: 0px;')
+                  each method in article.methods
+                    li
+                      if method.is_debug
+                        span(class='method-name')= '(' + method.method_name + ')'
+                        | &nbsp;
+                      span(lang='ja')= method.text
+    include search_footer
+
+block append scripts
+  script(src='/static/js/search.js')

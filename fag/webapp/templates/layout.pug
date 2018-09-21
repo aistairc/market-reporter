@@ -1,0 +1,17 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width,initial-scale=1.0')
+    // [KDE Oxygen Icon](http://www.kde.org/)
+    link(rel='shortcut icon', href='/static/favicon/kde-oxygen-action-office-chart-line.png')
+    block stylesheets
+      include stylesheets.pug
+    title Financial Article Generator
+  body
+    include navbar.pug
+    main
+      .container
+        block content
+    block scripts
+      include scripts.pug
