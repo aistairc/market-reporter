@@ -1,0 +1,86 @@
+{
+  "NYSE": {
+    "tz": "US/Eastern",
+    "name": "New York Stock Exchange",
+    "utc_offset": -5,
+    "open_local": "09:30",
+    "close_local": "16:00",
+    "has_dst": true
+  },
+  "NASDAQ": {
+    "tz": "US/Eastern",
+    "name": "Nasdaq Stock Market",
+    "utc_offset": -5,
+    "open_local": "09:30",
+    "close_local": "16:00",
+    "has_dst": true
+  },
+  "LSE": {
+    "name": "London Stock Exchange",
+    "tz": "UTC",
+    "utc_offset": 0,
+    "open_local": "08:00",
+    "close_local": "16:30",
+    "has_dst": true
+  },
+  "TSE": {
+    "name": "Tokyo Stock Exchange",
+    "tz": "Asia/Tokyo",
+    "utc_offset": 9,
+    "open_local": "09:00",
+    "close_local": "15:00",
+    "lunch_local": [
+      "11:30",
+      "12:30"
+    ],
+    "has_dst": false
+  },
+  "OSA": {
+    "name": "Osaka Securities Exchange",
+    "tz": "Asia/Tokyo",
+    "utc_offset": 9,
+    "open_local": "8:45",
+    "close_local": "29:30",
+    "lunch_local": [
+      "15:15",
+      "16:30"
+    ],
+    "has_dst": false
+  },
+  "SSE": {
+    "name": "Shanghai Stock Exchange",
+    "tz": "Asia/Shanghai",
+    "utc_offset": 8,
+    "open_local": "09:30",
+    "close_local": "15:00",
+    "lunch_local": [
+      "11:30",
+      "13:00"
+    ],
+    "has_dst": false
+  },
+  "SEHK": {
+    "name": "Hong Kong Stock Exchange",
+    "tz": "Asia/Shanghai",
+    "utc_offset": 8,
+    "open_local": "09:15",
+    "close_local": "16:00",
+    "lunch_local": [
+      "12:00",
+      "13:00"
+    ],
+    "has_dst": false
+  },
+  "SZSE": {
+    "name": "Shenzhen Stock Exchange",
+    "tz": "Asia/Shanghai",
+    "utc_offset": 8,
+    "open_local": "09:30",
+    "close_local": "15:00",
+    "lunch_local": [
+      "11:30",
+      "13:00"
+    ],
+    "has_dst": false
+  }
+}
