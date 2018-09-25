@@ -6,7 +6,6 @@ envs/hosts
 envs/*.retry
 logs/
 output/
-resources/
-!resources/prices/_test.csv.gz
+resources/prices/*
 *.toml
 !*example.toml
