@@ -171,7 +171,7 @@ You can see a page as the following picture.
 python setup.py test
 ```
 
-## License and References
+## License and Reference
 Market Reporter is licensed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html) (v3 or later) for non-commercial purposes.
 For commercial uses, please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp).
 

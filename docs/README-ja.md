@@ -18,7 +18,7 @@
 3. [使い方](#使い方)
 4. [Webインターフェース](#Webインターフェース)
 5. [テスト](#テスト)
-6. [参考文献](#参考文献)
+6. [ライセンスと参考文献](#ライセンスと参考文献)
 
 ## 概要
 
@@ -174,7 +174,7 @@ nohup uwsgi --ini uwsgi.ini &
 python setup.py test
 ```
 
-## License and References
+## ライセンスと参考文献
 Market Reporterは非商用目的の場合[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html)（v3以上）で利用できます。
 商用利用の場合は[kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)までご連絡ください。
 
