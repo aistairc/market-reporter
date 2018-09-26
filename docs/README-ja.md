@@ -176,7 +176,7 @@ python setup.py test
 
 ## ライセンスと参考文献
 Market Reporterは非商用目的の場合[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html)（v3以上）で利用できます。
-商用利用の場合は[kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)までご連絡ください。
+商用目的で利用する場合は[kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)までご連絡ください。
 
 このソフトウェアには特許出願中の技術が含まれます（出願番号：2017001583）。
 
