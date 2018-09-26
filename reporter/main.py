@@ -7,20 +7,20 @@ from pathlib import Path
 import jsonlines
 import torch
 
-from fag.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
-from fag.core.train import run
-from fag.database.model import create_tables
-from fag.database.read import load_alignments_from_db
-from fag.postprocessing.bleu import calc_bleu
-from fag.preprocessing.dataset import create_dataset, prepare_resources
-from fag.util.config import Config
-from fag.util.constant import Phase, SpecialToken
-from fag.util.logging import create_logger
+from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
+from reporter.core.train import run
+from reporter.database.model import create_tables
+from reporter.database.read import load_alignments_from_db
+from reporter.postprocessing.bleu import calc_bleu
+from reporter.preprocessing.dataset import create_dataset, prepare_resources
+from reporter.util.config import Config
+from reporter.util.constant import Phase, SpecialToken
+from reporter.util.logging import create_logger
 
 
 def parse_args() -> argparse.Namespace:
 
-    parser = argparse.ArgumentParser(prog='fag')
+    parser = argparse.ArgumentParser(prog='reporter')
     parser.add_argument('--device',
                         type=str,
                         metavar='DEVICE',
@@ -55,7 +55,7 @@ def main() -> None:
 
     device = torch.device(args.device)
 
-    now = datetime.today().strftime('fag-%Y-%m-%d-%H-%M-%S')
+    now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
     dest_log = config.dir_logs / Path('{}.log'.format(now))
 
     logger = create_logger(dest_log,  is_debug=args.is_debug)

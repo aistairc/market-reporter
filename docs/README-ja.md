@@ -1,4 +1,4 @@
-# Financial Article Generator
+# Market Reporter
 [English](../README.md)
 
 <p align="center"><img src="../docs/pics/logo.png"></p>
@@ -146,7 +146,7 @@ db = -1
 ```bash
 cp example.toml config.toml  # Create a configuration file
 vi config.toml  # Edit some variables according to your environment
-python -m fag --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
 ```
 
 
@@ -155,7 +155,7 @@ python -m fag --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to
 以下のコマンドを実行し、ブラウザで `http://localhost:5000/` にアクセスしてください。
 
 ```bash
-python -m fag.webapp
+python -m reporter.webapp
 ```
 
 サーバー環境で起動する際は、代わりに以下のコマンドを実行してください。
@@ -166,7 +166,7 @@ nohup uwsgi --ini uwsgi.ini &
 
 正常に起動すると以下のような検索画面が表示されます。
 
-<p align="center"><img src="../docs/pics/fag-webapp.png"></p>
+<p align="center"><img src="../docs/pics/webapp.png"></p>
 
 ## テスト
 

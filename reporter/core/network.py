@@ -6,15 +6,15 @@ import torch
 from torch import Tensor, nn
 from torchtext.data import Batch
 
-from fag.util.config import Config
-from fag.util.constant import (
+from reporter.util.config import Config
+from reporter.util.constant import (
     GENERATION_LIMIT,
     N_LONG_TERM,
     N_SHORT_TERM,
     TIMESLOT_SIZE,
     Phase,
     SeqType)
-from fag.util.conversion import stringify_ric_seqtype
+from reporter.util.conversion import stringify_ric_seqtype
 
 
 class Attention(nn.Module):

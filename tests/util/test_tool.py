@@ -1,7 +1,7 @@
 from unittest import TestCase
 from types import GeneratorType
 
-from fag.util.tool import takeuntil
+from reporter.util.tool import takeuntil
 
 
 class TestTool(TestCase):

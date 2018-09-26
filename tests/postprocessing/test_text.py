@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fag.postprocessing.text import number2kansuuzi
+from reporter.postprocessing.text import number2kansuuzi
 
 
 class TestPostprocessing(TestCase):

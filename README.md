@@ -1,9 +1,9 @@
-# Financial Article Generator
+# Market Reporter
 [日本語](docs/README-ja.md)
 
 <p align="center"><img src="docs/pics/logo.png"></p>
 
-__FAG (Financial Article Generator)__ is a tool that automatically generates market comments from time series data of prices.
+__Market Reporter__ is a tool that automatically generates market comments from time series data of prices.
 
 ## Table of Contents
 1. [About](#about)
@@ -144,7 +144,7 @@ Please change it to a nonnegative integer.
 ```bash
 cp example.toml config.toml  # Create a configuration file
 vi config.toml  # Edit some variables according to your environment
-python -m fag --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
 ```
 
 
@@ -153,7 +153,7 @@ python -m fag --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to
 Execute the following command and access `http://localhost:5000/` in a web browser.
 
 ```bash
-python -m fag.webapp
+python -m reporter.webapp
 ```
 
 When you launch it on a server, execute the following command instead.
@@ -162,7 +162,7 @@ nohup uwsgi --ini uwsgi.ini &
 ```
 
 You can see a page as the following picture.
-<p align="center"><img src="docs/pics/fag-webapp.png"></p>
+<p align="center"><img src="docs/pics/webapp.png"></p>
 
 ## Test
 

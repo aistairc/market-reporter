@@ -9,7 +9,7 @@ from typing import List
 from boto3.resources.base import ServiceResource
 from botocore.exceptions import ClientError
 
-from fag.resource.reuters import filename2ric, ric2filename
+from reporter.resource.reuters import filename2ric, ric2filename
 
 
 def download_nikkei_headlines_from_s3(bucket: ServiceResource,

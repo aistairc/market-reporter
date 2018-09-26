@@ -2,10 +2,10 @@ import unittest
 from pathlib import Path
 from numpy import allclose
 
-from fag.database.model import create_tables, Close, Price
-from fag.database.write import insert_prices
-from fag.util.config import Config
-from fag.util.logging import create_logger
+from reporter.database.model import create_tables, Close, Price
+from reporter.database.write import insert_prices
+from reporter.util.config import Config
+from reporter.util.logging import create_logger
 
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker

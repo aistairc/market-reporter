@@ -11,11 +11,11 @@ from sqlalchemy import Integer, cast, extract, func, Date
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
-from fag.core.operation import find_operation
-from fag.database.misc import in_utc, in_jst
-from fag.database.model import Headline, Price
-from fag.util.constant import REUTERS_DATETIME_FORMAT, Code, Phase, SeqType, UTC
-from fag.util.conversion import stringify_ric_seqtype
+from reporter.core.operation import find_operation
+from reporter.database.misc import in_utc, in_jst
+from reporter.database.model import Headline, Price
+from reporter.util.constant import REUTERS_DATETIME_FORMAT, Code, Phase, SeqType, UTC
+from reporter.util.conversion import stringify_ric_seqtype
 
 
 class Alignment:

@@ -8,7 +8,7 @@ from typing import Dict, List, Union
 
 import requests
 
-from fag.util.constant import Reuters
+from reporter.util.constant import Reuters
 
 
 def filename2ric(filename: str) -> str:
