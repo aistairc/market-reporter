@@ -174,7 +174,14 @@ nohup uwsgi --ini uwsgi.ini &
 python setup.py test
 ```
 
-## 参考文献
+## License and References
+Market Reporterは非商用目的の場合[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html)（v3以上）で利用できます。
+商用利用の場合は[kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)までご連絡ください。
+
+このソフトウェアには特許出願中の技術が含まれます（出願番号：2017001583）。
+
+このソフトウェアを利用した論文を書く場合は、以下のいずれかまたは両方を引用してください。
+
 ```
 @InProceedings{murakami2017,
   author = {Murakami, Soichiro
@@ -196,8 +203,22 @@ python setup.py test
 }
 
 @InProceedings{aoki2018,
-  author = {Tatsuya Aoki
+  author = {Aoki, Tatsuya
+            and Miyazawa, Akira
+            and Ishigaki, Tatsuya
+            and Goshima, Keiichi
+            and Aoki, Kasumi
+            and Kobayashi, Ichiro
+            and Takamura, Hiroya
+            and Miyao, Yusuke},
   }
-  url = {http://www.aclweb.org/anthology/P17-1126}
+  title = {Generating Market Comments Referring to External Resources}
+  booktitle = {Proceedings of the 11th International Conference on Natural Language Generation},
+  year = {2018},
+  publisher = {Association for Computational Linguistics},
+  pages = {},
+  location = {},
+  doi = {},
+  url = {}
 }
 ```
