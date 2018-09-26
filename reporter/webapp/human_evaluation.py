@@ -8,8 +8,8 @@ from typing import Dict
 from sqlalchemy.orm.session import Session
 from tqdm import tqdm
 
-from fag.database.model import HumanEvaluation, GenerationResult
-from fag.postprocessing.text import number2kansuuzi
+from reporter.database.model import HumanEvaluation, GenerationResult
+from reporter.postprocessing.text import number2kansuuzi
 
 
 def populate_for_human_evaluation(session: Session,

@@ -15,18 +15,18 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import extract
 from tqdm import tqdm
 
-from fag.database.misc import in_jst
-from fag.database.model import Close, Headline, Instrument, Price
-from fag.preprocessing.text import (
+from reporter.database.misc import in_jst
+from reporter.database.model import Close, Headline, Instrument, Price
+from reporter.preprocessing.text import (
     is_interesting,
     is_template,
     kansuuzi2number,
     replace_prices_with_tags,
     simplify_headline)
-from fag.preprocessing.number import format_digit
-from fag.resource.reuters import ric2filename
-from fag.util.config import Span
-from fag.util.constant import (
+from reporter.preprocessing.number import format_digit
+from reporter.resource.reuters import ric2filename
+from reporter.util.config import Span
+from reporter.util.constant import (
     DOMESTIC_INDEX,
     EQUITY,
     FUTURES,
@@ -38,7 +38,7 @@ from fag.util.constant import (
     Code,
     Phase,
     SeqType)
-from fag.util.exchange import ClosingTime
+from reporter.util.exchange import ClosingTime
 
 
 def redis_key(ric: str, seqtype: SeqType, t: Union[str, datetime]) -> str:

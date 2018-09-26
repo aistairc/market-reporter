@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple, Union
 
 from sqlalchemy.orm.session import Session
 
-from fag.database.model import Close, Price
+from reporter.database.model import Close, Price
 
 
 class RICInfo:

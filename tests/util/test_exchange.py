@@ -3,8 +3,8 @@ from unittest import TestCase
 from datetime import time
 import pytz
 
-from fag.util.constant import EST, EDT
-from fag.util.exchange import ClosingTime
+from reporter.util.constant import EST, EDT
+from reporter.util.exchange import ClosingTime
 
 
 class TestClosingTime(TestCase):

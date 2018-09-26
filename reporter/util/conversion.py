@@ -1,4 +1,4 @@
-from fag.util.constant import SeqType
+from reporter.util.constant import SeqType
 
 
 def stringify_ric_seqtype(ric: str, seqtype: SeqType) -> str:

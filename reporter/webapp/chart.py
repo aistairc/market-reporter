@@ -3,8 +3,8 @@ from datetime import datetime, timedelta
 
 from sqlalchemy.orm.session import Session
 
-from fag.database.read import fetch_prices_of_a_day
-from fag.util.constant import UTC
+from reporter.database.read import fetch_prices_of_a_day
+from reporter.util.constant import UTC
 
 
 def fetch_points(session: Session, ric: str, start: datetime, end: datetime) -> Tuple[List[int], List[str]]:

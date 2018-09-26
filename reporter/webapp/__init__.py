@@ -6,15 +6,15 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
-from fag.database.misc import in_jst, in_utc
-from fag.database.model import Headline, HumanEvaluation, GenerationResult
-from fag.database.read import fetch_max_t_of_prev_trading_day
-from fag.util.config import Config
-from fag.util.constant import UTC, Code
-from fag.webapp.human_evaluation import populate_for_human_evaluation
-from fag.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
-from fag.webapp.search import construct_constraint_query
-from fag.webapp.chart import fetch_points
+from reporter.database.misc import in_jst, in_utc
+from reporter.database.model import Headline, HumanEvaluation, GenerationResult
+from reporter.database.read import fetch_max_t_of_prev_trading_day
+from reporter.util.config import Config
+from reporter.util.constant import UTC, Code
+from reporter.webapp.human_evaluation import populate_for_human_evaluation
+from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
+from reporter.webapp.search import construct_constraint_query
+from reporter.webapp.chart import fetch_points
 
 
 config = Config('config.toml')

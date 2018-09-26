@@ -3,12 +3,12 @@ import tempfile
 
 from janome.tokenizer import Tokenizer
 
-from fag.preprocessing.text import (
+from reporter.preprocessing.text import (
     simplify_headline,
     is_template,
     replace_prices_with_tags,
     kansuuzi2number)
-from fag.util.constant import IDEOGRAPHIC_SPACE
+from reporter.util.constant import IDEOGRAPHIC_SPACE
 
 
 class TestPreprocessing(TestCase):

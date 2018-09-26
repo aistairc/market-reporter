@@ -4,7 +4,7 @@ from pathlib import Path
 
 import toml
 
-from fag.util.constant import Code
+from reporter.util.constant import Code
 
 
 class Span:
