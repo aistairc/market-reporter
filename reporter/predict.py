@@ -58,7 +58,6 @@ def predict() -> List[str]:
     device = torch.device(args.device)
 
     dest_t = args.time
-    dest_t = '2016-09-27T10:10:00.000000000+0900'
     dest_ric = args.ric
 
     # Connect to Redis
