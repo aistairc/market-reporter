@@ -12,6 +12,8 @@ from torchtext.vocab import Vocab
 import redis
 from redis import Redis
 
+from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
+from reporter.core.operation import replace_tags_with_vals, get_latest_closing_vals
 from reporter.database.read import Alignment
 from reporter.util.config import Config
 from reporter.util.constant import (
@@ -19,8 +21,12 @@ from reporter.util.constant import (
     N_SHORT_TERM,
     REUTERS_DATETIME_FORMAT,
     SeqType,
+    Phase,
+    Code,
     SpecialToken)
 from reporter.util.conversion import stringify_ric_seqtype
+from reporter.util.tool import takeuntil
+from reporter.postprocessing.text import remove_bos
 
 
 def parse_args() -> argparse.Namespace:
@@ -57,7 +63,10 @@ def predict() -> List[str]:
 
     device = torch.device(args.device)
 
+    dest_model = config.dir_output / Path(args.model)
+
     dest_t = args.time
+
     dest_ric = args.ric
 
     # Connect to Redis
@@ -82,6 +91,35 @@ def predict() -> List[str]:
         writer.write(alignment.to_mapping())
 
     (vocab, predict_iter) = create_dataset(config, device, rics, seqtypes)
+
+    # Read model
+    vocab_size = len(vocab)
+    attn = setup_attention(config, seqtypes)
+    encoder = Encoder(config, device)
+    decoder = Decoder(config, vocab_size, attn, device)
+    model = EncoderDecoder(encoder, decoder, device)
+    criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
+                                 ignore_index=vocab.stoi[SpecialToken.Padding.value])
+    model.eval()
+
+    with dest_model.open(mode='rb') as f:
+        model.load_state_dict(torch.load(f))
+
+    result = []
+    for batch in predict_iter:
+        times = batch.time
+        tokens = batch.token
+        raw_short_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawShort)
+        latest_vals = [x for x in getattr(batch, raw_short_field).data[:, 0]]
+        raw_long_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawLong)
+        latest_closing_vals = get_latest_closing_vals(batch, raw_long_field, times)
+        loss, pred, attn_weight = model(batch, batch.batch_size, tokens, times, criterion, Phase.Test)
+        i_eos = vocab.stoi[SpecialToken.EOS.value]
+        pred_sents = [remove_bos([vocab.itos[i] for i in takeuntil(i_eos, sent)]) for sent in zip(*pred)]
+        for (pred_sent, latest_closing_val, latest_val) in zip(pred_sents, latest_closing_vals, latest_vals):
+            result = replace_tags_with_vals(pred_sent, latest_closing_val, latest_val)
+
+    return result
 
 
 def load_alignment_from_db(r: Redis,
@@ -172,4 +210,4 @@ def create_dataset(config: Config,
 
 
 if __name__ == "__main__":
-    predict()
+    print(predict())
