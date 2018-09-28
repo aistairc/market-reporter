@@ -63,25 +63,25 @@ def predict() -> List[str]:
 
     device = torch.device(args.device)
 
-    dest_model = config.dir_output / Path(args.model)
+    pretrain_model = config.dir_output / Path(args.model)
 
-    dest_t = args.time
+    t = args.time
 
-    dest_ric = args.ric
+    target_ric = args.ric
 
     # Connect to Redis
     connection_pool = redis.ConnectionPool(**config.redis)
     redis_client = redis.StrictRedis(connection_pool=connection_pool)
 
     # Make the alignment of predict
-    rics = config.rics if dest_ric in config.rics else [dest_ric] + config.rics
+    rics = config.rics if target_ric in config.rics else [target_ric] + config.rics
 
     seqtypes = [SeqType.RawShort, SeqType.RawLong,
                 SeqType.MovRefShort, SeqType.MovRefLong,
                 SeqType.NormMovRefShort, SeqType.NormMovRefLong,
                 SeqType.StdShort, SeqType.StdLong]
 
-    alignment = load_alignment_from_db(redis_client, rics, dest_t, seqtypes)
+    alignment = load_alignment_from_db(redis_client, rics, t, seqtypes)
 
     # Write the predict data
     config.dir_output.mkdir(parents=True, exist_ok=True)
@@ -102,7 +102,7 @@ def predict() -> List[str]:
                                  ignore_index=vocab.stoi[SpecialToken.Padding.value])
     model.eval()
 
-    with dest_model.open(mode='rb') as f:
+    with pretrain_model.open(mode='rb') as f:
         model.load_state_dict(torch.load(f))
 
     result = []
@@ -127,8 +127,8 @@ def load_alignment_from_db(r: Redis,
                            t: str,
                            seqtypes: List[SeqType]) -> Alignment:
     # Make the alignment of predict
-    dest_time = datetime.strptime(t, REUTERS_DATETIME_FORMAT)
-    dest_unixtime = dest_time.timestamp()
+    time = datetime.strptime(t, REUTERS_DATETIME_FORMAT)
+    unixtime = time.timestamp()
 
     ric_seqtype_to_keys = dict()
     ric_seqtype_to_unixtimes = dict()
@@ -143,7 +143,7 @@ def load_alignment_from_db(r: Redis,
     chart = dict()
     for (ric, seqtype) in itertools.product(rics, seqtypes):
         U = ric_seqtype_to_unixtimes[(ric, seqtype)]
-        valid_indices = numpy.where(U <= dest_unixtime)
+        valid_indices = numpy.where(U <= unixtime)
         if valid_indices[0].shape[0] == 0:
             vals = []
         else:
@@ -156,7 +156,7 @@ def load_alignment_from_db(r: Redis,
     processed_tokens = ['']
     article_id = 'dummy'
 
-    return Alignment(article_id, t, dest_time.hour, processed_tokens, chart)
+    return Alignment(article_id, t, time.hour, processed_tokens, chart)
 
 
 def create_dataset(config: Config,
