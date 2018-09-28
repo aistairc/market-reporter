@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def predict() -> List[str]:
+def predict() -> List[List[str]]:
 
     args = parse_args()
 
@@ -117,7 +117,7 @@ def predict() -> List[str]:
         i_eos = vocab.stoi[SpecialToken.EOS.value]
         pred_sents = [remove_bos([vocab.itos[i] for i in takeuntil(i_eos, sent)]) for sent in zip(*pred)]
         for (pred_sent, latest_closing_val, latest_val) in zip(pred_sents, latest_closing_vals, latest_vals):
-            result = replace_tags_with_vals(pred_sent, latest_closing_val, latest_val)
+            result.append(replace_tags_with_vals(pred_sent, latest_closing_val, latest_val))
 
     return result
 
