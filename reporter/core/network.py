@@ -265,6 +265,9 @@ class Decoder(nn.Module):
         weight = 0.0
         word_embed = self.word_embed_layer(word)
         time_embed = self.time_embed_layer(time)
+        # if batch_size 1, change the dimension of embedding because of the there are 1.
+        word_embed = word_embed.view(batch_size, -1) if word_embed.dim() == 1 else word_embed
+        time_embed = time_embed.view(batch_size, -1) if time_embed.dim() == 1 else time_embed
         stream = torch.cat((word_embed, time_embed), 1)
         self.h_n, self.c_n = self.recurrent_layer(stream, (self.h_n, self.c_n))
         hidden = self.h_n
