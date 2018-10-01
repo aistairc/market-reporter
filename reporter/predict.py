@@ -113,9 +113,12 @@ def predict() -> List[List[str]]:
         latest_vals = [x for x in getattr(batch, raw_short_field).data[:, 0]]
         raw_long_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawLong)
         latest_closing_vals = get_latest_closing_vals(batch, raw_long_field, times)
+
         loss, pred, attn_weight = model(batch, batch.batch_size, tokens, times, criterion, Phase.Test)
+
         i_eos = vocab.stoi[SpecialToken.EOS.value]
         pred_sents = [remove_bos([vocab.itos[i] for i in takeuntil(i_eos, sent)]) for sent in zip(*pred)]
+
         for (pred_sent, latest_closing_val, latest_val) in zip(pred_sents, latest_closing_vals, latest_vals):
             result.append(replace_tags_with_vals(pred_sent, latest_closing_val, latest_val))
 
@@ -193,11 +196,12 @@ def create_dataset(config: Config,
         fields[key] = (key, price_field)
 
     # read alignment of train and predict
-    train = TabularDataset(path='output/alignment-train.json', format='json', fields=fields)
     predict = TabularDataset(path='output/alignment-predict.json', format='json', fields=fields)
 
     # build vocab from train tokens
-    token_field.build_vocab(train, min_freq=config.token_min_freq)
+    train_vocab = config.dir_output / Path('trian.vocab')
+    with train_vocab.open('rb') as f:
+            token_field.vocab = torch.load(f)
 
     # make iteroter train and predict
     predict_iter = Iterator(predict,
