@@ -98,6 +98,9 @@ def main() -> None:
         dest_vocab = Path(config.dir_output) / Path('vocab.json')
         with dest_vocab.open(mode='w') as f:
             json.dump(vocab.stoi, f, ensure_ascii=False, indent=True)
+        dest_train_vocab = Path(config.dir_output) / Path('train.vocab')
+        with dest_train_vocab.open(mode='wb') as f:
+            torch.save(vocab, f)
         seqtypes = []
         attn = setup_attention(config, seqtypes)
         encoder = Encoder(config, device)
