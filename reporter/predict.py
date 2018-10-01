@@ -105,7 +105,7 @@ def predict() -> List[List[str]]:
     with pretrain_model.open(mode='rb') as f:
         model.load_state_dict(torch.load(f))
 
-    result = []
+    results = []
     for batch in predict_iter:
         times = batch.time
         tokens = batch.token
@@ -120,9 +120,9 @@ def predict() -> List[List[str]]:
         pred_sents = [remove_bos([vocab.itos[i] for i in takeuntil(i_eos, sent)]) for sent in zip(*pred)]
 
         for (pred_sent, latest_closing_val, latest_val) in zip(pred_sents, latest_closing_vals, latest_vals):
-            result.append(replace_tags_with_vals(pred_sent, latest_closing_val, latest_val))
+            results.append(replace_tags_with_vals(pred_sent, latest_closing_val, latest_val))
 
-    return result
+    return results
 
 
 def load_alignment_from_db(r: Redis,
