@@ -199,9 +199,9 @@ def create_dataset(config: Config,
     predict = TabularDataset(path='output/alignment-predict.json', format='json', fields=fields)
 
     # build vocab from train tokens
-    train_vocab = config.dir_output / Path('trian.vocab')
+    train_vocab = config.dir_output / Path('train.vocab')
     with train_vocab.open('rb') as f:
-            token_field.vocab = torch.load(f)
+        token_field.vocab = torch.load(f)
 
     # make iteroter train and predict
     predict_iter = Iterator(predict,
