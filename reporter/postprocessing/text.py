@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from fag.util.constant import SpecialToken
+from reporter.util.constant import SpecialToken
 
 
 def number2kansuuzi(tokens: List[str]) -> List[str]:

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import toml
 
-from fag.resource.reuters import get_auth_token, filename2ric, ric2filename
+from reporter.resource.reuters import get_auth_token, filename2ric, ric2filename
 
 
 class TestReuters(TestCase):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from fag.core.operation import find_operation, perform_operation
+from reporter.core.operation import find_operation, perform_operation
 
 
 class TestOperation(TestCase):

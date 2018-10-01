@@ -7,12 +7,12 @@ from nltk.translate.bleu_score import SmoothingFunction, sentence_bleu
 from torchtext.data import Iterator
 from torchtext.vocab import Vocab
 
-from fag.core.network import Attention, EncoderDecoder
-from fag.core.operation import replace_tags_with_vals, get_latest_closing_vals
-from fag.util.constant import SEED, Code, Phase, SeqType, SpecialToken
-from fag.util.conversion import stringify_ric_seqtype
-from fag.util.tool import takeuntil
-from fag.postprocessing.text import remove_bos
+from reporter.core.network import Attention, EncoderDecoder
+from reporter.core.operation import replace_tags_with_vals, get_latest_closing_vals
+from reporter.util.constant import SEED, Code, Phase, SeqType, SpecialToken
+from reporter.util.conversion import stringify_ric_seqtype
+from reporter.util.tool import takeuntil
+from reporter.postprocessing.text import remove_bos
 
 
 class RunResult:

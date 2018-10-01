@@ -1,6 +1,6 @@
 import sys
 
-from fag.main import main
+from reporter.main import main
 
 
 sys.exit(main())

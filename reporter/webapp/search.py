@@ -1,7 +1,7 @@
 from sqlalchemy import not_
 from sqlalchemy.orm import Query
 
-from fag.database.model import Headline, HumanEvaluation
+from reporter.database.model import Headline, HumanEvaluation
 
 
 def construct_constraint_query(field: str, relation: str, condition: str) -> Query:
