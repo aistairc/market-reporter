@@ -44,14 +44,10 @@ def parse_args() -> argparse.Namespace:
                         metavar='FILENAME',
                         default='config.toml',
                         help='specify config file (default: `config.toml`)')
-    parser.add_argument('-m',
-                        '--model',
+    parser.add_argument('--dir',
                         type=str,
-                        metavar='FILENAME')
-    parser.add_argument('-v',
-                        '--vocab',
-                        type=str,
-                        metavar='FILENAME')
+                        metavar='DIRECTORYNAME',
+                        help='specify directory of the model file and the vocab file')
     parser.add_argument('-t',
                         '--time',
                         type=str)
@@ -69,9 +65,9 @@ def predict() -> List[List[str]]:
 
     device = torch.device(args.device)
 
-    dest_pretrained_model = config.dir_output / Path(args.model)
+    dest_pretrained_model = Path(args.dir) / Path('reporter.model')
 
-    dest_train_vocab = config.dir_output / Path(args.vocab)
+    dest_train_vocab = Path(args.dir) / Path('reporter.vocab')
 
     t = args.time
 
