@@ -1,3 +1,6 @@
+import sys
+import errno
+import os
 import argparse
 import itertools
 from typing import List, Tuple
@@ -63,11 +66,14 @@ def predict() -> List[List[str]]:
 
     device = torch.device(args.device)
 
-    pretrain_model = config.dir_output / Path(args.model)
+    dest_pretrained_model = config.dir_output / Path(args.model)
 
     t = args.time
 
     target_ric = args.ric
+
+    if not dest_pretrained_model.is_file():
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_pretrained_model))
 
     # Connect to Redis
     connection_pool = redis.ConnectionPool(**config.redis)
@@ -102,7 +108,7 @@ def predict() -> List[List[str]]:
                                  ignore_index=vocab.stoi[SpecialToken.Padding.value])
     model.eval()
 
-    with pretrain_model.open(mode='rb') as f:
+    with dest_pretrained_model.open(mode='rb') as f:
         model.load_state_dict(torch.load(f))
 
     results = []
@@ -195,12 +201,17 @@ def create_dataset(config: Config,
         key = stringify_ric_seqtype(ric, seqtype)
         fields[key] = (key, price_field)
 
-    # read alignment of train and predict
+    # load alignment of predict
     predict = TabularDataset(path='output/alignment-predict.json', format='json', fields=fields)
 
-    # build vocab from train tokens
-    train_vocab = config.dir_output / Path('train.vocab')
-    with train_vocab.open('rb') as f:
+    # load vocab
+    dest_train_vocab = config.dir_output / Path('train.vocab')
+
+    # If vocab does not exist.
+    if not dest_train_vocab.is_file():
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_train_vocab))
+
+    with dest_train_vocab.open('rb') as f:
         token_field.vocab = torch.load(f)
 
     # make iteroter train and predict
