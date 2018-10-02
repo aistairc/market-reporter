@@ -1,9 +1,8 @@
-import sys
 import errno
 import os
 import argparse
 import itertools
-from typing import List, Tuple
+from typing import List
 from datetime import datetime
 from pathlib import Path
 
@@ -49,6 +48,10 @@ def parse_args() -> argparse.Namespace:
                         '--model',
                         type=str,
                         metavar='FILENAME')
+    parser.add_argument('-v',
+                        '--vocab',
+                        type=str,
+                        metavar='FILENAME')
     parser.add_argument('-t',
                         '--time',
                         type=str)
@@ -68,12 +71,19 @@ def predict() -> List[List[str]]:
 
     dest_pretrained_model = config.dir_output / Path(args.model)
 
+    dest_train_vocab = config.dir_output / Path(args.vocab)
+
     t = args.time
 
     target_ric = args.ric
 
+    # If model file does not exist.
     if not dest_pretrained_model.is_file():
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_pretrained_model))
+
+    # If vocab file does not exist.
+    if not dest_train_vocab.is_file():
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_train_vocab))
 
     # Connect to Redis
     connection_pool = redis.ConnectionPool(**config.redis)
@@ -96,7 +106,11 @@ def predict() -> List[List[str]]:
         writer = jsonlines.Writer(f)
         writer.write(alignment.to_mapping())
 
-    (vocab, predict_iter) = create_dataset(config, device, rics, seqtypes)
+    vocab = None
+    with dest_train_vocab.open('rb') as f:
+        vocab = torch.load(f)
+
+    predict_iter = create_dataset(config, device, vocab, rics, seqtypes)
 
     # Read model
     vocab_size = len(vocab)
@@ -170,8 +184,9 @@ def load_alignment_from_db(r: Redis,
 
 def create_dataset(config: Config,
                    device: torch.device,
+                   vocab: Vocab,
                    rics: List[str],
-                   seqtypes: List[SeqType]) -> Tuple[Vocab, Iterator]:
+                   seqtypes: List[SeqType]) -> Iterator:
     # Make dataset
     fields = dict()
     fields[SeqType.ArticleID.value] = (SeqType.ArticleID.value, RawField())
@@ -204,15 +219,7 @@ def create_dataset(config: Config,
     # load alignment of predict
     predict = TabularDataset(path='output/alignment-predict.json', format='json', fields=fields)
 
-    # load vocab
-    dest_train_vocab = config.dir_output / Path('train.vocab')
-
-    # If vocab does not exist.
-    if not dest_train_vocab.is_file():
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_train_vocab))
-
-    with dest_train_vocab.open('rb') as f:
-        token_field.vocab = torch.load(f)
+    token_field.vocab = vocab
 
     # make iteroter train and predict
     predict_iter = Iterator(predict,
@@ -221,7 +228,7 @@ def create_dataset(config: Config,
                             repeat=False,
                             sort=False)
 
-    return (token_field.vocab, predict_iter)
+    return predict_iter
 
 
 if __name__ == "__main__":
