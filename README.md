@@ -178,7 +178,7 @@ Market Reporter is available under different licensing options:
 + Commercial licenses.
 
 Commercial licenses are appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU.
-Please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp) for details.
+For details, please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)
 
 This software uses a technique applied for patent (patent application number 2017001583).
 
