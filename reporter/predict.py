@@ -1,35 +1,35 @@
-import errno
-import os
 import argparse
+import errno
 import itertools
-from typing import List
+import os
 from datetime import datetime
 from pathlib import Path
+from typing import List
 
 import numpy
 import jsonlines
+import redis
 import torch
+from redis import Redis
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
-import redis
-from redis import Redis
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
-from reporter.core.operation import replace_tags_with_vals, get_latest_closing_vals
+from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
 from reporter.database.read import Alignment
+from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
 from reporter.util.constant import (
     N_LONG_TERM,
     N_SHORT_TERM,
-    REUTERS_DATETIME_FORMAT,
     NIKKEI_DATETIME_FORMAT,
-    SeqType,
-    Phase,
+    REUTERS_DATETIME_FORMAT,
     Code,
+    Phase,
+    SeqType,
     SpecialToken)
 from reporter.util.conversion import stringify_ric_seqtype
 from reporter.util.tool import takeuntil
-from reporter.postprocessing.text import remove_bos
 
 
 def parse_args() -> argparse.Namespace:
@@ -72,10 +72,14 @@ class Predictor:
         dest_train_vocab = output / Path('reporter.vocab')
 
         if not dest_pretrained_model.is_file():
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_pretrained_model))
+            raise FileNotFoundError(errno.ENOENT,
+                                    os.strerror(errno.ENOENT),
+                                    str(dest_pretrained_model))
 
         if not dest_train_vocab.is_file():
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_train_vocab))
+            raise FileNotFoundError(errno.ENOENT,
+                                    os.strerror(errno.ENOENT),
+                                    str(dest_train_vocab))
 
         self.seqtypes = [SeqType.RawShort, SeqType.RawLong,
                          SeqType.MovRefShort, SeqType.MovRefLong,
@@ -86,7 +90,6 @@ class Predictor:
         with dest_train_vocab.open('rb') as f:
             self.vocab = torch.load(f)
 
-        # Read model
         vocab_size = len(self.vocab)
         attn = setup_attention(self.config, self.seqtypes)
         encoder = Encoder(self.config, self.device)
@@ -115,7 +118,11 @@ class Predictor:
             writer = jsonlines.Writer(f)
             writer.write(alignment.to_mapping())
 
-        predict_iter = create_dataset(self.config, self.device, self.vocab, rics, self.seqtypes)
+        predict_iter = create_dataset(self.config,
+                                      self.device,
+                                      self.vocab,
+                                      rics,
+                                      self.seqtypes)
 
         self.model.eval()
 
@@ -159,7 +166,7 @@ def load_alignment_from_db(r: Redis,
             numpy.array([datetime.strptime(k.split('__')[2], REUTERS_DATETIME_FORMAT).timestamp()
                          for k in ric_seqtype_to_keys[(ric, seqtype)]], dtype=numpy.int64)
 
-    # Find the latest prices for the selected time
+    # Find the latest prices of the specified time
     chart = dict()
     for (ric, seqtype) in itertools.product(rics, seqtypes):
         U = ric_seqtype_to_unixtimes[(ric, seqtype)]
@@ -184,7 +191,7 @@ def create_dataset(config: Config,
                    vocab: Vocab,
                    rics: List[str],
                    seqtypes: List[SeqType]) -> Iterator:
-    # Make dataset
+
     fields = dict()
     fields[SeqType.ArticleID.value] = (SeqType.ArticleID.value, RawField())
 
@@ -213,8 +220,10 @@ def create_dataset(config: Config,
         key = stringify_ric_seqtype(ric, seqtype)
         fields[key] = (key, price_field)
 
-    # load alignment of predict
-    predict = TabularDataset(path='output/alignment-predict.json', format='json', fields=fields)
+    # load an alignment for predicttion
+    predict = TabularDataset(path='output/alignment-predict.json',
+                             format='json',
+                             fields=fields)
 
     token_field.vocab = vocab
 
@@ -230,14 +239,13 @@ def main() -> None:
 
     args = parse_args()
 
-    predictor = Predictor(Config(args.dest_config), torch.device(args.device), Path(args.output))
+    predictor = Predictor(Config(args.dest_config),
+                          torch.device(args.device),
+                          Path(args.output))
 
-    t = args.time
+    sentence = predictor.predict(args.time, args.ric)
 
-    ric = args.ric
-
-    sentence = predictor.predict(t, ric)
-    print(', '.join(sentence))
+    print('"' + '", "'.join(sentence) + '"')
 
 
 if __name__ == "__main__":
