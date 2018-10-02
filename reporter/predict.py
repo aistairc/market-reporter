@@ -22,6 +22,7 @@ from reporter.util.constant import (
     N_LONG_TERM,
     N_SHORT_TERM,
     REUTERS_DATETIME_FORMAT,
+    NIKKEI_DATETIME_FORMAT,
     SeqType,
     Phase,
     Code,
@@ -60,7 +61,7 @@ def parse_args() -> argparse.Namespace:
 
 class Predictor:
 
-    def __init__(self, config: Config, device: torch.device, output: Path) -> None:
+    def __init__(self, config: Config, device: torch.device, output: Path):
 
         self.config = config
 
@@ -97,7 +98,7 @@ class Predictor:
         with dest_pretrained_model.open(mode='rb') as f:
             self.model.load_state_dict(torch.load(f))
 
-    def predict(self, t: str, target_ric: str) -> List[List[str]]:
+    def predict(self, t: str, target_ric: str) -> List[str]:
 
         # Connect to Redis
         connection_pool = redis.ConnectionPool(**self.config.redis)
@@ -118,30 +119,27 @@ class Predictor:
 
         self.model.eval()
 
-        results = []
-        for batch in predict_iter:
-            times = batch.time
-            tokens = batch.token
-            raw_short_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawShort)
-            latest_vals = [x for x in getattr(batch, raw_short_field).data[:, 0]]
-            raw_long_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawLong)
-            latest_closing_vals = get_latest_closing_vals(batch, raw_long_field, times)
+        batch = next(iter(predict_iter))
 
-            loss, pred, attn_weight = self.model(batch,
-                                                 batch.batch_size,
-                                                 tokens,
-                                                 times,
-                                                 self.criterion,
-                                                 Phase.Test)
+        times = batch.time
+        tokens = batch.token
+        raw_short_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawShort)
+        latest_vals = [x for x in getattr(batch, raw_short_field).data[:, 0]]
+        raw_long_field = stringify_ric_seqtype(Code.N225.value, SeqType.RawLong)
+        latest_closing_vals = get_latest_closing_vals(batch, raw_long_field, times)
 
-            i_eos = self.vocab.stoi[SpecialToken.EOS.value]
-            pred_sents = [remove_bos([self.vocab.itos[i] for i in takeuntil(i_eos, sent)])
-                          for sent in zip(*pred)]
+        loss, pred, attn_weight = self.model(batch,
+                                             batch.batch_size,
+                                             tokens,
+                                             times,
+                                             self.criterion,
+                                             Phase.Test)
 
-            for (pred_sent, latest_closing_val, latest_val) in zip(pred_sents, latest_closing_vals, latest_vals):
-                results.append(replace_tags_with_vals(pred_sent, latest_closing_val, latest_val))
+        i_eos = self.vocab.stoi[SpecialToken.EOS.value]
+        pred_sents = [remove_bos([self.vocab.itos[i] for i in takeuntil(i_eos, sent)])
+                      for sent in zip(*pred)]
 
-        return results
+        return replace_tags_with_vals(pred_sents[0], latest_closing_vals[0], latest_vals[0])
 
 
 def load_alignment_from_db(r: Redis,
@@ -149,7 +147,7 @@ def load_alignment_from_db(r: Redis,
                            t: str,
                            seqtypes: List[SeqType]) -> Alignment:
     # Make an alignment for prediction
-    time = datetime.strptime(t, REUTERS_DATETIME_FORMAT)
+    time = datetime.strptime(t, NIKKEI_DATETIME_FORMAT)
     unixtime = time.timestamp()
 
     ric_seqtype_to_keys = dict()
@@ -228,7 +226,7 @@ def create_dataset(config: Config,
                     sort=False)
 
 
-if __name__ == "__main__":
+def main() -> None:
 
     args = parse_args()
 
@@ -238,4 +236,9 @@ if __name__ == "__main__":
 
     ric = args.ric
 
-    print(predictor.predict(t, ric))
+    sentence = predictor.predict(t, ric)
+    print(', '.join(sentence))
+
+
+if __name__ == "__main__":
+    main()
