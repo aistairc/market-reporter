@@ -44,7 +44,8 @@ def parse_args() -> argparse.Namespace:
                         metavar='FILENAME',
                         default='config.toml',
                         help='specify config file (default: `config.toml`)')
-    parser.add_argument('--dir',
+    parser.add_argument('-o',
+                        '--output',
                         type=str,
                         metavar='DIRECTORYNAME',
                         help='specify directory of the model file and the vocab file')
@@ -65,19 +66,17 @@ def predict() -> List[List[str]]:
 
     device = torch.device(args.device)
 
-    dest_pretrained_model = Path(args.dir) / Path('reporter.model')
+    dest_pretrained_model = Path(args.output) / Path('reporter.model')
 
-    dest_train_vocab = Path(args.dir) / Path('reporter.vocab')
+    dest_train_vocab = Path(args.output) / Path('reporter.vocab')
 
     t = args.time
 
     target_ric = args.ric
 
-    # If model file does not exist.
     if not dest_pretrained_model.is_file():
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_pretrained_model))
 
-    # If vocab file does not exist.
     if not dest_train_vocab.is_file():
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), str(dest_train_vocab))
 
@@ -145,7 +144,7 @@ def load_alignment_from_db(r: Redis,
                            rics: List[str],
                            t: str,
                            seqtypes: List[SeqType]) -> Alignment:
-    # Make the alignment of predict
+    # Make an alignment for prediction
     time = datetime.strptime(t, REUTERS_DATETIME_FORMAT)
     unixtime = time.timestamp()
 
@@ -217,14 +216,12 @@ def create_dataset(config: Config,
 
     token_field.vocab = vocab
 
-    # make iteroter train and predict
-    predict_iter = Iterator(predict,
-                            batch_size=1,
-                            device=-1 if device.type == 'cpu' else device,
-                            repeat=False,
-                            sort=False)
-
-    return predict_iter
+    # Make an iteroter for prediction
+    return Iterator(predict,
+                    batch_size=1,
+                    device=-1 if device.type == 'cpu' else device,
+                    repeat=False,
+                    sort=False)
 
 
 if __name__ == "__main__":

@@ -56,7 +56,7 @@ def main() -> None:
     device = torch.device(args.device)
 
     now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
-    dest_log = config.dir_output / Path('{}/reporter.log'.format(now))
+    dest_log = config.dir_output / Path(now) / Path('reporter.log')
 
     logger = create_logger(dest_log,  is_debug=args.is_debug)
     config.write_log(logger)
@@ -95,7 +95,7 @@ def main() -> None:
         (vocab, train, valid, test) = create_dataset(config, device)
 
         vocab_size = len(vocab)
-        dest_vocab = config.dir_output / Path('{}/reporter.vocab'.format(now))
+        dest_vocab = config.dir_output / Path(now) / Path('reporter.vocab')
         with dest_vocab.open(mode='wb') as f:
             torch.save(vocab, f)
         seqtypes = []
@@ -108,7 +108,7 @@ def main() -> None:
                                      ignore_index=vocab.stoi[SpecialToken.Padding.value])
 
     # === Train ===
-    dest_model = config.dir_output / Path('{}/reporter.model'.format(now))
+    dest_model = config.dir_output / Path(now) / Path('reporter.model')
     prev_valid_bleu = 0.0
     max_bleu = 0.0
     best_epoch = 0
