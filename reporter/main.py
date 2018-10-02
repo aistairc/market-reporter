@@ -56,7 +56,7 @@ def main() -> None:
     device = torch.device(args.device)
 
     now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
-    dest_log = config.dir_logs / Path('{}.log'.format(now))
+    dest_log = config.dir_output / Path('{}/reporter.log'.format(now))
 
     logger = create_logger(dest_log,  is_debug=args.is_debug)
     config.write_log(logger)
@@ -95,11 +95,8 @@ def main() -> None:
         (vocab, train, valid, test) = create_dataset(config, device)
 
         vocab_size = len(vocab)
-        dest_vocab = Path(config.dir_output) / Path('vocab.json')
-        with dest_vocab.open(mode='w') as f:
-            json.dump(vocab.stoi, f, ensure_ascii=False, indent=True)
-        dest_train_vocab = Path(config.dir_output) / Path('train.vocab')
-        with dest_train_vocab.open(mode='wb') as f:
+        dest_vocab = config.dir_output / Path('{}/reporter.vocab'.format(now))
+        with dest_vocab.open(mode='wb') as f:
             torch.save(vocab, f)
         seqtypes = []
         attn = setup_attention(config, seqtypes)
@@ -111,7 +108,7 @@ def main() -> None:
                                      ignore_index=vocab.stoi[SpecialToken.Padding.value])
 
     # === Train ===
-    dest_model = config.dir_output / '{}.model'.format(now)
+    dest_model = config.dir_output / Path('{}/reporter.model'.format(now))
     prev_valid_bleu = 0.0
     max_bleu = 0.0
     best_epoch = 0
