@@ -172,8 +172,13 @@ python setup.py test
 ```
 
 ## License and Reference
-Market Reporter is licensed under the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html) (v3 or later) for non-commercial purposes.
-For commercial uses, please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp).
+Market Reporter is available under different licensing options:
+
++ [GNU General Public License (v3 or later)](https://www.gnu.org/licenses/gpl-3.0.en.html).
++ Commercial licenses.
+
+Commercial licenses are appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU.
+Please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp) for details.
 
 This software uses a technique applied for patent (patent application number 2017001583).
 
@@ -210,7 +215,8 @@ When you write a paper using this software, please cite either or both of the fo
             and Miyao, Yusuke},
   }
   title = {Generating Market Comments Referring to External Resources}
-  booktitle = {Proceedings of the 11th International Conference on Natural Language Generation},
+  booktitle = {Proceedings of the 11th International Conference on
+               Natural Language Generation},
   year = {2018},
   publisher = {Association for Computational Linguistics},
   pages = {},
