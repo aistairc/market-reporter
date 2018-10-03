@@ -263,8 +263,8 @@ class Decoder(nn.Module):
                 batch_size: int) -> Tuple[Tensor, Tensor]:
 
         weight = 0.0
-        word_embed = self.word_embed_layer(word)
-        time_embed = self.time_embed_layer(time)
+        word_embed = self.word_embed_layer(word).view(batch_size, self.word_embed_size)
+        time_embed = self.time_embed_layer(time).view(batch_size, self.time_embed_size)
         stream = torch.cat((word_embed, time_embed), 1)
         self.h_n, self.c_n = self.recurrent_layer(stream, (self.h_n, self.c_n))
         hidden = self.h_n
