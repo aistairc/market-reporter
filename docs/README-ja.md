@@ -16,6 +16,8 @@
     6. [PostgreSQL](#postgresql)
     7. [Redis](#redis)   
 3. [使い方](#使い方)
+    1. [学習](#学習)
+    2. [予測](#予測)
 4. [Webインターフェース](#Webインターフェース)
 5. [テスト](#テスト)
 6. [参考文献](#参考文献)
@@ -143,12 +145,38 @@ db = -1
 
 ## 使い方
 
+### 学習
+
+まず、以下のコマンドのように `config.toml` を作成してください。
+
 ```bash
-cp example.toml config.toml  # Create a configuration file
-vi config.toml  # Edit some variables according to your environment
-python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+cp example.toml config.toml
 ```
 
+`config.toml` の変数を環境に応じて変更してください。
+
+```bash
+vi config.toml
+```
+
+以下のコマンドを実行してください。 GPU(CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
+```bash
+python -m reporter --device 'cuda:0'
+```
+
+実行後、`reporter.log` と `reporter.model`、 `reporter.vocab` が `output/reporter-datetime` 以下に出力されます。 `datetime` は実行日時を表しています。
+
+### 予測
+
+学習後、出力ファイルを用いて、以下のコマンドを実行することで指定した時間におけるテキストを生成することができます。
+
+```bash
+python -m reporter.predict --device 'cpu' --config config.toml --output output/reporter-datetime -t '2018-10-03 09:03:00+0900' --ric '.N225'
+```
+
+- `--output` : モデルと辞書ファイルが格納されたディレクトリ
+- `-t` or `--time` : 時間 （フォーマット '年-月-日 時:分:秒+タイムゾーン'）
+- `--ric` : RIC コード
 
 ## Webインターフェース
 

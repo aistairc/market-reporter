@@ -16,6 +16,8 @@ __Market Reporter__ is a tool that automatically generates market comments from 
     6. [PostgreSQL](#postgresql)
     7. [Redis](#redis)   
 3. [Usage](#usage)
+    1. [Training](#training)
+    2. [Prediction](#prediction)
 4. [Web Interface](#web-interface)
 5. [Test](#test)
 6. [References](#references)
@@ -141,12 +143,39 @@ Please change it to a nonnegative integer.
 
 ## Usage
 
+### Training
+
+Create `config.toml` the following command.
+
 ```bash
-cp example.toml config.toml  # Create a configuration file
-vi config.toml  # Edit some variables according to your environment
-python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+cp example.toml config.toml
 ```
 
+Edit some variables according to your environment.
+
+```bash
+vi config.toml
+```
+
+Execute the following command. When you use GPU(CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.
+
+```bash
+python -m reporter --device 'cuda:0'
+```
+
+The program ends, `reporter.log`, `reporter.model` and `reporter.vocab` are created in `output/reporter-datetime`, where `datetime` is the execution time.
+
+### Prediction
+
+After training, using the output files, you can generate market comment at the specified any time as the following command.
+
+```bash
+python -m reporter.predict --device 'cpu' --config config.toml --output output/reporter-datetime -t '2018-10-03 09:03:00+0900' --ric '.N225'
+```
+
+- `--output` : the directory on `reporter.model` and `reporter.vocab`
+- `-t` or `--time` : time (format 'year-month-day hour:minute:second+timezone')
+- `--ric` : RIC code
 
 ## Web Interface
 
