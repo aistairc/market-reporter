@@ -78,6 +78,11 @@ def main() -> None:
             create_tables(engine)
 
             import redis
+            from redis.exceptions import ConnectionError
+            if config.redis['db'] < 0:
+                raise ConnectionError('DB index is {}. Please specify a zero-based numeric index.'
+                                      .format(config.redis['db']))
+
             connection_pool = redis.ConnectionPool(**config.redis)
             redis_client = redis.StrictRedis(connection_pool=connection_pool)
 
