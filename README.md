@@ -5,6 +5,11 @@
 
 __Market Reporter__ is a tool that automatically generates market comments from time series data of prices.
 
+This is an implementation of [Murakami et al. 2017](#reference) and [Aoki et al. 2018](#reference).
+Given sequences of prices, it generates a short summary that describes them.
+Examples are shown in the following picture, which was taken from the web interface for human evaluation in debug mode.
+<p align="center"><img src="docs/pics/gloss.png"></p>
+
 ## Table of Contents
 1. [About](#about)
 2. [Requirements](#requirements)
@@ -19,12 +24,6 @@ __Market Reporter__ is a tool that automatically generates market comments from 
 4. [Web Interface](#web-interface)
 5. [Test](#test)
 6. [References](#references)
-
-## About
-This is an implementation of [Murakami et al. 2017](#reference) and [Aoki et al. 2018](#reference).
-Given sequences of prices, it generates a short summary describing them.
-Examples are shown in the following picture, which was taken from the web interface for human evaluation in debug mode.
-<p align="center"><img src="docs/pics/webapp-human-evaluation-debug.png"></p>
 
 ## Requirements
 ### Architecture
