@@ -67,8 +67,10 @@ def main() -> None:
     if not config.dest_dataset.is_file():
 
         # === Alignment ===
-        is_any_alignment_missing = len(list(config.dir_output.glob('alignment-*.json'))) < 3
-        if is_any_alignment_missing:
+        is_all_alignments_exist = (config.dir_output / Path('alignment-train.json')).exists() \
+                                  and (config.dir_output / Path('alignment-valid.json')).exists() \
+                                  and (config.dir_output / Path('alignment-test.json')).exists()
+        if not is_all_alignments_exist:
 
             from sqlalchemy.engine import create_engine
             from sqlalchemy.orm.session import sessionmaker
