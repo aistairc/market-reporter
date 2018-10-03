@@ -79,9 +79,11 @@ def main() -> None:
 
             import redis
             from redis.exceptions import ConnectionError
-            if config.redis['db'] < 0:
+            redis_db_index = config.redis['db']
+            print(redis_db_index)
+            if not isinstance(redis_db_index, int) or redis_db_index < 0:
                 raise ConnectionError('DB index is {}. Please specify a zero-based numeric index.'
-                                      .format(config.redis['db']))
+                                      .format(redis_db_index))
 
             connection_pool = redis.ConnectionPool(**config.redis)
             redis_client = redis.StrictRedis(connection_pool=connection_pool)
