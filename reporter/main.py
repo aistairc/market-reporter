@@ -3,6 +3,7 @@ import json
 import warnings
 from datetime import datetime
 from pathlib import Path
+from functools import reduce
 
 import jsonlines
 import torch
@@ -67,8 +68,11 @@ def main() -> None:
     if not config.dest_dataset.is_file():
 
         # === Alignment ===
-        is_any_alignment_missing = len(list(config.dir_output.glob('alignment-*.json'))) < 3
-        if is_any_alignment_missing:
+        has_all_alignments = \
+            reduce(lambda x, y: x and y,
+                   [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
+                    for phase in list(Phase)])
+        if not has_all_alignments:
 
             from sqlalchemy.engine import create_engine
             from sqlalchemy.orm.session import sessionmaker
@@ -80,7 +84,6 @@ def main() -> None:
             import redis
             from redis.exceptions import ConnectionError
             redis_db_index = config.redis['db']
-            print(redis_db_index)
             if not isinstance(redis_db_index, int) or redis_db_index < 0:
                 raise ConnectionError('DB index is {}. Please specify a zero-based numeric index.'
                                       .format(redis_db_index))
