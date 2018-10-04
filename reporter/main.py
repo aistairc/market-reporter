@@ -70,7 +70,7 @@ def main() -> None:
         # === Alignment ===
         has_all_alignments = \
             reduce(lambda x, y: x and y,
-                   [(config.dir_output / Path('alignment-{}.json'.format(phase))).exists()
+                   [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
                     for phase in list(Phase)])
         if not has_all_alignments:
 
