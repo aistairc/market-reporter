@@ -3,6 +3,7 @@ import json
 import warnings
 from datetime import datetime
 from pathlib import Path
+from functools import reduce
 
 import jsonlines
 import torch
@@ -67,10 +68,11 @@ def main() -> None:
     if not config.dest_dataset.is_file():
 
         # === Alignment ===
-        is_all_alignments_exist = (config.dir_output / Path('alignment-train.json')).exists() \
-                                  and (config.dir_output / Path('alignment-valid.json')).exists() \
-                                  and (config.dir_output / Path('alignment-test.json')).exists()
-        if not is_all_alignments_exist:
+        has_all_alignments = \
+            reduce(lambda x, y: x and y,
+                   [(config.dir_output / Path('alignment-{}.json'.format(phase))).exists()
+                    for phase in list(Phase)])
+        if not has_all_alignments:
 
             from sqlalchemy.engine import create_engine
             from sqlalchemy.orm.session import sessionmaker
