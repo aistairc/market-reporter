@@ -8,3 +8,4 @@ output/
 resources/prices/*
 *.toml
 !*example.toml
+*.pyc
