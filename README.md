@@ -145,10 +145,11 @@ Please change it to a nonnegative integer.
 
 ### Training
 
-Create a configuration file (default: `config.toml`). Please copy [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) or [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml).
+Create a configuration file (default: `config.toml`). Please copy [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) or [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) and edit it according to your environment.
 
 ```bash
 cp example.toml config.toml
+vi config.toml
 ```
 
 Execute the following command. When you use GPU(CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.

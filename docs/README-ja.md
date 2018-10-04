@@ -147,10 +147,11 @@ db = -1
 
 ### 学習
 
-まず、以下のコマンドのように、 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) もしくは [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピーし、 `config.toml` を作成してください。
+まず、以下のコマンドのように、 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) もしくは [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピーし、 `config.toml` を作成してください。その後、実行環境に応じてファイルを編集してください。
 
 ```bash
 cp example.toml config.toml
+vi config.toml
 ```
 
 以下のコマンドを実行してください。 GPU(CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
