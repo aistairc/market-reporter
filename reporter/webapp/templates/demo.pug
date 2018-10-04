@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  h1#heading
+    | &nbsp;
+  h2#subheading.mb-3
+    | &nbsp;
+  ul#tab-index.nav.nav-tabs
+    each ric in ['.N225', '.TOPX']
+      li.nav-item
+        a.nav-link(class={'active': ric == '.N225'}, data-toggle='tab', href='#tab'+ric)= ric
+  #datepicker.float-left
+  canvas#chart.float-right.mt-0(height="252", width="800")
+
+block append scripts
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/datepicker.min.js', integrity='sha256-0prQxFtdWQNa3vW5JDMbvbBp6ehKzf9UIWqFGZIWPPE=', crossorigin='anonymous')
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/i18n/datepicker.en.min.js', integrity='sha256-RbE9ux8UbaKexk/+aT9XkZ8tcUWg3yw/3XE/S8iW7eI=', crossorigin='anonymous')
+
+  script(type='text/javascript')
+    | var minDate = new Date({{min_date * 1000}});
+    | var maxDate = new Date({{max_date * 1000}});
+  script(src='/static/js/demo.js')
+
+block append stylesheets
+  link(href='https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/css/datepicker.min.css', rel='stylesheet', integrity='sha256-q0wZgzQ6Ru67x+pIe9IAztrnlHNHyZui3BMwqUYDnpI=', crossorigin='anonymous')

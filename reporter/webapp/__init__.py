@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import List
 
 import http
@@ -8,13 +8,18 @@ from sqlalchemy import func
 
 from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import Headline, HumanEvaluation, GenerationResult
-from reporter.database.read import fetch_max_t_of_prev_trading_day
+from reporter.database.read import fetch_max_t_of_prev_trading_day, fetch_rics, fetch_date_range
 from reporter.util.config import Config
-from reporter.util.constant import UTC, Code
+from reporter.util.constant import UTC, Code, NIKKEI_DATETIME_FORMAT
 from reporter.webapp.human_evaluation import populate_for_human_evaluation
 from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
 from reporter.webapp.search import construct_constraint_query
 from reporter.webapp.chart import fetch_points
+from reporter.predict import Predictor
+
+import os
+import torch
+from pathlib import Path
 
 
 config = Config('config.toml')
@@ -27,6 +32,13 @@ db = SQLAlchemy(app)
 
 ric_to_ric_info = load_ric_to_ric_info()
 populate_for_human_evaluation(db.session, config.result)
+
+device = os.environ.get('DEVICE', 'cpu')
+output = os.environ.get('OUTPUT', 'output')
+
+predictor = Predictor(config,
+                      torch.device(device),
+                      Path(output))
 
 
 class EvalTarget:
@@ -358,3 +370,40 @@ def articles(page_name: str, article_id: str) -> flask.Response:
     return article_evaluation(article_id,
                               flask.request.method,
                               is_debug=page_name == 'debug')
+
+@app.route('/demo')
+def demo() -> flask.Response:
+    min_date, max_date = fetch_date_range(db.session)
+    return flask.render_template('demo.pug', title='demo',
+        min_date=min_date.timestamp(),
+        max_date=max_date.timestamp()
+    )
+
+@app.route('/data_ts/<string:ric>/<string:timestamp>')
+def data_ts(ric: str, timestamp: str) -> flask.Response:
+    start = datetime.fromtimestamp(int(timestamp), timezone.utc)
+    end = start + timedelta(days=1)
+    print(start, end)
+
+    data = {}
+    xs, ys = fetch_points(db.session, ric, start, end)
+
+    data = {
+        'start': start.timestamp(),
+        'end': end.timestamp(),
+        'xs': xs,
+        'ys': ys,
+        'title': '{} {}'.format(ric, start.strftime('%Y-%m-%d'))
+    }
+
+    return app.response_class(response=flask.json.dumps(data),
+                              status=http.HTTPStatus.OK,
+                              mimetype='application/json')
+
+@app.route('/predict/<string:ric>/<string:timestamp>')
+def predict(ric: str, timestamp: str) -> flask.Response:
+    time = datetime.fromtimestamp(int(timestamp), timezone.utc)
+    sentence = predictor.predict(time.strftime(NIKKEI_DATETIME_FORMAT), ric)
+    return app.response_class(response=flask.json.dumps(sentence),
+                              status=http.HTTPStatus.OK,
+                              mimetype='application/json')
