@@ -147,16 +147,10 @@ db = -1
 
 ### 学習
 
-まず、以下のコマンドのように `config.toml` を作成してください。
+まず、以下のコマンドのように、 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) もしくは [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピーし、 `config.toml` を作成してください。
 
 ```bash
 cp example.toml config.toml
-```
-
-`config.toml` の変数を環境に応じて変更してください。
-
-```bash
-vi config.toml
 ```
 
 以下のコマンドを実行してください。 GPU(CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
@@ -164,19 +158,20 @@ vi config.toml
 python -m reporter --device 'cuda:0'
 ```
 
-実行後、`reporter.log` と `reporter.model`、 `reporter.vocab` が `output/reporter-datetime` 以下に出力されます。 `datetime` は実行日時を表しています。
+実行後、3 つのファイル (`reporter.log` と `reporter.model`、 `reporter.vocab`) が `config.output_dir/reporter-DATETIME` 以下に出力されます。 ここで、 `config.output_dir` は `config.toml` で設定した変数、 `DATETIME` はプログラム実行日時のタイムスタンプを表しています。
 
 ### 予測
 
 学習後、出力ファイルを用いて、以下のコマンドを実行することで指定した時間におけるテキストを生成することができます。
 
 ```bash
-python -m reporter.predict --device 'cpu' --config config.toml --output output/reporter-datetime -t '2018-10-03 09:03:00+0900' --ric '.N225'
+python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
+# -o or --output : 'reporter.model' と 'reporter.vocab' が格納されたディレクトリ
+# -t or --time : 時間 (フォーマット '年-月-日 時:分:秒+タイムゾーン')
+# -r or --ric : Reuters Instrument Code
+#               (e.g. '.N225': 日経平均, '.DJI': ダウ平均株価, etc.)
 ```
 
-- `--output` : モデルと辞書ファイルが格納されたディレクトリ
-- `-t` or `--time` : 時間 （フォーマット '年-月-日 時:分:秒+タイムゾーン'）
-- `--ric` : RIC コード
 
 ## Webインターフェース
 
