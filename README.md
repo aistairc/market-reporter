@@ -152,7 +152,7 @@ cp example.toml config.toml
 vi config.toml
 ```
 
-Execute the following command. When you use GPU(CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.
+Execute the following command for the training of model. When you use GPU (CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.
 
 ```bash
 python -m reporter --device 'cuda:0'
@@ -166,9 +166,9 @@ After training, using the output files, you can generate market comment at the s
 
 ```bash
 python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
-# -o or --output : directory containing 'reporter.model' and 'reporter.vocab'
-# -t or --time : time (format 'year-month-day hour:minute:second+timezone')
-# -r or --ric : Reuters Instrument Code
+# -o or --output: directory containing 'reporter.model' and 'reporter.vocab'
+# -t or --time: time (format 'year-month-day hour:minute:second+timezone')
+# -r or --ric: Reuters Instrument Code
 #    	    (e.g. '.N225': Nikkei Stock Average, '.DJI': Dow Jones Industrial Average, etc.)
 ```
 

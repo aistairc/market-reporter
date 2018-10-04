@@ -154,7 +154,7 @@ cp example.toml config.toml
 vi config.toml
 ```
 
-以下のコマンドを実行してください。 GPU(CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
+モデルを学習するためは以下のコマンドを実行してください。 GPU (CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
 ```bash
 python -m reporter --device 'cuda:0'
 ```
@@ -167,10 +167,10 @@ python -m reporter --device 'cuda:0'
 
 ```bash
 python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
-# -o or --output : 'reporter.model' と 'reporter.vocab' が格納されたディレクトリ
-# -t or --time : 時間 (フォーマット '年-月-日 時:分:秒+タイムゾーン')
-# -r or --ric : Reuters Instrument Code
-#               (e.g. '.N225': 日経平均, '.DJI': ダウ平均株価, etc.)
+# -o or --output: 'reporter.model' と 'reporter.vocab' が格納されたディレクトリ
+# -t or --time: 時間 (フォーマット '年-月-日 時:分:秒+タイムゾーン')
+# -r or --ric: Reuters Instrument Code
+#              (e.g. '.N225': 日経平均, '.DJI': ダウ平均株価, etc.)
 ```
 
 
