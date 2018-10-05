@@ -3,16 +3,13 @@
 
 <p align="center"><img src="docs/pics/logo.png"></p>
 
-__Market Reporter__ is a tool that automatically generates market comments from time series data of prices.
+__Market Reporter__ automatically generates short comments that describe time series data of stock prices, FX rates, etc.
+This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [PDF].
 
-This is an implementation of [Murakami et al. 2017](#reference) and [Aoki et al. 2018](#reference).
-Given sequences of prices, it generates a short summary that describes them.
-Examples are shown in the following picture, which was taken from the web interface for human evaluation in debug mode.
 <p align="center"><img src="docs/pics/gloss.png"></p>
 
 ## Table of Contents
-1. [About](#about)
-2. [Requirements](#requirements)
+1. [Requirements](#requirements)
     1. [Architecture](#architecture)
     2. [Resources](#resources)
     3. [EC2](#ec2)
@@ -20,12 +17,12 @@ Examples are shown in the following picture, which was taken from the web interf
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
     7. [Redis](#redis)   
-3. [Usage](#usage)
+2. [Usage](#usage)
     1. [Training](#training)
     2. [Prediction](#prediction)
-4. [Web Interface](#web-interface)
-5. [Test](#test)
-6. [References](#references)
+3. [Web Interface](#web-interface)
+4. [Test](#test)
+5. [References](#references)
 
 ## Requirements
 ### Architecture

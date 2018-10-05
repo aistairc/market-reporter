@@ -3,11 +3,13 @@
 
 <p align="center"><img src="../docs/pics/logo.png"></p>
 
-与えられた株価等の時系列データから、それを要約した短いテキストを自動で生成します。
+__Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [PDF] のPythonによる実装です。
+
+<p align="center"><img src="../docs/pics/gloss.png"></p>
+
 
 ## 目次
-1. [概要](#概要)
-2. [準備](#準備)
+1. [準備](#準備)
     1. [構成](#構成)
     2. [資源](#資源)
     3. [EC2](#ec2)
@@ -15,19 +17,12 @@
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
     7. [Redis](#redis)   
-3. [使い方](#使い方)
+2. [使い方](#使い方)
     1. [学習](#学習)
     2. [予測](#予測)
-4. [Webインターフェース](#Webインターフェース)
-5. [テスト](#テスト)
-6. [参考文献](#参考文献)
-
-## 概要
-
-これは論文[Murakami et al. 2017](#reference)と[Aoki et al. 2018](#reference)のPythonによる実装です。
-時系列数値データから、それを要約した見出し文を自動で生成します。
-以下は出力例をwebインターフェースで見たものです。
-<p align="center"><img src="../docs/pics/webapp-human-evaluation-debug.png"></p>
+3. [Webインターフェース](#Webインターフェース)
+4. [テスト](#テスト)
+5. [参考文献](#参考文献)
 
 ## 準備
 ### 構成
