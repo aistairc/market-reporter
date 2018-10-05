@@ -2,21 +2,23 @@ import argparse
 import errno
 import itertools
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List
 
-import numpy
 import jsonlines
 import redis
 import torch
 from redis import Redis
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm.session import Session, sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
 from reporter.database.read import Alignment
+from reporter.database.model import Price, Close
 from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
 from reporter.util.constant import (
@@ -105,6 +107,10 @@ class Predictor:
             self.model.load_state_dict(torch.load(f))
 
     def predict(self, t: str, target_ric: str) -> List[str]:
+        # Connect to Postgres
+        engine = create_engine(self.config.db_uri)
+        SessionMaker = sessionmaker(bind=engine)
+        pg_session = SessionMaker()
 
         # Connect to Redis
         connection_pool = redis.ConnectionPool(**self.config.redis)
@@ -112,7 +118,7 @@ class Predictor:
 
         rics = self.config.rics if target_ric in self.config.rics else [target_ric] + self.config.rics
 
-        alignment = load_alignment_from_db(redis_client, rics, t, self.seqtypes)
+        alignment = make_alignment_for_prediction(redis_client, pg_session, rics, t, self.seqtypes)
 
         # Write the prediction data
         self.config.dir_output.mkdir(parents=True, exist_ok=True)
@@ -152,35 +158,26 @@ class Predictor:
         return replace_tags_with_vals(pred_sents[0], latest_closing_vals[0], latest_vals[0])
 
 
-def load_alignment_from_db(r: Redis,
-                           rics: List[str],
-                           t: str,
-                           seqtypes: List[SeqType]) -> Alignment:
-    # Make an alignment for prediction
+def make_alignment_for_prediction(r: Redis,
+                                  session: Session,
+                                  rics: List[str],
+                                  t: str,
+                                  seqtypes: List[SeqType]) -> Alignment:
     time = datetime.strptime(t, NIKKEI_DATETIME_FORMAT)
-    unixtime = time.timestamp()
+    delta = timedelta(days=10)
 
-    ric_seqtype_to_keys = dict()
-    ric_seqtype_to_unixtimes = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        ric_seqtype_to_keys[(ric, seqtype)] = \
-            [k for k in r.keys(ric + '__' + seqtype.value + '__*')]
-        ric_seqtype_to_unixtimes[(ric, seqtype)] = \
-            numpy.array([datetime.strptime(k.split('__')[2], REUTERS_DATETIME_FORMAT).timestamp()
-                         for k in ric_seqtype_to_keys[(ric, seqtype)]], dtype=numpy.int64)
-
-    # Find the latest prices of the specified time
     chart = dict()
     for (ric, seqtype) in itertools.product(rics, seqtypes):
-        U = ric_seqtype_to_unixtimes[(ric, seqtype)]
-        valid_indices = numpy.where(U <= unixtime)
-        if valid_indices[0].shape[0] == 0:
-            vals = []
-        else:
-            i_max_sub = U[valid_indices].argmax()
-            i_max = numpy.arange(U.shape[0])[valid_indices][i_max_sub]
-            key = ric_seqtype_to_keys[(ric, seqtype)][i_max]
-            vals = r.lrange(key, 0, -1)
+        Model = Close if seqtype.value.endswith('long') else Price
+        model_t = session \
+            .query(Model.t) \
+            .filter(Model.ric == ric, Model.t <= str(time), Model.t >= str(time - delta)) \
+            .order_by(Model.t.desc()) \
+            .first()
+
+        key = stringify_ric_seqtype(ric, seqtype) + '__' + model_t[0].strftime(REUTERS_DATETIME_FORMAT)
+
+        vals = r.lrange(key, 0, -1)
         chart[stringify_ric_seqtype(ric, seqtype)] = vals
 
     processed_tokens = ['']
