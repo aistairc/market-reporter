@@ -52,9 +52,12 @@ def parse_args() -> argparse.Namespace:
                         help='specify directory of the model file and the vocab file')
     parser.add_argument('-t',
                         '--time',
-                        type=str)
-    parser.add_argument('--ric',
-                        type=str)
+                        type=str,
+                        help='Datetime (format: `year-month-day hour:minute:second+timezone`)')
+    parser.add_argument('-r',
+                        '--ric',
+                        type=str,
+                        help='Reuters Insturument Code (e.g. `.N225`: Nikkei Stock Average)')
 
     return parser.parse_args()
 
