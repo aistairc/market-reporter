@@ -12,6 +12,7 @@ import torch
 from redis import Redis
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
+from sqlalchemy import func
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import Session, sessionmaker
 
@@ -170,12 +171,11 @@ def make_alignment_for_prediction(r: Redis,
     for (ric, seqtype) in itertools.product(rics, seqtypes):
         Model = Close if seqtype.value.endswith('long') else Price
         model_t = session \
-            .query(Model.t) \
-            .filter(Model.ric == ric, Model.t <= str(time), Model.t >= str(time - delta)) \
-            .order_by(Model.t.desc()) \
-            .first()
+            .query(func.max(Model.t)) \
+            .filter(Model.ric == ric, Model.t <= time) \
+            .scalar()
 
-        key = ric + '__' + seqtype.value + '__' + model_t[0].strftime(REUTERS_DATETIME_FORMAT)
+        key = ric + '__' + seqtype.value + '__' + model_t.strftime(REUTERS_DATETIME_FORMAT)
 
         vals = r.lrange(key, 0, -1)
         chart[stringify_ric_seqtype(ric, seqtype)] = vals
