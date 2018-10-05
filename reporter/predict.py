@@ -2,7 +2,7 @@ import argparse
 import errno
 import itertools
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import List
 
@@ -165,7 +165,6 @@ def make_alignment_for_prediction(r: Redis,
                                   t: str,
                                   seqtypes: List[SeqType]) -> Alignment:
     time = datetime.strptime(t, NIKKEI_DATETIME_FORMAT)
-    delta = timedelta(days=10)
 
     chart = dict()
     for (ric, seqtype) in itertools.product(rics, seqtypes):
