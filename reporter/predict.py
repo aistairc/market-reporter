@@ -175,7 +175,7 @@ def make_alignment_for_prediction(r: Redis,
             .order_by(Model.t.desc()) \
             .first()
 
-        key = stringify_ric_seqtype(ric, seqtype) + '__' + model_t[0].strftime(REUTERS_DATETIME_FORMAT)
+        key = ric + '__' + seqtype.value + '__' + model_t[0].strftime(REUTERS_DATETIME_FORMAT)
 
         vals = r.lrange(key, 0, -1)
         chart[stringify_ric_seqtype(ric, seqtype)] = vals
