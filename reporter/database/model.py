@@ -13,7 +13,7 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 
-from reporter.constant import SeqType
+from reporter.util.constant import SeqType
 
 
 Base = declarative_base()
@@ -84,6 +84,9 @@ class Close(Base):
 
         self.ric = ric
         self.t = t
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {'ric': self.ric, 't': self.t}
 
 
 class Headline(Base):
@@ -210,6 +213,7 @@ class GenerationResult(Base):
 
 def create_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine, tables=[Price.__table__,
+                                             PriceSeq.__table__,
                                              Headline.__table__,
                                              Instrument.__table__,
                                              Close.__table__,

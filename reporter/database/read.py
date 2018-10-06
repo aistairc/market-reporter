@@ -80,7 +80,7 @@ def fetch_max_t_of_prev_trading_day(session: Session, ric: str, t: datetime) -> 
         .scalar()
 
 
-def load_alignments_from_db(session: Session, r: Redis, phase: Phase, logger: Logger) -> List[Alignment]:
+def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> List[Alignment]:
 
     headlines = session \
         .query(Headline.article_id,
@@ -104,12 +104,7 @@ def load_alignments_from_db(session: Session, r: Redis, phase: Phase, logger: Lo
 
     ric_seqtype_to_keys = dict()
     ric_seqtype_to_unixtimes = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        ric_seqtype_to_keys[(ric, seqtype)] = \
-            [k for k in r.keys(ric + '__' + seqtype.value + '__*')]
-        ric_seqtype_to_unixtimes[(ric, seqtype)] = \
-            numpy.array([datetime.strptime(k.split('__')[2], REUTERS_DATETIME_FORMAT).timestamp()
-                         for k in ric_seqtype_to_keys[(ric, seqtype)]], dtype=numpy.int64)
+
     for h in tqdm(headlines):
 
         # Find the latest prices before the article is published

@@ -133,7 +133,7 @@ def insert_prices(session: Session,
                                               tzinfo=UTC)
 
                     if prev_row_t < close_datetime and close_datetime <= t:
-                        close_prices.append(Close(ric, t,  val).to_dict())
+                        close_prices.append(Close(ric, t).to_dict())
 
                         if len(raw_long_vals) > 1:
                             raw_mov_ref_long_val = val - raw_long_vals[0]
@@ -163,7 +163,7 @@ def insert_prices(session: Session,
                         price_seqs[SeqType.StdLong] \
                             .append(PriceSeq(ric, SeqType.StdLong, t, std_long_vals).to_dict())
 
-                prices.append(PriceSeq(ric, t, utc_offset, val).to_dict())
+                prices.append(Price(ric, t, utc_offset, val).to_dict())
 
                 if len(raw_short_vals) > 1 and len(raw_long_vals) > 2:
                     raw_mov_ref_short_val = val - raw_long_vals[1 if t == close_datetime else 0]
@@ -196,7 +196,7 @@ def insert_prices(session: Session,
             session.execute(Close.__table__.insert(), close_prices)
 
             for seqtype in seqtypes:
-                if seqtype == SeqType.NomMovRefLong:
+                if seqtype == SeqType.NormMovRefLong:
                     price_seqs[seqtype] = \
                         [PriceSeq(ric, p['t'], SeqType.NomMovRefLong, None)
                          for p in price_seqs[SeqType.MovRefLong]] \
