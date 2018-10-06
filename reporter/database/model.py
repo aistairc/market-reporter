@@ -1,6 +1,5 @@
 from datetime import datetime
-from decimal import Decimal
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from sqlalchemy import (
     TIMESTAMP,
@@ -13,6 +12,8 @@ from sqlalchemy import (
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
+
+from reporter.constant import SeqType
 
 
 Base = declarative_base()
@@ -37,6 +38,39 @@ class Price(Base):
         self.t = t
         self.utc_offset = utc_offset
         self.val = val
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {'ric': self.ric,
+                't': self.t,
+                'utc_offset': self.utc_offset,
+                'val': self.val}
+
+
+class PriceSeq(Base):
+
+    __tablename__ = 'price_seqs'
+
+    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    seqtype = Column(String, primary_key=True)
+    t = Column(TIMESTAMP(timezone=True), primary_key=True)
+    vals = Column(postgresql.ARRAY(Numeric(15, 6)), nullable=True)
+
+    def __init__(self,
+                 ric: str,
+                 seqtype: SeqType,
+                 t: datetime,
+                 vals: Union[None, List[str]]):
+
+        self.ric = ric
+        self.t = t
+        self.seqtype = seqtype.value
+        self.vals = vals
+
+    def to_dict(self):
+        return {'ric': self.ric,
+                't': self.t,
+                'seqtype': self.seqtype,
+                'vals': self.vals}
 
 
 class Close(Base):
@@ -102,27 +136,6 @@ class Headline(Base):
         self.dictionary = dictionary
         self.is_used = is_used
         self.phase = phase
-
-
-class Stat(Base):
-
-    __tablename__ = 'stat'
-
-    ric = Column(String, primary_key=True)
-    y = Column(Integer, primary_key=True)
-    mean = Column(Numeric(15, 6), nullable=False)
-    std = Column(Numeric(15, 6), nullable=False)
-
-    def __init__(self,
-                 ric: str,
-                 y: int,
-                 mean: Decimal,
-                 std: Decimal):
-
-        self.ric = ric
-        self.y = y
-        self.mean = mean
-        self.std = std
 
 
 class Instrument(Base):
@@ -198,7 +211,6 @@ class GenerationResult(Base):
 def create_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine, tables=[Price.__table__,
                                              Headline.__table__,
-                                             Stat.__table__,
                                              Instrument.__table__,
                                              Close.__table__,
                                              HumanEvaluation.__table__,

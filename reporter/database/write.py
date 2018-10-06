@@ -5,10 +5,9 @@ from decimal import Decimal
 from logging import Logger
 from math import isclose
 from pathlib import Path
-from typing import List, Union
+from typing import List
 
 import pandas
-import redis
 from janome.tokenizer import Tokenizer
 from pytz import UTC
 from sqlalchemy.orm.session import Session
@@ -16,14 +15,13 @@ from sqlalchemy.sql.expression import extract
 from tqdm import tqdm
 
 from reporter.database.misc import in_jst
-from reporter.database.model import Close, Headline, Instrument, Price
+from reporter.database.model import Close, Headline, Instrument, Price, PriceSeq
 from reporter.preprocessing.text import (
     is_interesting,
     is_template,
     kansuuzi2number,
     replace_prices_with_tags,
     simplify_headline)
-from reporter.preprocessing.number import format_digit
 from reporter.resource.reuters import ric2filename
 from reporter.util.config import Span
 from reporter.util.constant import (
@@ -41,18 +39,11 @@ from reporter.util.constant import (
 from reporter.util.exchange import ClosingTime
 
 
-def redis_key(ric: str, seqtype: SeqType, t: Union[str, datetime]) -> str:
-    return ric + '__' + seqtype.value + '__' + (t if isinstance(t, str) else t.strftime(REUTERS_DATETIME_FORMAT))
-
-
 def insert_prices(session: Session,
-                  redis_client: redis.Redis,
                   dir_prices: Path,
                   missing_rics: List[str],
                   dir_resources: Path,
                   logger: Logger) -> None:
-
-    rpipe = redis_client.pipeline()
 
     ct = ClosingTime(dir_resources)
     insert_instruments(session, dir_resources / Path('ric.csv'), logger)
@@ -142,15 +133,15 @@ def insert_prices(session: Session,
                                               tzinfo=UTC)
 
                     if prev_row_t < close_datetime and close_datetime <= t:
-                        close_prices.append({'ric': ric, 't': t, 'val': val})
+                        close_prices.append(Close(ric, t,  val).to_dict())
 
                         if len(raw_long_vals) > 1:
                             raw_mov_ref_long_val = val - raw_long_vals[0]
                             raw_mov_ref_long_vals = [raw_mov_ref_long_val] + raw_mov_ref_long_vals \
                                 if len(raw_mov_ref_long_vals) < N_LONG_TERM \
                                 else [raw_mov_ref_long_val] + raw_mov_ref_long_vals[:-1]
-                            rpipe.rpush(redis_key(ric, SeqType.MovRefLong, t),
-                                        *[format_digit(v) for v in raw_mov_ref_long_vals])
+                            price_seqs[SeqType.MovRefLong] \
+                                .append(PriceSeq(ric, SeqType.MovRefLong, t, raw_mov_ref_long_vals).to_dict())
                             max_mov_ref_long_val = float(raw_mov_ref_long_val) \
                                 if raw_mov_ref_long_val > max_mov_ref_long_val \
                                 else float(max_mov_ref_long_val)
@@ -162,31 +153,25 @@ def insert_prices(session: Session,
                             if len(raw_long_vals) < N_LONG_TERM \
                             else [val] + raw_long_vals[:-1]
                         price_seqs[SeqType.RawLong] \
-                            .append({'ric': ric,
-                                     't': t,
-                                     'seqtype': SeqType.RawLong.value,
-                                     'vals': raw_long_vals})
-                        rpipe.rpush(redis_key(ric, SeqType.RawLong, t),
-                                    *[format_digit(v) for v in raw_long_vals])
+                            .append(PriceSeq(ric, SeqType.RawLong, t, raw_long_vals).to_dict())
+                        price_seqs[SeqType.RawLong]. \
+                            append(PriceSeq(ric, SeqType.RawLong, t, raw_long_vals).to_dict())
 
                         std_long_vals = [std_val] + std_long_vals \
                             if len(std_long_vals) < N_LONG_TERM \
                             else [std_val] + std_long_vals[:-1]
-                        rpipe.rpush(redis_key(ric, SeqType.StdLong, t),
-                                    *[format_digit(v) for v in std_long_vals])
+                        price_seqs[SeqType.StdLong] \
+                            .append(PriceSeq(ric, SeqType.StdLong, t, std_long_vals).to_dict())
 
-                prices.append({'ric': ric,
-                               't': t,
-                               'utc_offset': utc_offset,
-                               'val': val})
+                prices.append(PriceSeq(ric, t, utc_offset, val).to_dict())
 
                 if len(raw_short_vals) > 1 and len(raw_long_vals) > 2:
                     raw_mov_ref_short_val = val - raw_long_vals[1 if t == close_datetime else 0]
                     raw_mov_ref_short_vals = [raw_mov_ref_short_val] + raw_mov_ref_short_vals \
                         if len(raw_mov_ref_short_vals) < N_SHORT_TERM \
                         else [raw_mov_ref_short_val] + raw_mov_ref_short_vals[:-1]
-                    rpipe.rpush(redis_key(ric, SeqType.MovRefShort, t),
-                                *[format_digit(v) for v in raw_mov_ref_short_vals])
+                    price_seqs[SeqType.MovRefShort] \
+                        .append(PriceSeq(ric, SeqType.MovRefShort, t, raw_mov_ref_short_vals).to_dict())
                     max_mov_ref_short_val = float(raw_mov_ref_short_val) \
                         if raw_mov_ref_short_val > max_mov_ref_short_val \
                         else float(max_mov_ref_short_val)
@@ -197,43 +182,31 @@ def insert_prices(session: Session,
                 raw_short_vals = [val] + raw_short_vals \
                     if len(raw_short_vals) < N_SHORT_TERM \
                     else [val] + raw_short_vals[:-1]
-                rpipe.rpush(redis_key(ric, SeqType.RawShort, t),
-                            *[format_digit(v) for v in raw_short_vals])
+                price_seqs[SeqType.RawShort] \
+                    .append(PriceSeq(ric, SeqType.RawShort, t, raw_short_vals).to_dict())
 
                 std_short_vals = [std_val] + std_short_vals \
                     if len(std_short_vals) < N_SHORT_TERM \
                     else [std_val] + std_short_vals[:-1]
-                rpipe.rpush(redis_key(ric, SeqType.StdShort, t),
-                            *[format_digit(v) for v in std_short_vals])
+                price_seqs[SeqType.StdShort] \
+                    .append(Price(ric, SeqType.StdShort, t, std_short_vals).to_dict())
                 prev_row_t = t
 
             session.execute(Price.__table__.insert(), prices)
             session.execute(Close.__table__.insert(), close_prices)
 
-            try:
-                rpipe.execute()
-
-                def f(v: float, maxv: float, minv: float) -> Union[None, float]:
-                    return None \
-                        if isclose(maxv, minv) \
-                        else (2 * v - (maxv + minv)) / (maxv - minv)
-
-                for k in redis_client.keys(redis_key(ric, SeqType.MovRefLong, '*')):
-                    _, _, t = k.split('__')
-                    rpipe.rpush(redis_key(ric, SeqType.NormMovRefLong, t),
-                                *[format_digit(f(float(v), max_mov_ref_long_val, min_mov_ref_long_val))
-                                  for v in redis_client.lrange(k, 0, -1)])
-
-                for k in redis_client.keys(redis_key(ric, SeqType.MovRefShort, '*')):
-                    _, _, t = k.split('__')
-                    rpipe.rpush(redis_key(ric, SeqType.NormMovRefShort, t),
-                                *[format_digit(f(float(v), max_mov_ref_short_val, min_mov_ref_short_val))
-                                  for v in redis_client.lrange(k, 0, -1)])
-
-                rpipe.execute()
-                rpipe.save()
-            except redis.exceptions.ResponseError:
-                session.rollback()
+            for seqtype in seqtypes:
+                if seqtype == SeqType.NomMovRefLong:
+                    price_seqs[seqtype] = \
+                        [PriceSeq(ric, p['t'], SeqType.NomMovRefLong, None)
+                         for p in price_seqs[SeqType.MovRefLong]] \
+                        if isclose(max_mov_ref_long_val, min_mov_ref_long_val) \
+                        else [PriceSeq(ric, p['t'], SeqType.NormMovRefLong,
+                                       [(2 * v - (max_mov_ref_long_val + min_mov_ref_long_val)) /
+                                        (max_mov_ref_long_val - min_mov_ref_long_val)
+                                        for v in p['vals']]).to_dict()
+                              for p in price_seqs[SeqType.MovRefLong]]
+                session.execute(PriceSeq.__table__.insert(), price_seqs[seqtype])
             session.commit()
 
             logger.info('end importing {}'.format(ric))
