@@ -5,6 +5,7 @@ from sqlalchemy import (
     TIMESTAMP,
     Boolean,
     Column,
+    Float,
     Integer,
     Numeric,
     String,
@@ -53,13 +54,13 @@ class PriceSeq(Base):
     ric = Column(String, primary_key=True)  # Reuters Instrument Code
     seqtype = Column(String, primary_key=True)
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
-    vals = Column(postgresql.ARRAY(Numeric(15, 6)), nullable=True)
+    vals = Column(postgresql.ARRAY(Float), nullable=True)
 
     def __init__(self,
                  ric: str,
                  seqtype: SeqType,
                  t: datetime,
-                 vals: Union[None, List[str]]):
+                 vals: Union[None, List[float]]):
 
         self.ric = ric
         self.t = t

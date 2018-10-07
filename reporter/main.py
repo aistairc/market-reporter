@@ -7,6 +7,8 @@ from functools import reduce
 
 import jsonlines
 import torch
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm.session import sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.train import run
@@ -70,12 +72,9 @@ def main() -> None:
         reduce(lambda x, y: x and y,
                [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
                 for phase in list(Phase)])
-    print(has_all_alignments)
 
     if not has_all_alignments:
 
-        from sqlalchemy.engine import create_engine
-        from sqlalchemy.orm.session import sessionmaker
         engine = create_engine(config.db_uri)
         SessionMaker = sessionmaker(bind=engine)
         pg_session = SessionMaker()

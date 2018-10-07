@@ -60,8 +60,8 @@ def insert_prices(session: Session,
         with gzip.open(filename, mode='rt') as f:
             dataframe = pandas.read_table(f, delimiter=',')
             column = 'Close Bid' if int(dataframe[['Last']].dropna().count()) == 0 else 'Last'
-            mean = Decimal(float(dataframe[[column]].mean()))
-            std = Decimal(float(dataframe[[column]].std()))
+            mean = float(dataframe[[column]].mean())
+            std = float(dataframe[[column]].std())
 
             f.seek(0)
             N = sum(1 for _ in f) - 1
@@ -96,10 +96,10 @@ def insert_prices(session: Session,
             std_long_vals = []
             std_short_vals = []
             prev_row_t = None
-            max_mov_ref_long_val = Decimal('-Infinity')
-            min_mov_ref_long_val = Decimal('Infinity')
-            max_mov_ref_short_val = Decimal('-Infinity')
-            min_mov_ref_short_val = Decimal('Infinity')
+            max_mov_ref_long_val = float('-inf')
+            min_mov_ref_long_val = float('inf')
+            max_mov_ref_short_val = float('-inf')
+            min_mov_ref_short_val = float('inf')
 
             for _ in tqdm(range(N)):
                 fields = next(reader)
@@ -115,7 +115,7 @@ def insert_prices(session: Session,
                 if last == '' and close_bid == '':
                     continue
                 val = Decimal(close_bid if last == '' else last)
-                std_val = (val - mean) / std
+                std_val = (float(val) - mean) / std
                 try:
                     t = datetime.strptime(t, REUTERS_DATETIME_FORMAT)
                 except ValueError:
@@ -136,26 +136,24 @@ def insert_prices(session: Session,
                         close_prices.append(Close(ric, t).to_dict())
 
                         if len(raw_long_vals) > 1:
-                            raw_mov_ref_long_val = val - raw_long_vals[0]
+                            raw_mov_ref_long_val = float(val) - raw_long_vals[0]
                             raw_mov_ref_long_vals = [raw_mov_ref_long_val] + raw_mov_ref_long_vals \
                                 if len(raw_mov_ref_long_vals) < N_LONG_TERM \
                                 else [raw_mov_ref_long_val] + raw_mov_ref_long_vals[:-1]
                             price_seqs[SeqType.MovRefLong] \
                                 .append(PriceSeq(ric, SeqType.MovRefLong, t, raw_mov_ref_long_vals).to_dict())
-                            max_mov_ref_long_val = float(raw_mov_ref_long_val) \
+                            max_mov_ref_long_val = raw_mov_ref_long_val \
                                 if raw_mov_ref_long_val > max_mov_ref_long_val \
-                                else float(max_mov_ref_long_val)
-                            min_mov_ref_long_val = float(raw_mov_ref_long_val) \
+                                else max_mov_ref_long_val
+                            min_mov_ref_long_val = raw_mov_ref_long_val \
                                 if raw_mov_ref_long_val < min_mov_ref_long_val \
-                                else float(min_mov_ref_long_val)
+                                else min_mov_ref_long_val
 
-                        raw_long_vals = [val] + raw_long_vals \
+                        raw_long_vals = [float(val)] + raw_long_vals \
                             if len(raw_long_vals) < N_LONG_TERM \
-                            else [val] + raw_long_vals[:-1]
+                            else [float(val)] + raw_long_vals[:-1]
                         price_seqs[SeqType.RawLong] \
                             .append(PriceSeq(ric, SeqType.RawLong, t, raw_long_vals).to_dict())
-                        price_seqs[SeqType.RawLong]. \
-                            append(PriceSeq(ric, SeqType.RawLong, t, raw_long_vals).to_dict())
 
                         std_long_vals = [std_val] + std_long_vals \
                             if len(std_long_vals) < N_LONG_TERM \
@@ -166,22 +164,22 @@ def insert_prices(session: Session,
                 prices.append(Price(ric, t, utc_offset, val).to_dict())
 
                 if len(raw_short_vals) > 1 and len(raw_long_vals) > 2:
-                    raw_mov_ref_short_val = val - raw_long_vals[1 if t == close_datetime else 0]
+                    raw_mov_ref_short_val = float(val) - raw_long_vals[1 if t == close_datetime else 0]
                     raw_mov_ref_short_vals = [raw_mov_ref_short_val] + raw_mov_ref_short_vals \
                         if len(raw_mov_ref_short_vals) < N_SHORT_TERM \
                         else [raw_mov_ref_short_val] + raw_mov_ref_short_vals[:-1]
                     price_seqs[SeqType.MovRefShort] \
                         .append(PriceSeq(ric, SeqType.MovRefShort, t, raw_mov_ref_short_vals).to_dict())
-                    max_mov_ref_short_val = float(raw_mov_ref_short_val) \
+                    max_mov_ref_short_val = raw_mov_ref_short_val \
                         if raw_mov_ref_short_val > max_mov_ref_short_val \
-                        else float(max_mov_ref_short_val)
-                    min_mov_ref_short_val = float(raw_mov_ref_short_val) \
+                        else max_mov_ref_short_val
+                    min_mov_ref_short_val = raw_mov_ref_short_val \
                         if raw_mov_ref_short_val < min_mov_ref_short_val \
-                        else float(min_mov_ref_short_val)
+                        else min_mov_ref_short_val
 
-                raw_short_vals = [val] + raw_short_vals \
+                raw_short_vals = [float(val)] + raw_short_vals \
                     if len(raw_short_vals) < N_SHORT_TERM \
-                    else [val] + raw_short_vals[:-1]
+                    else [float(val)] + raw_short_vals[:-1]
                 price_seqs[SeqType.RawShort] \
                     .append(PriceSeq(ric, SeqType.RawShort, t, raw_short_vals).to_dict())
 
@@ -189,19 +187,29 @@ def insert_prices(session: Session,
                     if len(std_short_vals) < N_SHORT_TERM \
                     else [std_val] + std_short_vals[:-1]
                 price_seqs[SeqType.StdShort] \
-                    .append(Price(ric, SeqType.StdShort, t, std_short_vals).to_dict())
+                    .append(PriceSeq(ric, SeqType.StdShort, t, std_short_vals).to_dict())
                 prev_row_t = t
 
             session.execute(Price.__table__.insert(), prices)
             session.execute(Close.__table__.insert(), close_prices)
 
             for seqtype in seqtypes:
-                if seqtype == SeqType.NormMovRefLong:
+                if seqtype == SeqType.NormMovRefShort:
                     price_seqs[seqtype] = \
-                        [PriceSeq(ric, p['t'], SeqType.NomMovRefLong, None)
+                        [PriceSeq(ric, SeqType.NomMovRefShort, p['t'], None)
+                         for p in price_seqs[SeqType.MovRefShort]] \
+                        if isclose(max_mov_ref_long_val, min_mov_ref_short_val) \
+                        else [PriceSeq(ric, SeqType.NormMovRefShort, p['t'],
+                                       [(2 * v - (max_mov_ref_short_val + min_mov_ref_short_val)) /
+                                        (max_mov_ref_short_val - min_mov_ref_short_val)
+                                        for v in p['vals']]).to_dict()
+                              for p in price_seqs[SeqType.MovRefShort]]
+                elif seqtype == SeqType.NormMovRefLong:
+                    price_seqs[seqtype] = \
+                        [PriceSeq(ric, SeqType.NomMovRefLong, p['t'], None)
                          for p in price_seqs[SeqType.MovRefLong]] \
                         if isclose(max_mov_ref_long_val, min_mov_ref_long_val) \
-                        else [PriceSeq(ric, p['t'], SeqType.NormMovRefLong,
+                        else [PriceSeq(ric, SeqType.NormMovRefLong, p['t'],
                                        [(2 * v - (max_mov_ref_long_val + min_mov_ref_long_val)) /
                                         (max_mov_ref_long_val - min_mov_ref_long_val)
                                         for v in p['vals']]).to_dict()
