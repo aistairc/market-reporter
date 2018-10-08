@@ -33,16 +33,6 @@ uri = 'postgresql://ubuntu@localhost:5432/DBNAME'
 [postgres-test]
 uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'
 
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-
-[redis-test]
-host = 'localhost'
-port = 6379
-db = -1
-
 [train]
 user_dict = 'user-dict.csv'
 n_epochs = 60

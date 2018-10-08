@@ -114,8 +114,6 @@ class Predictor:
         pg_session = SessionMaker()
 
         # Connect to Redis
-        connection_pool = redis.ConnectionPool(**self.config.redis)
-        redis_client = redis.StrictRedis(connection_pool=connection_pool)
 
         rics = self.config.rics if target_ric in self.config.rics else [target_ric] + self.config.rics
 
@@ -159,8 +157,7 @@ class Predictor:
         return replace_tags_with_vals(pred_sents[0], latest_closing_vals[0], latest_vals[0])
 
 
-def make_alignment_for_prediction(r: Redis,
-                                  session: Session,
+def make_alignment_for_prediction(session: Session,
                                   rics: List[str],
                                   t: str,
                                   seqtypes: List[SeqType]) -> Alignment:
@@ -168,15 +165,11 @@ def make_alignment_for_prediction(r: Redis,
 
     chart = dict()
     for (ric, seqtype) in itertools.product(rics, seqtypes):
-        Model = Close if seqtype.value.endswith('long') else Price
         model_t = session \
             .query(func.max(Model.t)) \
             .filter(Model.ric == ric, Model.t <= time) \
             .scalar()
 
-        key = ric + '__' + seqtype.value + '__' + model_t.strftime(REUTERS_DATETIME_FORMAT)
-
-        vals = r.lrange(key, 0, -1)
         chart[stringify_ric_seqtype(ric, seqtype)] = vals
 
     processed_tokens = ['']

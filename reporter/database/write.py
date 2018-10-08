@@ -54,7 +54,7 @@ def insert_prices(session: Session,
 
     for ric in missing_rics:
 
-        filename = ric2filename(dir_resources / Path('prices'), ric, extension='csv.gz')
+        filename = ric2filename(dir_prices, ric, extension='csv.gz')
 
         price_seqs = dict((seqtype, []) for seqtype in seqtypes)
         with gzip.open(filename, mode='rt') as f:

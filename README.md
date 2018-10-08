@@ -16,7 +16,6 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
     4. [S3](#s3)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
-    7. [Redis](#redis)   
 2. [Usage](#usage)
     1. [Training](#training)
     2. [Prediction](#prediction)
@@ -39,7 +38,7 @@ The architecture is illustrated below.
 
 ### EC2
 When you use Amazon EC2, launch an instance by Ansible.
-The script installs PostgreSQL, Redis, and the other dependencies on it.
+The script installs dependencies such as PostgreSQL.
 ```bash
 pip install ansible
 cd envs
@@ -122,20 +121,6 @@ Then edit `config.toml`.
 - uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
 + uri = 'postgresql://kirito:PNdWzhR2rzqUXW4n4GGRa7bN@localhost:2345/master'
 ```
-
-### Redis
-
-The settings are written as below in the config file.
-
-```
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-```
-The variable `db` is set to `-1` by default to prevent exisiting data from being overwritten.
-Please change it to a nonnegative integer.
-
 
 ## Usage
 
