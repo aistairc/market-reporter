@@ -6,17 +6,20 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-import numpy
 import jsonlines
 import redis
 import torch
 from redis import Redis
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
+from sqlalchemy import func
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm.session import Session, sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
-from reporter.database.read import Alignment
+from reporter.database.read import Alignment, fetch_latest_vals
+from reporter.database.model import Price, Close
 from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
 from reporter.util.constant import (
@@ -52,9 +55,12 @@ def parse_args() -> argparse.Namespace:
                         help='specify directory of the model file and the vocab file')
     parser.add_argument('-t',
                         '--time',
-                        type=str)
-    parser.add_argument('--ric',
-                        type=str)
+                        type=str,
+                        help='Datetime (format: `year-month-day hour:minute:second+timezone`)')
+    parser.add_argument('-r',
+                        '--ric',
+                        type=str,
+                        help='Reuters Insturument Code (e.g. `.N225`: Nikkei Stock Average)')
 
     return parser.parse_args()
 
@@ -95,28 +101,33 @@ class Predictor:
         encoder = Encoder(self.config, self.device)
         decoder = Decoder(self.config, vocab_size, attn, self.device)
         self.model = EncoderDecoder(encoder, decoder, self.device)
-        self.criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
-                                          ignore_index=self.vocab.stoi[SpecialToken.Padding.value])
+        self.criterion = \
+            torch.nn.NLLLoss(reduction='elementwise_mean',
+                             ignore_index=self.vocab.stoi[SpecialToken.Padding.value])
 
         with dest_pretrained_model.open(mode='rb') as f:
             self.model.load_state_dict(torch.load(f))
 
     def predict(self, t: str, target_ric: str) -> List[str]:
+        # Connect to Postgres
+        engine = create_engine(self.config.db_uri)
+        SessionMaker = sessionmaker(bind=engine)
+        pg_session = SessionMaker()
 
         # Connect to Redis
-        connection_pool = redis.ConnectionPool(**self.config.redis)
-        redis_client = redis.StrictRedis(connection_pool=connection_pool)
 
-        rics = self.config.rics if target_ric in self.config.rics else [target_ric] + self.config.rics
+        rics = self.config.rics \
+            if target_ric in self.config.rics \
+            else [target_ric] + self.config.rics
 
-        alignment = load_alignment_from_db(redis_client, rics, t, self.seqtypes)
+        alignments = load_alignments_from_db(pg_session, rics, t, self.seqtypes)
 
         # Write the prediction data
         self.config.dir_output.mkdir(parents=True, exist_ok=True)
-        dest_alignment = self.config.dir_output / Path('alignment-predict.json')
-        with dest_alignment.open(mode='w') as f:
+        dest_alignments = self.config.dir_output / Path('alignment-predict.json')
+        with dest_alignments.open(mode='w') as f:
             writer = jsonlines.Writer(f)
-            writer.write(alignment.to_mapping())
+            writer.write(alignments.to_dict())
 
         predict_iter = create_dataset(self.config,
                                       self.device,
@@ -149,40 +160,15 @@ class Predictor:
         return replace_tags_with_vals(pred_sents[0], latest_closing_vals[0], latest_vals[0])
 
 
-def load_alignment_from_db(r: Redis,
-                           rics: List[str],
-                           t: str,
-                           seqtypes: List[SeqType]) -> Alignment:
-    # Make an alignment for prediction
+def load_alignments_from_db(session: Session,
+                            rics: List[str],
+                            t: str,
+                            seqtypes: List[SeqType]) -> Alignment:
     time = datetime.strptime(t, NIKKEI_DATETIME_FORMAT)
-    unixtime = time.timestamp()
-
-    ric_seqtype_to_keys = dict()
-    ric_seqtype_to_unixtimes = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        ric_seqtype_to_keys[(ric, seqtype)] = \
-            [k for k in r.keys(ric + '__' + seqtype.value + '__*')]
-        ric_seqtype_to_unixtimes[(ric, seqtype)] = \
-            numpy.array([datetime.strptime(k.split('__')[2], REUTERS_DATETIME_FORMAT).timestamp()
-                         for k in ric_seqtype_to_keys[(ric, seqtype)]], dtype=numpy.int64)
-
-    # Find the latest prices of the specified time
-    chart = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        U = ric_seqtype_to_unixtimes[(ric, seqtype)]
-        valid_indices = numpy.where(U <= unixtime)
-        if valid_indices[0].shape[0] == 0:
-            vals = []
-        else:
-            i_max_sub = U[valid_indices].argmax()
-            i_max = numpy.arange(U.shape[0])[valid_indices][i_max_sub]
-            key = ric_seqtype_to_keys[(ric, seqtype)][i_max]
-            vals = r.lrange(key, 0, -1)
-        chart[stringify_ric_seqtype(ric, seqtype)] = vals
-
+    chart = dict([fetch_latest_vals(session, time, ric, seqtype)
+                  for (ric, seqtype) in itertools.product(rics, seqtypes)])
     processed_tokens = ['']
     article_id = 'dummy'
-
     return Alignment(article_id, t, time.hour, processed_tokens, chart)
 
 

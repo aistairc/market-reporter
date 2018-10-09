@@ -3,28 +3,25 @@
 
 <p align="center"><img src="docs/pics/logo.png"></p>
 
-__Market Reporter__ is a tool that automatically generates market comments from time series data of prices.
+__Market Reporter__ automatically generates short comments that describe time series data of stock prices, FX rates, etc.
+This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [PDF].
+
+<p align="center"><img src="docs/pics/gloss.png"></p>
 
 ## Table of Contents
-1. [About](#about)
-2. [Requirements](#requirements)
+1. [Requirements](#requirements)
     1. [Architecture](#architecture)
     2. [Resources](#resources)
     3. [EC2](#ec2)
     4. [S3](#s3)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
-    7. [Redis](#redis)   
-3. [Usage](#usage)
-4. [Web Interface](#web-interface)
-5. [Test](#test)
-6. [References](#references)
-
-## About
-This is an implementation of [Murakami et al. 2017](#reference) and [Aoki et al. 2018](#reference).
-Given sequences of prices, it generates a short summary describing them.
-Examples are shown in the following picture, which was taken from the web interface for human evaluation in debug mode.
-<p align="center"><img src="docs/pics/webapp-human-evaluation-debug.png"></p>
+2. [Usage](#usage)
+    1. [Training](#training)
+    2. [Prediction](#prediction)
+3. [Web Interface](#web-interface)
+4. [Test](#test)
+5. [References](#references)
 
 ## Requirements
 ### Architecture
@@ -41,7 +38,7 @@ The architecture is illustrated below.
 
 ### EC2
 When you use Amazon EC2, launch an instance by Ansible.
-The script installs PostgreSQL, Redis, and the other dependencies on it.
+The script installs dependencies such as PostgreSQL.
 ```bash
 pip install ansible
 cd envs
@@ -125,26 +122,37 @@ Then edit `config.toml`.
 + uri = 'postgresql://kirito:PNdWzhR2rzqUXW4n4GGRa7bN@localhost:2345/master'
 ```
 
-### Redis
-
-The settings are written as below in the config file.
-
-```
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-```
-The variable `db` is set to `-1` by default to prevent exisiting data from being overwritten.
-Please change it to a nonnegative integer.
-
-
 ## Usage
 
+### Training
+
+Create a configuration file (default: `config.toml`). Please copy [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) or [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) and edit it according to your environment.
+
 ```bash
-cp example.toml config.toml  # Create a configuration file
-vi config.toml  # Edit some variables according to your environment
-python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+cp example.toml config.toml
+vi config.toml
+```
+
+Execute the following command for the training of model. When you use GPU (CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.
+
+```bash
+python -m reporter --device 'cuda:0'
+```
+
+After the program finishes, it saves three files (`reporter.log`, `reporter.model`, and `reporter.vocab`) to `config.output_dir/reporter-DATETIME`, where `config.output_dir` is a variable set in `config.toml` and `DATETIME` is the timestamp of the starting time.
+
+### Prediction
+
+Prediction submodule generates a single comment of a financial instrument at specified time by loading a trained model.
+
+```bash
+# -r, --ric: Reuters Instrument Code (e.g. '.N225' for Nikkei Stock Average)
+# -t, --time: timestamp in '%Y-%m-%d %H:%M:%S%z' format
+# -o, --output: directory that contains 'reporter.model' and 'reporter.vocab'
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 

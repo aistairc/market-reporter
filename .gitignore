@@ -6,6 +6,7 @@ envs/hosts
 envs/*.retry
 output/
 resources/prices/*
+resources/headlines/*
 *.toml
 !*example.toml
 *.pyc

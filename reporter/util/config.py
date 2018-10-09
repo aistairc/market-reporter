@@ -46,17 +46,6 @@ class Config:
         self.db_uri = config.get('postgres', {}).get('uri')
         self.db_uri_test = config.get('postgres-test', {}).get('uri')
 
-        redis = config.get('redis', {})
-        self.redis = {'host': redis.get('host', 'localhost'),
-                      'port': int(redis.get('port', 6379)),
-                      'db': int(redis.get('db', -1)),
-                      'decode_responses': True}
-        redis = config.get('redis-test', {})
-        self.redis_test = {'host': redis.get('host', 'localhost'),
-                           'port': int(redis.get('port', 6379)),
-                           'db': int(redis.get('db', -1)),
-                           'decode_responses': True}
-
         s3 = config.get('s3', {})
         self.aws_profile_name = s3.get('profile_name', 'default')
         self.s3_bucket_name = s3.get('bucket_name')

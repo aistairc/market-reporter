@@ -2,18 +2,20 @@ import itertools
 from datetime import datetime, timedelta
 from decimal import Decimal
 from logging import Logger
+from multiprocessing import Pool
 from typing import Any, Dict, List, Tuple
 from xml.etree.ElementTree import fromstring
 
 import numpy
 from redis import Redis
 from sqlalchemy import Integer, cast, extract, func, Date
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, scoped_session
+from sqlalchemy.orm.session import sessionmaker
 from tqdm import tqdm
 
 from reporter.core.operation import find_operation
 from reporter.database.misc import in_utc, in_jst
-from reporter.database.model import Headline, Price
+from reporter.database.model import Headline, Price, PriceSeq
 from reporter.util.constant import REUTERS_DATETIME_FORMAT, Code, Phase, SeqType, UTC
 from reporter.util.conversion import stringify_ric_seqtype
 
@@ -33,7 +35,7 @@ class Alignment:
         self.processed_tokens = processed_tokens
         self.chart = chart
 
-    def to_mapping(self) -> Dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return {'article_id': self.article_id,
                 't': self.t,
                 'jst_hour': self.jst_hour,
@@ -85,8 +87,31 @@ def fetch_max_t_of_prev_trading_day(session: Session, ric: str, t: datetime) -> 
         .scalar()
 
 
-def load_alignments_from_db(session: Session, r: Redis, phase: Phase, logger: Logger) -> List[Alignment]:
+def fetch_latest_vals(session: Session,
+                      t: datetime,
+                      ric: str,
+                      seqtype: SeqType) -> Tuple[str, List[str]]:
 
+    min_t = t - timedelta(days=7)
+    t = session \
+        .query(func.max(PriceSeq.t)) \
+        .filter(PriceSeq.ric == ric,
+                PriceSeq.seqtype == seqtype.value,
+                PriceSeq.t <= t,
+                PriceSeq.t > min_t) \
+        .scalar()
+    r = session \
+        .query(PriceSeq) \
+        .filter(PriceSeq.ric == ric,
+                PriceSeq.seqtype == seqtype.value,
+                PriceSeq.t == t) \
+        .one_or_none()
+    return (stringify_ric_seqtype(ric, seqtype),
+            [] if r is None else ['{:.2f}'.format(v) for v in r.vals])
+
+
+def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> List[Alignment]:
+    
     headlines = session \
         .query(Headline.article_id,
                Headline.tag_tokens,
@@ -109,33 +134,12 @@ def load_alignments_from_db(session: Session, r: Redis, phase: Phase, logger: Lo
 
     ric_seqtype_to_keys = dict()
     ric_seqtype_to_unixtimes = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        ric_seqtype_to_keys[(ric, seqtype)] = \
-            [k for k in r.keys(ric + '__' + seqtype.value + '__*')]
-        ric_seqtype_to_unixtimes[(ric, seqtype)] = \
-            numpy.array([datetime.strptime(k.split('__')[2], REUTERS_DATETIME_FORMAT).timestamp()
-                         for k in ric_seqtype_to_keys[(ric, seqtype)]], dtype=numpy.int64)
+
     for h in tqdm(headlines):
 
         # Find the latest prices before the article is published
-        chart = dict()
-        for (ric, seqtype) in itertools.product(rics, seqtypes):
-            U = ric_seqtype_to_unixtimes[(ric, seqtype)]
-            # Find the latest sequence before the headline is published
-            valid_indices = numpy.where(U <= h.unixtime)
-            if valid_indices[0].shape[0] == 0:
-                vals = []
-            else:
-                i_max_sub = U[valid_indices].argmax()
-                i_max = numpy.arange(U.shape[0])[valid_indices][i_max_sub]
-                key = ric_seqtype_to_keys[(ric, seqtype)][i_max]
-                vals = r.lrange(key, 0, -1)
-                # TODO
-                # if seqtype.value.endswith('short') and len(vals) > N_SHORT_TERM:
-                #     vals = vals[:N_SHORT_TERM]
-                # elif seqtype.value.endswith('long') and len(vals) > N_LONG_TERM:
-                #     vals = vals[:N_LONG_TERM]
-            chart[stringify_ric_seqtype(ric, seqtype)] = vals
+        chart = dict([fetch_latest_vals(session, h.t, ric, seqtype)
+                      for (ric, seqtype) in itertools.product(rics, seqtypes)])
 
         # Replace tags with price tags
         tag_tokens = h.tag_tokens
@@ -161,6 +165,6 @@ def load_alignments_from_db(session: Session, r: Redis, phase: Phase, logger: Lo
                 processed_tokens.append(tag_tokens[i])
 
         alignment = Alignment(h.article_id, str(h.t), h.jst_hour, processed_tokens, chart)
-        alignments.append(alignment.to_mapping())
+        alignments.append(alignment.to_dict())
     logger.info('end creating alignments between headlines and price sequences.')
     return alignments
