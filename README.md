@@ -143,14 +143,16 @@ After the program finishes, it saves three files (`reporter.log`, `reporter.mode
 
 ### Prediction
 
-After training, using the output files, you can generate market comment at the specified any time as the following command.
+Prediction submodule generates a single comment of a financial instrument at specified time by loading a trained model.
 
 ```bash
-python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
-# -o or --output: directory containing 'reporter.model' and 'reporter.vocab'
-# -t or --time: time (format 'year-month-day hour:minute:second+timezone')
-# -r or --ric: Reuters Instrument Code
-#    	    (e.g. '.N225': Nikkei Stock Average, '.DJI': Dow Jones Industrial Average, etc.)
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-DATETIME
+# -r, --ric: Reuters Instrument Code (e.g. '.N225' for Nikkei Stock Average)
+# -t, --time: timestamp in '%Y-%m-%d %H:%M:%S%z' format
+# -o, --output: directory that contains 'reporter.model' and 'reporter.vocab'
 ```
 
 
