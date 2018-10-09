@@ -148,13 +148,13 @@ python -m reporter --device 'cuda:0'
 学習後、出力ファイルを用いて、銘柄と時刻を指定することで概況テキストを生成することができます。
 
 ```bash
+# -r, --ric: 銘柄（Reuters Instrument Codeを指定してください。例えば日経平均の場合'.N225'になります。）
+# -t, --time: 時刻（'%Y-%m-%d %H:%M:%S%z'の形式で指定してください。）
+# -o, --output: 学習で作られた'reporter.model'と'reporter.vocab'を含むディレクトリを指定してください。
 python -m reporter.predict \
     -r '.N225' \
     -t '2018-10-03 09:03:00+0900' \
-    -o output/reporter-DATETIME
-# -r, --ric: 銘柄（Reuters Instrument Codeを指定。例えば日経平均であれば'.N225'になります。）
-# -t, --time: 時刻（'%Y-%m-%d %H:%M:%S%z'の形式で指定してください。）
-# -o, --output: 学習で作られた、'reporter.model'と'reporter.vocab'を含むディレクトリを指定してください。
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 

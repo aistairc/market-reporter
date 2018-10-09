@@ -146,13 +146,13 @@ After the program finishes, it saves three files (`reporter.log`, `reporter.mode
 Prediction submodule generates a single comment of a financial instrument at specified time by loading a trained model.
 
 ```bash
-python -m reporter.predict \
-    -r '.N225' \
-    -t '2018-10-03 09:03:00+0900' \
-    -o output/reporter-DATETIME
 # -r, --ric: Reuters Instrument Code (e.g. '.N225' for Nikkei Stock Average)
 # -t, --time: timestamp in '%Y-%m-%d %H:%M:%S%z' format
 # -o, --output: directory that contains 'reporter.model' and 'reporter.vocab'
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 
