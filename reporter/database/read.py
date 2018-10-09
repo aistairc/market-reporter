@@ -82,6 +82,29 @@ def fetch_max_t_of_prev_trading_day(session: Session, ric: str, t: datetime) -> 
         .scalar()
 
 
+def fetch_latest_vals(session: Session,
+                      t: datetime,
+                      ric: str,
+                      seqtype: SeqType) -> Tuple[str, List[str]]:
+
+    min_t = t - timedelta(days=7)
+    t = session \
+        .query(func.max(PriceSeq.t)) \
+        .filter(PriceSeq.ric == ric,
+                PriceSeq.seqtype == seqtype.value,
+                PriceSeq.t <= t,
+                PriceSeq.t > min_t) \
+        .scalar()
+    r = session \
+        .query(PriceSeq) \
+        .filter(PriceSeq.ric == ric,
+                PriceSeq.seqtype == seqtype.value,
+                PriceSeq.t == t) \
+        .one_or_none()
+    return (stringify_ric_seqtype(ric, seqtype),
+            [] if r is None else ['{:.2f}'.format(v) for v in r.vals])
+
+
 def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> List[Alignment]:
     
     headlines = session \
@@ -107,30 +130,10 @@ def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> L
     ric_seqtype_to_keys = dict()
     ric_seqtype_to_unixtimes = dict()
 
-    def fetch_latest_vals(t: datetime,
-                          ric: str,
-                          seqtype: SeqType) -> Tuple[str, List[str]]:
-
-        min_t = t - timedelta(days=7)
-        t = session \
-            .query(func.max(PriceSeq.t)) \
-            .filter(PriceSeq.ric == ric,
-                    PriceSeq.seqtype == seqtype.value,
-                    PriceSeq.t <= t,
-                    PriceSeq.t > min_t) \
-            .scalar()
-        r = session \
-            .query(PriceSeq) \
-            .filter(PriceSeq.ric == ric,
-                    PriceSeq.seqtype == seqtype.value,
-                    PriceSeq.t == t) \
-            .one_or_none()
-        return (stringify_ric_seqtype(ric, seqtype), [] if r is None else ['{:.2f}'.format(v) for v in r.vals])
-
     for h in tqdm(headlines):
 
         # Find the latest prices before the article is published
-        chart = dict([fetch_latest_vals(h.t, ric, seqtype)
+        chart = dict([fetch_latest_vals(session, h.t, ric, seqtype)
                       for (ric, seqtype) in itertools.product(rics, seqtypes)])
 
         # Replace tags with price tags
