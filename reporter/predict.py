@@ -18,7 +18,7 @@ from sqlalchemy.orm.session import Session, sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
-from reporter.database.read import Alignment
+from reporter.database.read import Alignment, fetch_latest_vals
 from reporter.database.model import Price, Close
 from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
@@ -101,8 +101,9 @@ class Predictor:
         encoder = Encoder(self.config, self.device)
         decoder = Decoder(self.config, vocab_size, attn, self.device)
         self.model = EncoderDecoder(encoder, decoder, self.device)
-        self.criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
-                                          ignore_index=self.vocab.stoi[SpecialToken.Padding.value])
+        self.criterion = \
+            torch.nn.NLLLoss(reduction='elementwise_mean',
+                             ignore_index=self.vocab.stoi[SpecialToken.Padding.value])
 
         with dest_pretrained_model.open(mode='rb') as f:
             self.model.load_state_dict(torch.load(f))
@@ -114,19 +115,19 @@ class Predictor:
         pg_session = SessionMaker()
 
         # Connect to Redis
-        connection_pool = redis.ConnectionPool(**self.config.redis)
-        redis_client = redis.StrictRedis(connection_pool=connection_pool)
 
-        rics = self.config.rics if target_ric in self.config.rics else [target_ric] + self.config.rics
+        rics = self.config.rics \
+            if target_ric in self.config.rics \
+            else [target_ric] + self.config.rics
 
-        alignment = make_alignment_for_prediction(redis_client, pg_session, rics, t, self.seqtypes)
+        alignments = load_alignments_from_db(pg_session, rics, t, self.seqtypes)
 
         # Write the prediction data
         self.config.dir_output.mkdir(parents=True, exist_ok=True)
-        dest_alignment = self.config.dir_output / Path('alignment-predict.json')
-        with dest_alignment.open(mode='w') as f:
+        dest_alignments = self.config.dir_output / Path('alignment-predict.json')
+        with dest_alignments.open(mode='w') as f:
             writer = jsonlines.Writer(f)
-            writer.write(alignment.to_mapping())
+            writer.write(alignments.to_dict())
 
         predict_iter = create_dataset(self.config,
                                       self.device,
@@ -159,29 +160,15 @@ class Predictor:
         return replace_tags_with_vals(pred_sents[0], latest_closing_vals[0], latest_vals[0])
 
 
-def make_alignment_for_prediction(r: Redis,
-                                  session: Session,
-                                  rics: List[str],
-                                  t: str,
-                                  seqtypes: List[SeqType]) -> Alignment:
+def load_alignments_from_db(session: Session,
+                            rics: List[str],
+                            t: str,
+                            seqtypes: List[SeqType]) -> Alignment:
     time = datetime.strptime(t, NIKKEI_DATETIME_FORMAT)
-
-    chart = dict()
-    for (ric, seqtype) in itertools.product(rics, seqtypes):
-        Model = Close if seqtype.value.endswith('long') else Price
-        model_t = session \
-            .query(func.max(Model.t)) \
-            .filter(Model.ric == ric, Model.t <= time) \
-            .scalar()
-
-        key = ric + '__' + seqtype.value + '__' + model_t.strftime(REUTERS_DATETIME_FORMAT)
-
-        vals = r.lrange(key, 0, -1)
-        chart[stringify_ric_seqtype(ric, seqtype)] = vals
-
+    chart = dict([fetch_latest_vals(session, time, ric, seqtype)
+                  for (ric, seqtype) in itertools.product(rics, seqtypes)])
     processed_tokens = ['']
     article_id = 'dummy'
-
     return Alignment(article_id, t, time.hour, processed_tokens, chart)
 
 

@@ -16,7 +16,6 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
     4. [S3](#s3)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
-    7. [Redis](#redis)   
 2. [Usage](#usage)
     1. [Training](#training)
     2. [Prediction](#prediction)
@@ -39,7 +38,7 @@ The architecture is illustrated below.
 
 ### EC2
 When you use Amazon EC2, launch an instance by Ansible.
-The script installs PostgreSQL, Redis, and the other dependencies on it.
+The script installs dependencies such as PostgreSQL.
 ```bash
 pip install ansible
 cd envs
@@ -123,20 +122,6 @@ Then edit `config.toml`.
 + uri = 'postgresql://kirito:PNdWzhR2rzqUXW4n4GGRa7bN@localhost:2345/master'
 ```
 
-### Redis
-
-The settings are written as below in the config file.
-
-```
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-```
-The variable `db` is set to `-1` by default to prevent exisiting data from being overwritten.
-Please change it to a nonnegative integer.
-
-
 ## Usage
 
 ### Training
@@ -158,14 +143,16 @@ After the program finishes, it saves three files (`reporter.log`, `reporter.mode
 
 ### Prediction
 
-After training, using the output files, you can generate market comment at the specified any time as the following command.
+Prediction submodule generates a single comment of a financial instrument at specified time by loading a trained model.
 
 ```bash
-python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
-# -o or --output: directory containing 'reporter.model' and 'reporter.vocab'
-# -t or --time: time (format 'year-month-day hour:minute:second+timezone')
-# -r or --ric: Reuters Instrument Code
-#    	    (e.g. '.N225': Nikkei Stock Average, '.DJI': Dow Jones Industrial Average, etc.)
+# -r, --ric: Reuters Instrument Code (e.g. '.N225' for Nikkei Stock Average)
+# -t, --time: timestamp in '%Y-%m-%d %H:%M:%S%z' format
+# -o, --output: directory that contains 'reporter.model' and 'reporter.vocab'
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 

@@ -16,7 +16,6 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
     4. [S3](#s3)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
-    7. [Redis](#redis)   
 2. [使い方](#使い方)
     1. [学習](#学習)
     2. [予測](#予測)
@@ -39,7 +38,7 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 
 ### EC2
 Amazon EC2を利用する場合、このレポジトリに含まれるAnsibleのスクリプトを使って環境構築をできるようになっています。
-これによりPostgreSQLやRedis等のこのツールを動かすために必要なソフトウェアもインストールすることができます。
+これによりPostgreSQL等の必要なソフトウェアもインストールすることができます。
 ```bash
 pip install ansible
 cd envs
@@ -125,18 +124,6 @@ psql -h localhost -p 2345 -U kirito master
 + uri = 'postgresql://kirito:PASSWORD@localhost:2345/master'
 ```
 
-### Redis
-
-Redisに関する設定は設定ファイルの `[redis]` のセクションに書かれています。
-変数 `db` は既存データの意図せざる上書きを防ぐため `-1` に設定されています。
-使用前に非負の整数に書き換えてください。
-
-```
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-```
 
 ## 使い方
 
@@ -158,14 +145,16 @@ python -m reporter --device 'cuda:0'
 
 ### 予測
 
-学習後、出力ファイルを用いて、以下のコマンドを実行することで指定した時間におけるテキストを生成することができます。
+学習後、出力ファイルを用いて、銘柄と時刻を指定することで概況テキストを生成することができます。
 
 ```bash
-python -m reporter.predict -o output/reporter-DATETIME -t '2018-10-03 09:03:00+0900' -r '.N225'
-# -o or --output: 'reporter.model' と 'reporter.vocab' が格納されたディレクトリ
-# -t or --time: 時間 (フォーマット '年-月-日 時:分:秒+タイムゾーン')
-# -r or --ric: Reuters Instrument Code
-#              (e.g. '.N225': 日経平均, '.DJI': ダウ平均株価, etc.)
+# -r, --ric: 銘柄（Reuters Instrument Codeを指定してください。例えば日経平均の場合'.N225'になります。）
+# -t, --time: 時刻（'%Y-%m-%d %H:%M:%S%z'の形式で指定してください。）
+# -o, --output: 学習で作られた'reporter.model'と'reporter.vocab'を含むディレクトリを指定してください。
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 
