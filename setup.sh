@@ -12,7 +12,7 @@ else
     then
         wget --no-clobber "$anaconda_script_uri"
         bash "$(basename $anaconda_script_uri)" -b -p "$ANACONDA_HOME"
-	if [ -f /etc/debian_version ]
+        if [ -f /etc/debian_version ]
         then
             echo "export PATH=$ANACONDA_HOME:\$PATH" \
             >> "$HOME/.profile"
