@@ -179,7 +179,7 @@ You can see a page as the following picture.
 python setup.py test
 ```
 
-## License and Reference
+## License and References
 Market Reporter is available under different licensing options:
 
 + [GNU General Public License (v3 or later)](https://www.gnu.org/licenses/gpl-3.0.en.html).
