@@ -3,29 +3,25 @@
 
 <p align="center"><img src="../docs/pics/logo.png"></p>
 
-与えられた株価等の時系列データから、それを要約した短いテキストを自動で生成します。
+__Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [PDF] のPythonによる実装です。
+
+<p align="center"><img src="../docs/pics/gloss.png"></p>
+
 
 ## 目次
-1. [概要](#概要)
-2. [準備](#準備)
+1. [準備](#準備)
     1. [構成](#構成)
     2. [資源](#資源)
     3. [EC2](#ec2)
     4. [S3](#s3)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
-    7. [Redis](#redis)   
-3. [使い方](#使い方)
-4. [Webインターフェース](#Webインターフェース)
-5. [テスト](#テスト)
-6. [ライセンスと参考文献](#ライセンスと参考文献)
-
-## 概要
-
-これは論文[Murakami et al. 2017](#reference)と[Aoki et al. 2018](#reference)のPythonによる実装です。
-時系列数値データから、それを要約した見出し文を自動で生成します。
-以下は出力例をwebインターフェースで見たものです。
-<p align="center"><img src="../docs/pics/webapp-human-evaluation-debug.png"></p>
+2. [使い方](#使い方)
+    1. [学習](#学習)
+    2. [予測](#予測)
+3. [Webインターフェース](#Webインターフェース)
+4. [テスト](#テスト)
+5. [参考文献](#参考文献)
 
 ## 準備
 ### 構成
@@ -42,7 +38,7 @@
 
 ### EC2
 Amazon EC2を利用する場合、このレポジトリに含まれるAnsibleのスクリプトを使って環境構築をできるようになっています。
-これによりPostgreSQLやRedis等のこのツールを動かすために必要なソフトウェアもインストールすることができます。
+これによりPostgreSQL等の必要なソフトウェアもインストールすることができます。
 ```bash
 pip install ansible
 cd envs
@@ -128,25 +124,37 @@ psql -h localhost -p 2345 -U kirito master
 + uri = 'postgresql://kirito:PASSWORD@localhost:2345/master'
 ```
 
-### Redis
-
-Redisに関する設定は設定ファイルの `[redis]` のセクションに書かれています。
-変数 `db` は既存データの意図せざる上書きを防ぐため `-1` に設定されています。
-使用前に非負の整数に書き換えてください。
-
-```
-[redis]
-host = 'localhost'
-port = 6379
-db = -1
-```
 
 ## 使い方
 
+### 学習
+
+まず、以下のコマンドのように、 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) もしくは [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピーし、 `config.toml` を作成してください。その後、実行環境に応じてファイルを編集してください。
+
 ```bash
-cp example.toml config.toml  # Create a configuration file
-vi config.toml  # Edit some variables according to your environment
-python -m reporter --device 'cuda:0'  # 'cpu' or 'cuda:n', where n is device index to select
+cp example.toml config.toml
+vi config.toml
+```
+
+モデルを学習するためは以下のコマンドを実行してください。 GPU (CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
+```bash
+python -m reporter --device 'cuda:0'
+```
+
+実行後、3 つのファイル (`reporter.log` と `reporter.model`、 `reporter.vocab`) が `config.output_dir/reporter-DATETIME` 以下に出力されます。 ここで、 `config.output_dir` は `config.toml` で設定した変数、 `DATETIME` はプログラム実行日時のタイムスタンプを表しています。
+
+### 予測
+
+学習後、出力ファイルを用いて、銘柄と時刻を指定することで概況テキストを生成することができます。
+
+```bash
+# -r, --ric: 銘柄（Reuters Instrument Codeを指定してください。例えば日経平均の場合'.N225'になります。）
+# -t, --time: 時刻（'%Y-%m-%d %H:%M:%S%z'の形式で指定してください。）
+# -o, --output: 学習で作られた'reporter.model'と'reporter.vocab'を含むディレクトリを指定してください。
+python -m reporter.predict \
+    -r '.N225' \
+    -t '2018-10-03 09:03:00+0900' \
+    -o output/reporter-2018-10-07-18-47-41
 ```
 
 
@@ -175,8 +183,13 @@ python setup.py test
 ```
 
 ## ライセンスと参考文献
-Market Reporterは非商用目的の場合[GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html)（v3以上）で利用できます。
-商用目的で利用する場合は[kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)までご連絡ください。
+Market Reporterは以下のいずれかのライセンスで利用可能です。
+
++ [GNU General Public License (v3 or later)](https://www.gnu.org/licenses/gpl-3.0.en.html)
++ 商用ライセンス
+
+商用ライセンスはソースコードを公開できないような場合に適しています。詳細については [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp) までご連絡ください。
+
 
 このソフトウェアには特許出願中の技術が含まれます（出願番号：2017001583）。
 

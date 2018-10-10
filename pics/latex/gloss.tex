@@ -1,0 +1,49 @@
+\documentclass[varwidth]{standalone}
+\usepackage{graphicx}
+\usepackage{fontspec}
+\usepackage{luatexja-fontspec}
+\setmainfont[%
+    Ligatures=TeX,%
+    BoldFont={TimesLTPro-Bold},%
+    ItalicFont={TimesLTPro-Italic},%
+    BoldItalicFont={TimesLTPro-BoldItalic}]{TimesLTPro-Roman}
+%\setsansfont[%
+%    BoldFont={HelveticaNeueLTStd-Roman},
+%    ItalicFont={HelveticaNeueLTStd-LtIt},
+%    BoldItalicFont={HelveticaNeueLTStd-It},
+%    ]{HelveticaNeueLTStd-Lt}
+\setsansfont[%
+    BoldFont={Fira Sans},
+    ItalicFont={Fira Sans Light Italic},
+    BoldItalicFont={Fira Sans Italic},
+    ]{Fira Sans Light}
+\ltjsetparameter{%
+    jacharrange={%
+        -2, % Exclude Greek and Cyrillic letters.
+        -3  % Punctuations and Miscellaneous symbols.
+    },
+    alxspmode={`/,allow},
+    alxspmode={`#,allow}
+}
+\setmainjfont[BoldFont={HiraMinProW6}]{HiraMinProW3}
+\setsansjfont[BoldFont={HiraKakuProW6}]{HiraKakuProW3}
+\usepackage{gb4e,cgloss4e}
+\setlength{\glossglue}{5pt plus 2pt minus 1pt}
+\noautomath%
+\renewcommand\eachwordone{\normalsize\gtfamily\sffamily}
+\renewcommand\eachwordtwo{\normalsize\sffamily\itshape}
+\renewcommand\eachwordthree{\normalsize\sffamily\upshape}
+\newcommand\fakesc[1]{\footnotesize\uppercase{#1}}
+\begin{document}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/graph-n225.pdf}
+\end{figure}
+\begin{exe}
+    \ex\glll%
+    {東証} {寄り付き} {続伸、} {上げ幅} {300} {円} {超、} {円安で} {輸出株に} {買い}\\
+    {Toushou} {yoritsuki} {zokushin,} {agehaba} {300} {en} {chou,} {en-yasu-de} {yushutsu-kabu-ni} {kai}\\
+    {TSE} {opening} {continual\_rise,} {gain} {300} {yen} {over,} {yen-cheap-\textsc{ins}} {export-stock-\textsc{dat}} {purchase}\\
+    \glt {\sffamily “Tokyo Stock Exchange opens 300 yen higher with a continual rise, thanks to demand for export-related shares boosted by a cheaper yen.”}
+\end{exe}
+\end{document}

@@ -4,8 +4,8 @@ __pycache__
 
 envs/hosts
 envs/*.retry
-logs/
 output/
 resources/prices/*
+resources/headlines/*
 *.toml
 !*example.toml

@@ -3,9 +3,12 @@ import json
 import warnings
 from datetime import datetime
 from pathlib import Path
+from functools import reduce
 
 import jsonlines
 import torch
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm.session import sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.train import run
@@ -56,59 +59,55 @@ def main() -> None:
     device = torch.device(args.device)
 
     now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
-    dest_log = config.dir_logs / Path('{}.log'.format(now))
+    dest_log = config.dir_output / Path(now) / Path('reporter.log')
 
-    logger = create_logger(dest_log,  is_debug=args.is_debug)
+    logger = create_logger(dest_log, is_debug=args.is_debug)
     config.write_log(logger)
 
     message = 'start main (is_debug: {}, device: {})'.format(args.is_debug, args.device)
     logger.info(message)
 
-    if not config.dest_dataset.is_file():
+    # === Alignment ===
+    has_all_alignments = \
+        reduce(lambda x, y: x and y,
+               [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
+                for phase in list(Phase)])
 
-        # === Alignment ===
-        is_any_alignment_missing = len(list(config.dir_output.glob('alignment-*.json'))) < 3
-        if is_any_alignment_missing:
+    if not has_all_alignments:
 
-            from sqlalchemy.engine import create_engine
-            from sqlalchemy.orm.session import sessionmaker
-            engine = create_engine(config.db_uri)
-            SessionMaker = sessionmaker(bind=engine)
-            pg_session = SessionMaker()
-            create_tables(engine)
+        engine = create_engine(config.db_uri)
+        SessionMaker = sessionmaker(bind=engine)
+        pg_session = SessionMaker()
+        create_tables(engine)
 
-            import redis
-            connection_pool = redis.ConnectionPool(**config.redis)
-            redis_client = redis.StrictRedis(connection_pool=connection_pool)
+        prepare_resources(config, pg_session, logger)
+        for phase in list(Phase):
+            config.dir_output.mkdir(parents=True, exist_ok=True)
+            dest_alignments = config.dir_output / Path('alignment-{}.json'.format(phase.value))
+            alignments = load_alignments_from_db(pg_session, phase, logger)
+            with dest_alignments.open(mode='w') as f:
+                writer = jsonlines.Writer(f)
+                writer.write_all(alignments)
+        pg_session.close()
 
-            prepare_resources(config, pg_session, redis_client, logger)
-            for phase in list(Phase):
-                config.dir_output.mkdir(parents=True, exist_ok=True)
-                dest_alignments = config.dir_output / Path('alignment-{}.json'.format(phase.value))
-                alignments = load_alignments_from_db(pg_session, redis_client, phase, logger)
-                with dest_alignments.open(mode='w') as f:
-                    writer = jsonlines.Writer(f)
-                    writer.write_all(alignments)
-            pg_session.close()
+    # === Dataset ===
+    (vocab, train, valid, test) = create_dataset(config, device)
 
-        # === Dataset ===
-        (vocab, train, valid, test) = create_dataset(config, device)
-
-        vocab_size = len(vocab)
-        dest_vocab = Path(config.dir_output) / Path('vocab.json')
-        with dest_vocab.open(mode='w') as f:
-            json.dump(vocab.stoi, f, ensure_ascii=False, indent=True)
-        seqtypes = []
-        attn = setup_attention(config, seqtypes)
-        encoder = Encoder(config, device)
-        decoder = Decoder(config, vocab_size, attn, device)
-        model = EncoderDecoder(encoder, decoder, device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
-        criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
-                                     ignore_index=vocab.stoi[SpecialToken.Padding.value])
+    vocab_size = len(vocab)
+    dest_vocab = config.dir_output / Path(now) / Path('reporter.vocab')
+    with dest_vocab.open(mode='wb') as f:
+        torch.save(vocab, f)
+    seqtypes = []
+    attn = setup_attention(config, seqtypes)
+    encoder = Encoder(config, device)
+    decoder = Decoder(config, vocab_size, attn, device)
+    model = EncoderDecoder(encoder, decoder, device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
+                                 ignore_index=vocab.stoi[SpecialToken.Padding.value])
 
     # === Train ===
-    dest_model = config.dir_output / '{}.model'.format(now)
+    dest_model = config.dir_output / Path(now) / Path('reporter.model')
     prev_valid_bleu = 0.0
     max_bleu = 0.0
     best_epoch = 0
