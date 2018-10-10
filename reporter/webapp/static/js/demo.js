@@ -1,18 +1,13 @@
-let selectedDate;
-
-let chart;
-
-function datePickedHandler(formattedDate, date, inst) {
-  selectedDate = date;
-  getChart();
-}
+"use strict";
 
 async function chartClickedHandler(evt) {
+  console.log(evt)
+  const chart = evt.target.chart;
   const element = chart.getElementsAtEvent(evt)[0];
   if (!element) return;
 
   const label = chart.data.labels[element._index];
-  const ric = document.querySelector('#tab-index a.active').textContent;
+  const ric = evt.target.id;
   const timestamp = Math.round(new Date(label).getTime() / 1000);
   const response = await fetch(`/predict/${ric}/${timestamp}`);
   const data = await response.json();
@@ -24,27 +19,31 @@ async function chartClickedHandler(evt) {
   subheading.textContent = `${ric}, ${label}`;
 }
 
-async function getChart() {
-  if (!selectedDate) return;
+async function datePickedHandler(formattedDate, date, inst) {
+  if (!date) return;
 
-  const ric = document.querySelector('#tab-index a.active').textContent;
+  const timestamp = Math.round(date.getTime() / 1000);
+  const response = await fetch(`/data_ts/${timestamp}`);
+  const { start, end, data } = await response.json();
 
-  const timestamp = Math.round(selectedDate.getTime() / 1000);
-  const response = await fetch(`/data_ts/${ric}/${timestamp}`);
-  const data = await response.json();
+  Object.keys(data).forEach(ric => {
+    const ricdata = data[ric];
+    const ys = ricdata.ys.filter(Boolean).map(parseFloat);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const scale = maxY - minY;
 
-  const ys = data.ys.filter(Boolean).map(parseFloat);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-  const scale = maxY - minY;
-
-  draw(canvas, ric, data, minY - 0.1 * scale, maxY + 0.1 * scale);
+    draw(start, end, ric, ricdata, minY - 0.1 * scale, maxY + 0.1 * scale);
+  });
 }
 
-function draw(canvas, ric, data, minY, maxY) {
-  if (chart) chart.destroy();
+function draw(start, end, ric, data, minY, maxY) {
+  const canvas = document.getElementById(ric);
+  const ctx = canvas.getContext('2d');
 
-  chart = new Chart(ctx, {
+  if (canvas.chart) canvas.chart.destroy();
+
+  canvas.chart = new Chart(ctx, {
     type: 'line',
     data: {
       labels: data['xs'],
@@ -76,8 +75,8 @@ function draw(canvas, ric, data, minY, maxY) {
             displayFormats: {
               minute: 'HH:mm'
             },
-            min: moment(data.start * 1000),
-            max: moment(data.end * 1000),
+            min: moment(start * 1000),
+            max: moment(end * 1000),
           },
           distribution: 'series',
           bounds: 'data',
@@ -114,9 +113,6 @@ function draw(canvas, ric, data, minY, maxY) {
 }
 
 $(() => {
-  canvas = document.querySelector('#chart');
-  ctx = canvas.getContext('2d');
-
   $('#datepicker').datepicker({
     language: 'en',
     dateFormat: 'yyyy-mm-dd',
@@ -125,7 +121,5 @@ $(() => {
     onSelect: datePickedHandler,
   });
 
-  $('#tab-index').on('shown.bs.tab', 'a', evt => getChart());
-
-  $(canvas).on('click', chartClickedHandler);
+  $(document).on('click', 'canvas', chartClickedHandler);
 });

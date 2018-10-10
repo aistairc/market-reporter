@@ -1,16 +1,17 @@
 extends layout
 
 block content
-  h1#heading
-    | &nbsp;
-  h2#subheading.mb-3
-    | &nbsp;
-  ul#tab-index.nav.nav-tabs
-    each ric in ['.N225', '.TOPX']
-      li.nav-item
-        a.nav-link(class={'active': ric == '.N225'}, data-toggle='tab', href='#tab'+ric)= ric
-  #datepicker.float-left
-  canvas#chart.float-right.mt-0(height="252", width="800")
+  .clearfix
+    h1#heading
+      | &nbsp;
+    h2#subheading.mb-3
+      | &nbsp;
+    #datepicker.float-left
+    canvas(id='.N225').float-right.mt-0(height="252", width="800")
+  for ric in rics
+    if ric != '.N225'
+      canvas(id=ric).float-left.mt-0(height="252", width="400")
+
 
 block append scripts
   script(src='https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/datepicker.min.js', integrity='sha256-0prQxFtdWQNa3vW5JDMbvbBp6ehKzf9UIWqFGZIWPPE=', crossorigin='anonymous')
@@ -19,6 +20,7 @@ block append scripts
   script(type='text/javascript')
     | var minDate = new Date({{min_date * 1000}});
     | var maxDate = new Date({{max_date * 1000}});
+    | var rics = {{rics_json}};
   script(src='/static/js/demo.js')
 
 block append stylesheets

@@ -374,27 +374,34 @@ def articles(page_name: str, article_id: str) -> flask.Response:
 @app.route('/demo')
 def demo() -> flask.Response:
     min_date, max_date = fetch_date_range(db.session)
+    rics = fetch_rics(db.session)
     return flask.render_template('demo.pug', title='demo',
         min_date=min_date.timestamp(),
-        max_date=max_date.timestamp()
+        max_date=max_date.timestamp(),
+        rics=rics,
+        rics_json=flask.json.dumps(rics)
     )
 
-@app.route('/data_ts/<string:ric>/<string:timestamp>')
-def data_ts(ric: str, timestamp: str) -> flask.Response:
+@app.route('/data_ts/<string:timestamp>')
+def data_ts(timestamp: str) -> flask.Response:
     start = datetime.fromtimestamp(int(timestamp), timezone.utc)
     end = start + timedelta(days=1)
-    print(start, end)
 
-    data = {}
-    xs, ys = fetch_points(db.session, ric, start, end)
-
+    rics = fetch_rics(db.session)
     data = {
         'start': start.timestamp(),
         'end': end.timestamp(),
-        'xs': xs,
-        'ys': ys,
-        'title': '{} {}'.format(ric, start.strftime('%Y-%m-%d'))
+        'data': {}
     }
+
+    for ric in rics:
+        xs, ys = fetch_points(db.session, ric, start, end)
+
+        data['data'][ric] = {
+            'xs': xs,
+            'ys': ys,
+            'title': '{} {}'.format(ric, start.strftime('%Y-%m-%d'))
+        }
 
     return app.response_class(response=flask.json.dumps(data),
                               status=http.HTTPStatus.OK,
