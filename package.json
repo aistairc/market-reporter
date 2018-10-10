@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.4.0",
+    "bootstrap": "4.1.3",
+    "bootswatch": "^4.1.3",
+    "chart.js": "^2.7.2",
+    "gulp": "^3.9.1",
+    "jquery": "^3.3.1",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.21",
+    "popper.js": "^1.14.4",
+    "typeface-roboto": "^0.0.54",
+    "typeface-roboto-mono": "^0.0.54",
+    "urijs": "^1.19.1"
+  }
+}

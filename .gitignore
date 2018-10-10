@@ -9,3 +9,6 @@ resources/prices/*
 resources/headlines/*
 *.toml
 !*example.toml
+
+node_modules/
+reporter/webapp/static/fonts/
