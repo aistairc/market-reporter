@@ -21,7 +21,8 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
     2. [Prediction](#prediction)
 3. [Web Interface](#web-interface)
 4. [Test](#test)
-5. [References](#references)
+5. [License and References](#license-and-references)
+
 
 ## Requirements
 ### Architecture
@@ -178,7 +179,18 @@ You can see a page as the following picture.
 python setup.py test
 ```
 
-## References
+## License and References
+Market Reporter is available under different licensing options:
+
++ [GNU General Public License (v3 or later)](https://www.gnu.org/licenses/gpl-3.0.en.html).
++ Commercial licenses.
+
+Commercial licenses are appropriate for development of proprietary/commercial software where you do not want to share any source code with third parties or otherwise cannot comply with the terms of the GNU.
+For details, please contact us at [kirt-contact-ml@aist.go.jp](kirt-contact-ml@aist.go.jp)
+
+This software uses a technique applied for patent (patent application number 2017001583).
+
+When you write a paper using this software, please cite either or both of the followings.
 
 ```
 @InProceedings{murakami2017,
@@ -201,11 +213,23 @@ python setup.py test
 }
 
 @InProceedings{aoki2018,
-  author = {Tatsuya Aoki,
+  author = {Aoki, Tatsuya
+            and Miyazawa, Akira
+            and Ishigaki, Tatsuya
+            and Goshima, Keiichi
+            and Aoki, Kasumi
+            and Kobayashi, Ichiro
             and Takamura, Hiroya
             and Miyao, Yusuke},
   }
   title = {Generating Market Comments Referring to External Resources}
+  booktitle = {Proceedings of the 11th International Conference on
+               Natural Language Generation},
+  year = {2018},
+  publisher = {Association for Computational Linguistics},
+  pages = {},
+  location = {},
+  doi = {},
   url = {}
 }
 ```
