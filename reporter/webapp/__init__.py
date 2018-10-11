@@ -392,7 +392,7 @@ def data_ts(timestamp: str) -> flask.Response:
     end = start + timedelta(days=1)
 
     # PostgreSQL-specific speedup (raw query)
-    if db.session.bind.dialect.name == 'postgresql' and False:
+    if db.session.bind.dialect.name == 'postgresql':
         rics = config.rics
         data = fetch_all_points_fast(db.session, rics, start, end)
 
