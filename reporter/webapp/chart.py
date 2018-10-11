@@ -1,7 +1,10 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Iterable
 from datetime import datetime, timedelta
+from itertools import groupby
 
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql import text
+from sqlalchemy.types import DateTime
 
 from reporter.database.read import fetch_prices_of_a_day
 from reporter.util.constant import UTC
@@ -30,3 +33,27 @@ def fetch_points(session: Session, ric: str, start: datetime, end: datetime) -> 
         t_prev_step = t
 
     return ts, ps
+
+
+def _xs_ys_of_group(iter: Iterable[Tuple[float, float, float]]) -> Dict[str, List[float]]:
+    result = { 'xs': [], 'ys': [] }
+    for t, val, _ in iter:
+        result['xs'].append(t)
+        result['ys'].append(val)
+    return result
+
+def fetch_all_points_fast(session: Session, start: datetime, end: datetime) -> Dict[int, float]:
+    sql = text("""
+        SELECT EXTRACT(epoch FROM t) AS t, val ::float, ric
+        FROM
+        (SELECT generate_series(:start ::timestamp, :end ::timestamp, '5 minutes' ::interval) AS t) times
+        CROSS JOIN
+        (SELECT DISTINCT ric FROM prices) rics
+        NATURAL LEFT JOIN prices
+        ORDER BY ric ASC, t ASC
+    """)
+    result = session.bind.execute(sql, start=start, end=end)
+    result = {
+        ric: _xs_ys_of_group(g) for ric, g in groupby(result, lambda e: e[2])
+    }
+    return result

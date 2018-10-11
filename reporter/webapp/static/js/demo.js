@@ -1,7 +1,6 @@
 "use strict";
 
 async function chartClickedHandler(evt) {
-  console.log(evt)
   const chart = evt.target.chart;
   const element = chart.getElementsAtEvent(evt)[0];
   if (!element) return;
@@ -13,7 +12,7 @@ async function chartClickedHandler(evt) {
   const data = await response.json();
 
   const heading = document.querySelector('#heading');
-  data.pop(); // take off </s>
+  data.pop(); // take off "</s>" at the end
   heading.textContent = data.join('');
   const subheading = document.querySelector('#subheading');
   subheading.textContent = `${ric}, ${label}`;
@@ -28,7 +27,7 @@ async function datePickedHandler(formattedDate, date, inst) {
 
   Object.keys(data).forEach(ric => {
     const ricdata = data[ric];
-    const ys = ricdata.ys.filter(Boolean).map(parseFloat);
+    const ys = ricdata.ys.filter(Boolean);
     const minY = Math.min(...ys);
     const maxY = Math.max(...ys);
     const scale = maxY - minY;
@@ -46,7 +45,7 @@ function draw(start, end, ric, data, minY, maxY) {
   canvas.chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: data['xs'],
+      labels: data['xs'].map(x => new Date(x * 1000)),
       datasets: [{
         label: ric,
         borderColor: '#ff0039',
@@ -62,9 +61,8 @@ function draw(start, end, ric, data, minY, maxY) {
       tooltips: {
         callbacks: {
           title: (tooltipItem, data) => {
-            const label = tooltipItem[0].xLabel.replace('GMT', 'Z');
-            const m = moment(label, 'ddd, DD MMM YYYY HH:mm:ss Z');
-            return m.tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm') + ' JST';
+            const label = tooltipItem[0].xLabel;
+            return moment(label).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm') + ' JST';
           }
         }
       },
@@ -96,7 +94,7 @@ function draw(start, end, ric, data, minY, maxY) {
         display: false
       },
       title: {
-        text: data['title'],
+        text: `${ric} ${moment(start * 1000).format("YYYY-MM-DD")}`,
         fontSize: 18,
         padding: 16,
         display: true

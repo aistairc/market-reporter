@@ -10,11 +10,11 @@ from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import Headline, HumanEvaluation, GenerationResult
 from reporter.database.read import fetch_max_t_of_prev_trading_day, fetch_rics, fetch_date_range
 from reporter.util.config import Config
-from reporter.util.constant import UTC, Code, NIKKEI_DATETIME_FORMAT
+from reporter.util.constant import UTC, JST, Code, NIKKEI_DATETIME_FORMAT
 from reporter.webapp.human_evaluation import populate_for_human_evaluation
 from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
 from reporter.webapp.search import construct_constraint_query
-from reporter.webapp.chart import fetch_points
+from reporter.webapp.chart import fetch_points, fetch_all_points_fast
 from reporter.predict import Predictor
 
 import os
@@ -40,6 +40,7 @@ predictor = Predictor(config,
                       torch.device(device),
                       Path(output))
 
+EPOCH = datetime.fromtimestamp(0, tz=UTC)
 
 class EvalTarget:
     def __init__(self, method_name: str, text: str, is_debug: bool):
@@ -384,32 +385,37 @@ def demo() -> flask.Response:
 
 @app.route('/data_ts/<string:timestamp>')
 def data_ts(timestamp: str) -> flask.Response:
-    start = datetime.fromtimestamp(int(timestamp), timezone.utc)
+    start = datetime.fromtimestamp(int(timestamp), JST)
     end = start + timedelta(days=1)
 
-    rics = fetch_rics(db.session)
+    # PostgreSQL-specific speedup (raw query)
+    if db.session.bind.dialect.name == 'postgresql':
+        data = fetch_all_points_fast(db.session, start, end)
+
+    else:
+        rics = fetch_rics(db.session)
+
+        data = {}
+        for ric in rics:
+            xs, ys = fetch_points(db.session, ric, start, end - timedelta(seconds=1))
+
+            data[ric] = {
+                'xs': [(x - EPOCH).total_seconds() for x in xs],
+                'ys': [float(y) if y is not None else None for y in ys],
+            }
+
     data = {
         'start': start.timestamp(),
         'end': end.timestamp(),
-        'data': {}
+        'data': data
     }
-
-    for ric in rics:
-        xs, ys = fetch_points(db.session, ric, start, end)
-
-        data['data'][ric] = {
-            'xs': xs,
-            'ys': ys,
-            'title': '{} {}'.format(ric, start.strftime('%Y-%m-%d'))
-        }
-
     return app.response_class(response=flask.json.dumps(data),
-                              status=http.HTTPStatus.OK,
-                              mimetype='application/json')
+                            status=http.HTTPStatus.OK,
+                            mimetype='application/json')
 
 @app.route('/predict/<string:ric>/<string:timestamp>')
 def predict(ric: str, timestamp: str) -> flask.Response:
-    time = datetime.fromtimestamp(int(timestamp), timezone.utc)
+    time = datetime.fromtimestamp(int(timestamp), JST)
     sentence = predictor.predict(time.strftime(NIKKEI_DATETIME_FORMAT), ric)
     return app.response_class(response=flask.json.dumps(sentence),
                               status=http.HTTPStatus.OK,

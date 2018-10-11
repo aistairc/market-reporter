@@ -8,9 +8,10 @@ block content
       | &nbsp;
     #datepicker.float-left
     canvas(id='.N225').float-right.mt-0(height="252", width="800")
-  for ric in rics
-    if ric != '.N225'
-      canvas(id=ric).float-left.mt-0(height="252", width="400")
+  #other-graphs
+    for ric in rics
+      if ric != '.N225'
+        canvas(id=ric).float-left.mt-0(height="252", width="360")
 
 
 block append scripts
@@ -25,3 +26,7 @@ block append scripts
 
 block append stylesheets
   link(href='https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/css/datepicker.min.css', rel='stylesheet', integrity='sha256-q0wZgzQ6Ru67x+pIe9IAztrnlHNHyZui3BMwqUYDnpI=', crossorigin='anonymous')
+  style
+    | #other-graphs canvas {
+    |   margin-right: 10px;
+    | }
