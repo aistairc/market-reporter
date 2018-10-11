@@ -42,8 +42,8 @@ predictor = Predictor(config,
 
 # TODO move to some util/misc module?
 EPOCH = datetime.fromtimestamp(0, tz=UTC)
-def epoch(dt: datetime):
-    return (x - EPOCH).total_seconds()
+def epoch(dt: datetime) -> float:
+    return (dt - EPOCH).total_seconds()
 
 class EvalTarget:
     def __init__(self, method_name: str, text: str, is_debug: bool):
@@ -392,7 +392,7 @@ def data_ts(timestamp: str) -> flask.Response:
     end = start + timedelta(days=1)
 
     # PostgreSQL-specific speedup (raw query)
-    if db.session.bind.dialect.name == 'postgresql':
+    if db.session.bind.dialect.name == 'postgresql' and False:
         rics = config.rics
         data = fetch_all_points_fast(db.session, rics, start, end)
 
