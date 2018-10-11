@@ -40,7 +40,10 @@ predictor = Predictor(config,
                       torch.device(device),
                       Path(output))
 
+# TODO move to some util/misc module?
 EPOCH = datetime.fromtimestamp(0, tz=UTC)
+def epoch(dt: datetime):
+    return (x - EPOCH).total_seconds()
 
 class EvalTarget:
     def __init__(self, method_name: str, text: str, is_debug: bool):
@@ -390,9 +393,12 @@ def data_ts(timestamp: str) -> flask.Response:
 
     # PostgreSQL-specific speedup (raw query)
     if db.session.bind.dialect.name == 'postgresql':
-        data = fetch_all_points_fast(db.session, start, end)
+        rics = config.rics
+        data = fetch_all_points_fast(db.session, rics, start, end)
 
     else:
+        # XXX Note that `fetch_rics` is super slow!
+        # `config.rics` is a better idea
         rics = fetch_rics(db.session)
 
         data = {}
@@ -400,7 +406,7 @@ def data_ts(timestamp: str) -> flask.Response:
             xs, ys = fetch_points(db.session, ric, start, end - timedelta(seconds=1))
 
             data[ric] = {
-                'xs': [(x - EPOCH).total_seconds() for x in xs],
+                'xs': [epoch(x) for x in xs],
                 'ys': [float(y) if y is not None else None for y in ys],
             }
 

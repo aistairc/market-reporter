@@ -42,17 +42,22 @@ def _xs_ys_of_group(iter: Iterable[Tuple[float, float, float]]) -> Dict[str, Lis
         result['ys'].append(val)
     return result
 
-def fetch_all_points_fast(session: Session, start: datetime, end: datetime) -> Dict[int, float]:
+def fetch_all_points_fast(session: Session, rics: List[str], start: datetime, end: datetime) -> Dict[int, float]:
     sql = text("""
         SELECT EXTRACT(epoch FROM t) AS t, val ::float, ric
         FROM
         (SELECT generate_series(:start ::timestamp, :end ::timestamp, '5 minutes' ::interval) AS t) times
         CROSS JOIN
-        (SELECT DISTINCT ric FROM prices) rics
+        (SELECT * FROM (VALUES
+        """ +
+        ", ".join(["(:ric%d)" % i for i in range(len(rics))])
+        + """
+        ) AS ric_vals (ric)) rics
         NATURAL LEFT JOIN prices
         ORDER BY ric ASC, t ASC
     """)
-    result = session.bind.execute(sql, start=start, end=end)
+    ric_dict = { "ric%d" % i: ric for i, ric in enumerate(rics) }
+    result = session.bind.execute(sql, start=start, end=end, **ric_dict)
     result = {
         ric: _xs_ys_of_group(g) for ric, g in groupby(result, lambda e: e[2])
     }
