@@ -106,7 +106,7 @@ class Predictor:
                              ignore_index=self.vocab.stoi[SpecialToken.Padding.value])
 
         with dest_pretrained_model.open(mode='rb') as f:
-            self.model.load_state_dict(torch.load(f))
+            self.model.load_state_dict(torch.load(f, map_location=self.device))
 
     def predict(self, t: str, target_ric: str) -> List[str]:
         # Connect to Postgres
