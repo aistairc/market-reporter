@@ -1,11 +1,11 @@
 # Market Reporter
 [English](../README.md)
 
-<p align="center"><img src="../docs/pics/logo.png"></p>
+<p align="center"><img src="../docs/pics/logo.svg" width="600px"></p>
 
 __Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [PDF] のPythonによる実装です。
 
-<p align="center"><img src="../docs/pics/gloss.png"></p>
+<p align="center"><img src="../docs/pics/gloss.svg" width="100%"></p>
 
 
 ## 目次
@@ -26,7 +26,7 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 ## 準備
 ### 構成
 システムの構成は以下の図のようになっています。
-<p align="center"><img src="../docs/pics/architecture.png"></p>
+<p align="center"><img src="../docs/pics/architecture.svg" width="100%"></p>
 
 [アイコンのクレジット](../docs/icon-credit-ja.md)
 
@@ -37,7 +37,7 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
     日経QUICKニュース社から購入したものを使用しています。
 
 ### EC2
-Amazon EC2を利用する場合、このレポジトリに含まれるAnsibleのスクリプトを使って環境構築をできるようになっています。
+Amazon EC2を利用する場合、このレポジトリに含まれるAnsibleのスクリプトを使って環境構築をできるようになっています（将来的にはDockerを利用できるようになる予定です）。
 これによりPostgreSQL等の必要なソフトウェアもインストールすることができます。
 ```bash
 pip install ansible

@@ -1,12 +1,12 @@
 # Market Reporter
 [日本語](docs/README-ja.md)
 
-<p align="center"><img src="docs/pics/logo.png"></p>
+<p align="center"><img src="docs/pics/logo.svg" width="600px"></p>
 
 __Market Reporter__ automatically generates short comments that describe time series data of stock prices, FX rates, etc.
 This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [PDF].
 
-<p align="center"><img src="docs/pics/gloss.png"></p>
+<p align="center"><img src="docs/pics/gloss.svg" width="100%"></p>
 
 ## Table of Contents
 1. [Requirements](#requirements)
@@ -27,7 +27,7 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
 ## Requirements
 ### Architecture
 The architecture is illustrated below.
-<p align="center"><img src="docs/pics/architecture.png"></p>
+<p align="center"><img src="docs/pics/architecture.svg" width="100%"></p>
 
 [Credit of the icons](docs/icon-credit.md)
 
@@ -38,7 +38,7 @@ The architecture is illustrated below.
     We purchased news articles provided by Nikkei Quick News.
 
 ### EC2
-When you use Amazon EC2, launch an instance by Ansible.
+When you use Amazon EC2, launch an instance by Ansible (It will be replaced by Docker in later releases).
 The script installs dependencies such as PostgreSQL.
 ```bash
 pip install ansible
