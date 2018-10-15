@@ -32,6 +32,7 @@ db = SQLAlchemy(app)
 
 ric_to_ric_info = load_ric_to_ric_info()
 populate_for_human_evaluation(db.session, config.result)
+demo_initial_date = config.demo_initial_date
 
 device = os.environ.get('DEVICE', 'cpu')
 output = os.environ.get('OUTPUT', 'output')
@@ -383,7 +384,8 @@ def demo() -> flask.Response:
         min_date=min_date.timestamp(),
         max_date=max_date.timestamp(),
         rics=rics,
-        rics_json=flask.json.dumps(rics)
+        rics_json=flask.json.dumps(rics),
+        initial_date=flask.json.dumps(demo_initial_date),
     )
 
 @app.route('/data_ts/<string:timestamp>')

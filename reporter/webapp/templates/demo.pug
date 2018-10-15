@@ -22,6 +22,7 @@ block append scripts
     | var minDate = new Date({{min_date * 1000}});
     | var maxDate = new Date({{max_date * 1000}});
     | var rics = {{rics_json}};
+    | var initialDate = new Date({{initial_date}});
   script(src='/static/js/demo.js')
 
 block append stylesheets

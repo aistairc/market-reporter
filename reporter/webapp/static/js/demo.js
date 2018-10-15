@@ -125,6 +125,7 @@ $(() => {
     dateFormat: 'yyyy-mm-dd',
     minDate: minDate,
     maxDate: maxDate,
+    startDate: initialDate,
     onSelect: datePickedHandler,
   });
 
