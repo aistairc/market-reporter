@@ -14,7 +14,7 @@ from reporter.util.constant import UTC, JST, Code, NIKKEI_DATETIME_FORMAT
 from reporter.webapp.human_evaluation import populate_for_human_evaluation
 from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
 from reporter.webapp.search import construct_constraint_query
-from reporter.webapp.chart import fetch_points, fetch_all_points_fast
+from reporter.webapp.chart import fetch_points, fetch_all_points_fast, fetch_close, fetch_all_closes_fast
 from reporter.predict import Predictor
 
 import os
@@ -389,31 +389,37 @@ def demo() -> flask.Response:
 @app.route('/data_ts/<string:timestamp>')
 def data_ts(timestamp: str) -> flask.Response:
     start = datetime.fromtimestamp(int(timestamp), JST)
-    end = start + timedelta(days=1)
+    one_day = timedelta(days=1)
+    end = start + one_day - timedelta(seconds=1)
+    day_before = start - one_day
 
     # PostgreSQL-specific speedup (raw query)
     if db.session.bind.dialect.name == 'postgresql':
         rics = config.rics
-        data = fetch_all_points_fast(db.session, rics, start, end)
+        prices = fetch_all_points_fast(db.session, rics, start, end)
+        closes = fetch_all_closes_fast(db.session, rics, day_before, start)
 
     else:
         # XXX Note that `fetch_rics` is super slow!
         # `config.rics` is a better idea
         rics = fetch_rics(db.session)
 
-        data = {}
+        prices = {}
+        closes = {}
         for ric in rics:
-            xs, ys = fetch_points(db.session, ric, start, end - timedelta(seconds=1))
+            xs, ys = fetch_points(db.session, ric, start, end)
 
-            data[ric] = {
+            prices[ric] = {
                 'xs': [epoch(x) for x in xs],
                 'ys': [float(y) if y is not None else None for y in ys],
             }
+            closes[ric] = fetch_close(db.session, ric, day_before)
 
     data = {
         'start': start.timestamp(),
         'end': end.timestamp(),
-        'data': data
+        'prices': prices,
+        'closes': closes,
     }
     return app.response_class(response=flask.json.dumps(data),
                             status=http.HTTPStatus.OK,

@@ -9,6 +9,10 @@ from sqlalchemy.types import DateTime
 from reporter.database.read import fetch_prices_of_a_day
 from reporter.util.constant import UTC
 
+from reporter.database.model import Price, Close
+from sqlalchemy import cast, Date
+from reporter.database.misc import in_jst
+
 
 def fetch_points(session: Session, ric: str, start: datetime, end: datetime) -> Tuple[List[int], List[str]]:
 
@@ -42,7 +46,7 @@ def _xs_ys_of_group(iter: Iterable[Tuple[float, float, float]]) -> Dict[str, Lis
         result['ys'].append(val)
     return result
 
-def fetch_all_points_fast(session: Session, rics: List[str], start: datetime, end: datetime) -> Dict[int, float]:
+def fetch_all_points_fast(session: Session, rics: List[str], start: datetime, end: datetime) -> Dict[str, float]:
     sql = text("""
         SELECT EXTRACT(epoch FROM t) AS t, val ::float, ric
         FROM
@@ -61,4 +65,29 @@ def fetch_all_points_fast(session: Session, rics: List[str], start: datetime, en
     result = {
         ric: _xs_ys_of_group(g) for ric, g in groupby(result, lambda e: e[2])
     }
+    return result
+
+def fetch_close(session: Session, ric: str, jst: datetime) -> float:
+    result = session \
+        .query(Price.val) \
+        .filter(cast(in_jst(Close.t), Date) == jst.date(), Close.ric == ric, Close.t == Price.t, Price.ric == ric) \
+        .scalar()
+    return float(result) if result is not None else None
+
+def fetch_all_closes_fast(session: Session, rics: List[str], start: datetime, end: datetime) -> Dict[str, float]:
+    sql = text("""
+        SELECT prices.ric, prices.val ::float
+        FROM
+        (SELECT * FROM (VALUES
+        """ +
+        ", ".join(["(:ric%d)" % i for i in range(len(rics))])
+        + """
+        ) AS ric_vals (ric)) rics
+        NATURAL JOIN prices
+        NATURAL LEFT JOIN closes
+        WHERE closes.t >= :start AND closes.t < :end
+    """)
+    ric_dict = { "ric%d" % i: ric for i, ric in enumerate(rics) }
+    result = session.bind.execute(sql, start=start, end=end, **ric_dict)
+    result = dict(list(result))
     return result

@@ -23,20 +23,21 @@ async function datePickedHandler(formattedDate, date, inst) {
 
   const timestamp = Math.round(date.getTime() / 1000);
   const response = await fetch(`/data_ts/${timestamp}`);
-  const { start, end, data } = await response.json();
+  const { start, end, prices, closes } = await response.json();
 
-  Object.keys(data).forEach(ric => {
-    const ricdata = data[ric];
-    const ys = ricdata.ys.filter(Boolean);
+  Object.keys(prices).forEach(ric => {
+    const ricVals = prices[ric];
+    const closeVal = closes[ric];
+    const ys = ricVals.ys.filter(Boolean);
     const minY = Math.min(...ys);
     const maxY = Math.max(...ys);
     const scale = maxY - minY;
 
-    draw(start, end, ric, ricdata, minY - 0.1 * scale, maxY + 0.1 * scale);
+    draw(start, end, ric, ricVals, closeVal, minY - 0.1 * scale, maxY + 0.1 * scale);
   });
 }
 
-function draw(start, end, ric, data, minY, maxY) {
+function draw(start, end, ric, data, closeVal, minY, maxY) {
   const canvas = document.getElementById(ric);
   const ctx = canvas.getContext('2d');
 
@@ -46,15 +47,23 @@ function draw(start, end, ric, data, minY, maxY) {
     type: 'line',
     data: {
       labels: data['xs'].map(x => new Date(x * 1000)),
-      datasets: [{
-        label: ric,
-        borderColor: '#ff0039',
-        backgroundColor: '#ff0039',
-        lineTension: 0,
-        fill: false,
-        showLine: true,
-        data: data['ys']
-      }]
+      datasets: [
+        {
+          label: ric + ' close',
+          borderColor: '#0000ff',
+          backgroundColor: '#0000ff',
+          data: [closeVal]
+        },
+        {
+          label: ric,
+          borderColor: '#ff0039',
+          backgroundColor: '#ff0039',
+          lineTension: 0,
+          fill: false,
+          showLine: true,
+          data: data['ys']
+        },
+      ]
     },
     options: {
       responsive: false,
