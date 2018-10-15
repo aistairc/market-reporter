@@ -52,8 +52,13 @@ def are_headlines_ready(session: Session):
 
 
 def fetch_rics(session: Session) -> List[str]:
-    results = session.query(Price.ric).group_by(Price.ric).all()
+    results = session.query(Price.ric).distinct()
     return [result.ric for result in results]
+
+
+def fetch_date_range(session: Session) -> Tuple[datetime, datetime]:
+    results = session.query(func.min(Price.t), func.max(Price.t)).first()
+    return results
 
 
 def fetch_prices_of_a_day(session: Session,
