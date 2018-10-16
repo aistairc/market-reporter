@@ -41,7 +41,6 @@ result = [
     ['Extr',
      'output/extr.csv']
 ]
-demo_initial_date = '2016-04-01'
 
 [train]
 user_dict = 'user-dict.csv'

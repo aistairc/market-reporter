@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import List
 
 import http
@@ -8,18 +8,13 @@ from sqlalchemy import func
 
 from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import Headline, HumanEvaluation, GenerationResult
-from reporter.database.read import fetch_max_t_of_prev_trading_day, fetch_rics, fetch_date_range
+from reporter.database.read import fetch_max_t_of_prev_trading_day
 from reporter.util.config import Config
-from reporter.util.constant import UTC, JST, Code, NIKKEI_DATETIME_FORMAT
+from reporter.util.constant import UTC, Code
 from reporter.webapp.human_evaluation import populate_for_human_evaluation
 from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
 from reporter.webapp.search import construct_constraint_query
-from reporter.webapp.chart import fetch_points, fetch_all_points_fast, fetch_close, fetch_all_closes_fast
-from reporter.predict import Predictor
-
-import os
-import torch
-from pathlib import Path
+from reporter.webapp.chart import fetch_points
 
 
 config = Config('config.toml')
@@ -32,19 +27,7 @@ db = SQLAlchemy(app)
 
 ric_to_ric_info = load_ric_to_ric_info()
 populate_for_human_evaluation(db.session, config.result)
-demo_initial_date = config.demo_initial_date
 
-device = os.environ.get('DEVICE', 'cpu')
-output = os.environ.get('OUTPUT', 'output')
-
-predictor = Predictor(config,
-                      torch.device(device),
-                      Path(output))
-
-# TODO move to some util/misc module?
-EPOCH = datetime.fromtimestamp(0, tz=UTC)
-def epoch(dt: datetime) -> float:
-    return (dt - EPOCH).total_seconds()
 
 class EvalTarget:
     def __init__(self, method_name: str, text: str, is_debug: bool):
@@ -375,62 +358,3 @@ def articles(page_name: str, article_id: str) -> flask.Response:
     return article_evaluation(article_id,
                               flask.request.method,
                               is_debug=page_name == 'debug')
-
-@app.route('/demo')
-def demo() -> flask.Response:
-    min_date, max_date = fetch_date_range(db.session)
-    rics = fetch_rics(db.session)
-    return flask.render_template('demo.pug', title='demo',
-        min_date=min_date.timestamp(),
-        max_date=max_date.timestamp(),
-        rics=rics,
-        rics_json=flask.json.dumps(rics),
-        initial_date=flask.json.dumps(demo_initial_date),
-    )
-
-@app.route('/data_ts/<string:timestamp>')
-def data_ts(timestamp: str) -> flask.Response:
-    start = datetime.fromtimestamp(int(timestamp), JST)
-    one_day = timedelta(days=1)
-    end = start + one_day - timedelta(seconds=1)
-    day_before = start - one_day
-
-    # PostgreSQL-specific speedup (raw query)
-    if db.session.bind.dialect.name == 'postgresql':
-        rics = config.rics
-        prices = fetch_all_points_fast(db.session, rics, start, end)
-        closes = fetch_all_closes_fast(db.session, rics, day_before, start)
-
-    else:
-        # XXX Note that `fetch_rics` is super slow!
-        # `config.rics` is a better idea
-        rics = fetch_rics(db.session)
-
-        prices = {}
-        closes = {}
-        for ric in rics:
-            xs, ys = fetch_points(db.session, ric, start, end)
-
-            prices[ric] = {
-                'xs': [epoch(x) for x in xs],
-                'ys': [float(y) if y is not None else None for y in ys],
-            }
-            closes[ric] = fetch_close(db.session, ric, day_before)
-
-    data = {
-        'start': start.timestamp(),
-        'end': end.timestamp(),
-        'prices': prices,
-        'closes': closes,
-    }
-    return app.response_class(response=flask.json.dumps(data),
-                            status=http.HTTPStatus.OK,
-                            mimetype='application/json')
-
-@app.route('/predict/<string:ric>/<string:timestamp>')
-def predict(ric: str, timestamp: str) -> flask.Response:
-    time = datetime.fromtimestamp(int(timestamp), JST)
-    sentence = predictor.predict(time.strftime(NIKKEI_DATETIME_FORMAT), ric)
-    return app.response_class(response=flask.json.dumps(sentence),
-                              status=http.HTTPStatus.OK,
-                              mimetype='application/json')
