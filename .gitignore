@@ -9,4 +9,3 @@ resources/prices/*
 resources/headlines/*
 *.toml
 !*example.toml
-*.pyc
