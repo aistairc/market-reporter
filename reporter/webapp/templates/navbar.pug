@@ -1,3 +1,10 @@
+mixin navitem(item_title, name)
+  li.nav-item(class={'active': item_title == title})
+    a.nav-link(href="/#{item_title}")
+      | #{name}
+      if item_title == title
+        span.sr-only (current)
+
 nav.navbar.navbar-expand-lg.navbar-dark
   .container
     a.navbar-brand(href='/human-evaluation/list')
@@ -6,17 +13,6 @@ nav.navbar.navbar-expand-lg.navbar-dark
       span.navbar-toggler-icon
     #navbarColor01.navbar-collapse.collapse
       ul.navbar-nav.ml-auto
-        if title == 'debug'
-          li.nav-item
-            a.nav-link(href='/human-evaluation') Human Evaluation
-          li.nav-item.active
-            a.nav-link(href='/debug')
-              | Debug
-              span.sr-only (current)
-        else
-          li.nav-item.active
-            a.nav-link(href='/human-evaluation')
-              | Human Evaluation
-              span.sr-only (current)
-          li.nav-item
-            a.nav-link(href='/debug') Debug
+        +navitem('demo', 'Demo')
+        +navitem('debug', 'Debug')
+        +navitem('human-evaluation', 'Human Evaluation')

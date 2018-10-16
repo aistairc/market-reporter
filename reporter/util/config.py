@@ -72,6 +72,7 @@ class Config:
         self.dec_hidden_size = int(dec.get('dec_hidden_size', 256))
 
         self.n_items_per_page = config.get('webapp', {}).get('n_items_per_page', 20)
+        self.demo_initial_date = config.get('webapp', {}).get('demo_initial_date', None)
 
         self.result = dict([(m, Path(p)) for (m, p)
                             in config.get('webapp', {}).get('result', [])])
