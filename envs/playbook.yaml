@@ -11,5 +11,4 @@
     - gcc
     - postgres-client
     - postgres-server
-    - redis
 ...

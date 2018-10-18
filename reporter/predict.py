@@ -7,9 +7,7 @@ from pathlib import Path
 from typing import List
 
 import jsonlines
-import redis
 import torch
-from redis import Redis
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
 from sqlalchemy import func
@@ -113,8 +111,6 @@ class Predictor:
         engine = create_engine(self.config.db_uri)
         SessionMaker = sessionmaker(bind=engine)
         pg_session = SessionMaker()
-
-        # Connect to Redis
 
         rics = self.config.rics \
             if target_ric in self.config.rics \

@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Tuple
 from xml.etree.ElementTree import fromstring
 
 import numpy
-from redis import Redis
 from sqlalchemy import Integer, cast, extract, func, Date
 from sqlalchemy.orm import Session, scoped_session
 from sqlalchemy.orm.session import sessionmaker
