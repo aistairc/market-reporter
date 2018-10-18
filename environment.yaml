@@ -69,7 +69,6 @@ dependencies:
   - pytz=2018.5=py37_0
   - pyyaml=3.13=py37h14c3975_0
   - readline=7.0=h7b6447c_5
-  - redis-py=2.10.6=py37_0
   - requests=2.19.1=py37_0
   - ruamel_yaml=0.15.46=py37h14c3975_0
   - setuptools=40.2.0=py37_0
@@ -93,7 +92,6 @@ dependencies:
     - colorama==0.3.9
     - docutils==0.14
     - flask-sqlalchemy==2.3.2
-    - hiredis==0.2.0
     - janome==0.3.6
     - jmespath==0.9.3
     - jsonlines==1.2.0
@@ -103,7 +101,6 @@ dependencies:
     - pyasn1==0.4.4
     - pynacl==1.2.1
     - pypugjs==5.7.1
-    - redis==2.10.6
     - rsa==3.4.2
     - s3transfer==0.1.13
     - sqlalchemy==1.2.11
