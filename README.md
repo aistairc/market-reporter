@@ -12,10 +12,8 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
 1. [Requirements](#requirements)
     1. [Architecture](#architecture)
     2. [Resources](#resources)
-    3. [EC2](#ec2)
-    4. [S3](#s3)
-    5. [Anaconda](#anaconda)
-    6. [PostgreSQL](#postgresql)
+    3. [S3](#s3)
+    4. [Docker](#docker)
 2. [Usage](#usage)
     1. [Training](#training)
     2. [Prediction](#prediction)
@@ -37,90 +35,24 @@ The architecture is illustrated below.
 + Text data  
     We purchased news articles provided by Nikkei Quick News.
 
-### EC2
-When you use Amazon EC2, launch an instance by Ansible (It will be replaced by Docker in later releases).
-The script installs dependencies such as PostgreSQL.
-```bash
-pip install ansible
-cd envs
-cp hosts.example hosts
-vi hosts # Edit variables according to your environment
-ansible-playbook playbook.yaml
-```
-
 ### Amazon S3
 This tool stores data to [Amazon S3](https://aws.amazon.com/s3/).
 Ask the manager to give you `AmazonS3FullAccess` and issue a credential file.
 For details, please read [AWS Identity and Access Management](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html).
 
-```bash
-mkdir -p "$HOME/.aws"
-chmod 700 "$HOME/.aws"
-touch "$HOME/.aws/credentials"
-chmod 600 "$HOME/.aws/credentials"
-# Change `PROFILE_NAME` to `default` or something.
-echo '[PROFILE_NAME]' >> credentials
-# Change `$HOME/Downloads/creadenticals.csv` according to your environment.
-downloaded_credentials="$HOME/Downloads/credentials.csv"
-cat $downloaded_credentials \
-    | awk 'BEGIN { FS = ","; } NR == 2 { print $3; }' \
-    | sed -e 's/^/aws_access_key_id=/' \
-    >> credentials
-cat $downloaded_credentials \
-    | awk 'BEGIN { FS = ","; } NR == 2 { print $4; }' \
-    | sed -e 's/^/aws_secret_access_key=/' \
-    >> credentials
-```
 
-### Anaconda
-We recommend <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a>.
-The code never runs on Python 2.
-After you install Anaconda, create a new environment from `environment.yaml`.
+### Docker
+Install [Docker](https://docs.docker.com/).
 
 ```bash
-conda env create -f environment.yaml -n NAME
-source activate NAME
-```
-
-### PostgreSQL
-PostgreSQL is installed by Ansible.
-When you install it manually, be sure you have `python3-psycopg2`.
-```bash
-sudo apt install python3-psycopg2
-```
-When you use your database named `master` on your local machine, edit `config.toml` as follows.
-```
-[postgres]
-- uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
-+ uri = 'postgresql:///master'
-```
-When you connect to a database server using SSH port forwarding,
-first add the configuration for the server to `~/.ssh/config`
-if you have not added it.
-
-```
-# ~/.ssh/config
-Host dbserver
-    HostName ec2-xxx-xxx-xxx-xxx.ap-northeast-1.compute.amazonaws.com
-    User kirito
-    IdentityFile ~/.ssh/kirito.pem
-    IdentitiesOnly yes
-    ForwardAgent yes
-    ServerAliveInterval 60
-```
-Then connect to the server on some port, say `2345`.
-```
-ssh -L 2345:localhost:5432 dbserver # `5432` is the default port of PostgreSQL 
-ssh -fNT -L 2345:localhost:5432 dbserver # `-fNT` options keep connection in the background
-```
-While keeping the connection above, you can access to the database on your local machine.
-```
-psql -h localhost -p 2345 -U kirito master
-```
-Then edit `config.toml`.
-```
-- uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
-+ uri = 'postgresql://kirito:PNdWzhR2rzqUXW4n4GGRa7bN@localhost:2345/master'
+cd docker
+docker build -t market-reporter
+docker run -it \
+    --name demo \
+    -e AWS_ACCESS_KEY_ID=your_access_key_id \
+    -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
+    market-reporter \
+    /bin/bash
 ```
 
 ## Usage
