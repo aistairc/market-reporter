@@ -10,21 +10,18 @@ import jsonlines
 import torch
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
-from sqlalchemy import func
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import Session, sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
 from reporter.database.read import Alignment, fetch_latest_vals
-from reporter.database.model import Price, Close
 from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
 from reporter.util.constant import (
     N_LONG_TERM,
     N_SHORT_TERM,
     NIKKEI_DATETIME_FORMAT,
-    REUTERS_DATETIME_FORMAT,
     Code,
     Phase,
     SeqType,
