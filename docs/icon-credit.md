@@ -4,7 +4,6 @@ We used the icons in the [illustration of architecture](../docs/pics/architectur
 + [Microsoft Azure, Cloud and Enterprise Symbol / Icon Set](https://www.microsoft.com/en-us/download/details.aspx?id=41937)
 + [Docker](https://www.docker.com/legal/brand-guidelines)
 + [Nginx](https://commons.wikimedia.org/wiki/File:Nginx_logo.svg)
-+ [Python](https://commons.wikimedia.org/wiki/File:Python-logo-notext.svg)
 + [PyTorch Logo](https://github.com/pytorch/pytorch)
 + [PostgreSQL](https://wiki.postgresql.org/wiki/Logo)
 + [Flask Logo](http://flask.pocoo.org/community/logos/)
