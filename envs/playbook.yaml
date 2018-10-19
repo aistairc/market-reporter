@@ -9,6 +9,4 @@
     - apt
     - git
     - gcc
-    - postgres-client
-    - postgres-server
 ...
