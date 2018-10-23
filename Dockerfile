@@ -4,16 +4,21 @@ RUN apt-get update && apt-get install -y \
     emacs \
     gcc \
     g++ \
+    nginx \
+    openssh-server \
     postgresql \    
     sudo \
+    supervisor \
     vim
 
-RUN useradd -G sudo -m -s /bin/bash plu \
-    && echo "plu:plumaketreporter" | chpasswd \
-    && echo 'Defaults visiblepw' >> /etc/sudoers \
-    && echo "plu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN useradd --create-home --shell /bin/bash plu
+
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# EXPOSE 22 5432
 
 USER postgres
+CMD supervisord -c /etc/supervisor/supervisord.conf
 
 RUN /etc/init.d/postgresql start \
     && createuser plu \
@@ -21,16 +26,10 @@ RUN /etc/init.d/postgresql start \
 
 USER plu
 
-ENV HOME /home/plu
-
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
     && echo "conda activate base" >> ~/.bashrc
 
-RUN mkdir -p ${HOME}/market-reporter
+WORKDIR /home/plu/
 
-WORKDIR ${HOME}/market-reporter
-
-# TODO : when the repository is published, use 'wget ....zip' .
-COPY --chown=plu:plu [".", "${HOME}/market-reporter/"]
-
-CMD ["/bin/bash"]
+ARG GITHUB_ACCESS_TOKEN
+RUN git clone https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/aistairc/market-reporter.git
