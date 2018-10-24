@@ -1,12 +1,12 @@
 # Market Reporter
 [日本語](docs/README-ja.md)
 
-<p align="center"><img src="docs/pics/logo.svg" width="600px"></p>
+<p align="center"><img src="docs/figures/logo.svg" width="600px"></p>
 
 __Market Reporter__ automatically generates short comments that describe time series data of stock prices, FX rates, etc.
 This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [PDF].
 
-<p align="center"><img src="docs/pics/gloss.svg" width="100%"></p>
+<p align="center"><img src="docs/figures/gloss.svg" width="100%"></p>
 
 ## Table of Contents
 1. [Requirements](#requirements)
@@ -27,7 +27,7 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
 ## Requirements
 ### Architecture
 The architecture is illustrated below.
-<p align="center"><img src="docs/pics/architecture.svg" width="100%"></p>
+<p align="center"><img src="docs/figures/architecture.svg" width="100%"></p>
 
 [Credit of the icons](docs/icon-credit.md)
 
@@ -171,7 +171,7 @@ nohup uwsgi --ini uwsgi.ini &
 ```
 
 You can see a page as the following picture.
-<p align="center"><img src="docs/pics/webapp.png"></p>
+<p align="center"><img src="docs/figures/webapp.png"></p>
 
 ## Test
 

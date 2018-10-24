@@ -1,11 +1,11 @@
 # Market Reporter
 [English](../README.md)
 
-<p align="center"><img src="../docs/pics/logo.svg" width="600px"></p>
+<p align="center"><img src="../docs/figures/logo.svg" width="600px"></p>
 
 __Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [PDF] のPythonによる実装です。
 
-<p align="center"><img src="../docs/pics/gloss.svg" width="100%"></p>
+<p align="center"><img src="../docs/figures/gloss.svg" width="100%"></p>
 
 
 ## 目次
@@ -26,7 +26,7 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 ## 準備
 ### 構成
 システムの構成は以下の図のようになっています。
-<p align="center"><img src="../docs/pics/architecture.svg" width="100%"></p>
+<p align="center"><img src="../docs/figures/architecture.svg" width="100%"></p>
 
 [アイコンのクレジット](../docs/icon-credit-ja.md)
 
@@ -174,7 +174,7 @@ nohup uwsgi --ini uwsgi.ini &
 
 正常に起動すると以下のような検索画面が表示されます。
 
-<p align="center"><img src="../docs/pics/webapp.png"></p>
+<p align="center"><img src="../docs/figures/webapp.png"></p>
 
 ## テスト
 
