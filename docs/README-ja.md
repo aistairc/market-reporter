@@ -12,8 +12,8 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 1. [準備](#準備)
     1. [構成](#構成)
     2. [資源](#資源)
-    3. [EC2](#ec2)
-    4. [S3](#s3)
+    3. [S3](#s3)
+    4. [Docker](#docker)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
 2. [使い方](#使い方)
@@ -35,17 +35,6 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
     時系列データは[Thomson Reuters DatScope Select](https://financial.thomsonreuters.com/en/products/infrastructure/financial-data-feeds/datascope-data-analytics-platform/datascope-select-data-delivery.html)との契約により利用可能になる[REST API](https://developers.thomsonreuters.com/datascope-select-dss/datascope-select-rest-api) を用いて取得しました。
 + テキストデータ
     日経QUICKニュース社から購入したものを使用しています。
-
-### EC2
-Amazon EC2を利用する場合、このレポジトリに含まれるAnsibleのスクリプトを使って環境構築をできるようになっています（将来的にはDockerを利用できるようになる予定です）。
-これによりPostgreSQL等の必要なソフトウェアもインストールすることができます。
-```bash
-pip install ansible
-cd envs
-cp hosts.example hosts
-vi hosts # Edit variables according to your environment
-ansible-playbook playbook.yaml
-```
 
 ### Amazon S3
 本ソフトウェアは[Amazon S3](https://aws.amazon.com/s3/)を使用します。
@@ -70,6 +59,33 @@ cat $downloaded_credentials \
     | awk 'BEGIN { FS = ","; } NR == 2 { print $4; }' \
     | sed -e 's/^/aws_secret_access_key=/' \
     >> credentials
+```
+
+### Docker
+Docker を使用する場合は、このセクションを参照にしてください。
+
+まず初めに、Market-reporter の Docker イメージを構築してください。
+```
+docker build \
+    --build-arg GITHUB_ACCESS_TOKEN=your_github_access_token \
+    -t market-reporter .
+```
+Dockerfile 内で `git clone` を使っています。 GitHun のプロファイルからアクセス トークンを取得してください。
+
+次に、Docker を実行してコンテナを作成してください.
+```
+docker run -it \
+    --name demo \
+    -e AWS_ACCESS_KEY_ID=your_access_key_id \
+    -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
+    market-reporter
+```
+このとき AWS アクセスキー ID と AWS シークレットアクセスキーを入力してください。
+AWS の認証情報ファイル (default: `~/.aws/credetials`) を使用する場合は、 `config.toml` ファイルの `[s3]` の `profile_name` の行のコメントアウトを取り除いてください.
+```
+[s3]
+-# profile_name = 'default'
++profile_name = 'default'
 ```
 
 ### Anaconda

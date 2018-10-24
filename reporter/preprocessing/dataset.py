@@ -30,7 +30,6 @@ def prepare_resources(config: Config, db_session: Session, logger: Logger) -> Di
     has_headlines = are_headlines_ready(db_session)
 
     dir_prices = Path(config.dir_resources, 'prices')
-
     boto3_session = boto3.session.Session(profile_name=config.aws_profile_name)
     bucket_name = config.s3_bucket_name
     s3 = boto3_session.resource('s3')
