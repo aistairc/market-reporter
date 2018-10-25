@@ -1,5 +1,10 @@
 FROM continuumio/anaconda3
 
+ARG GITHUB_ACCESS_TOKEN
+RUN test -n "$GITHUB_ACCESS_TOKEN"
+
+ENV DEBCONF_NOWARNINGS yes
+
 RUN apt-get update && apt-get install -y \
     emacs \
     gcc \
@@ -24,16 +29,14 @@ RUN /etc/init.d/postgresql start \
 
 USER plu
 
+WORKDIR /home/plu/
+
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
     && echo "conda activate base" >> ~/.bashrc
 
-WORKDIR /home/plu/
-
 COPY startup.sh .
 
-ARG GITHUB_ACCESS_TOKEN
 RUN git clone https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/aistairc/market-reporter.git
 
 USER root
-
 CMD ["./startup.sh"]
