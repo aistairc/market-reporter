@@ -47,7 +47,7 @@ class Config:
         self.db_uri_test = config.get('postgres-test', {}).get('uri')
 
         s3 = config.get('s3', {})
-        self.aws_profile_name = s3.get('profile_name', 'default')
+        self.aws_profile_name = s3.get('profile_name')
         self.s3_bucket_name = s3.get('bucket_name')
         self.remote_dir_prices = s3.get('remote_dir_prices')
         self.remote_nikkei_headline_filenames = s3.get('remote_nikkei_headline_filenames', [])

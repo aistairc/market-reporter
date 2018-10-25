@@ -12,8 +12,8 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PD
 1. [Requirements](#requirements)
     1. [Architecture](#architecture)
     2. [Resources](#resources)
-    3. [EC2](#ec2)
-    4. [S3](#s3)
+    3. [S3](#s3)
+    4. [Docker](#docker)
     5. [Anaconda](#anaconda)
     6. [PostgreSQL](#postgresql)
 2. [Usage](#usage)
@@ -37,17 +37,6 @@ The architecture is illustrated below.
 + Text data  
     We purchased news articles provided by Nikkei Quick News.
 
-### EC2
-When you use Amazon EC2, launch an instance by Ansible (It will be replaced by Docker in later releases).
-The script installs dependencies such as PostgreSQL.
-```bash
-pip install ansible
-cd envs
-cp hosts.example hosts
-vi hosts # Edit variables according to your environment
-ansible-playbook playbook.yaml
-```
-
 ### Amazon S3
 This tool stores data to [Amazon S3](https://aws.amazon.com/s3/).
 Ask the manager to give you `AmazonS3FullAccess` and issue a credential file.
@@ -70,6 +59,33 @@ cat $downloaded_credentials \
     | awk 'BEGIN { FS = ","; } NR == 2 { print $4; }' \
     | sed -e 's/^/aws_secret_access_key=/' \
     >> credentials
+```
+
+### Docker
+When you use Docker, refer this section.
+
+First, build Docker image of Market-reporter.
+```
+docker build \
+    --build-arg GITHUB_ACCESS_TOKEN=your_github_access_token \
+    -t market-reporter .
+```
+We use 'git clone' in Dockerfile. Please get the GitHub access token from your profile.
+
+Next, run Docker and create a container.
+```
+docker run -it \
+    --name demo \
+    -e AWS_ACCESS_KEY_ID=your_access_key_id \
+    -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
+    market-reporter
+```
+Please input AWS access key ID and AWS secret access key.
+If you use a credentials file of AWS (default: `~/.aws/credetials`), please edit `config.toml` to remove a comment out of `profile_name` at `[s3]`.
+```
+[s3]
+-# profile_name = 'default'
++profile_name = 'default'
 ```
 
 ### Anaconda

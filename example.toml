@@ -5,7 +5,7 @@ dir_output = 'output'
 
 [s3]
 use_s3 = true
-profile_name = 'default'
+# profile_name = 'default'
 bucket_name = 'BUCKETNAME'
 remote_dir_prices = 'finance/reuters/indices'
 remote_nikkei_headline_filenames = [
