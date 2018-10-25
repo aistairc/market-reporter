@@ -19,6 +19,7 @@ USER postgres
 RUN /etc/init.d/postgresql start \
     && createuser plu \
     && createdb master plu \
+    && createdb test_db plu \
     && /etc/init.d/postgresql stop
 
 USER plu
