@@ -11,8 +11,8 @@ YEN_EXPRS = ['円', '円高', '円安']
 
 def is_template(text: str) -> bool:
     """
-    >>> is_template('日経平均前引け、続伸　100円高の12000円</s>')
-    >>> True
+    >>> is_template('日経平均前引け、続伸　<yen val=100/>高の<yen val=12000/>')
+    True
     """
 
     start = r'(東証レビュー\([1-3]?[0-9]日\)( )?)?(日経平均)((前引け)|(大引け))?(、|　)'
@@ -20,6 +20,7 @@ def is_template(text: str) -> bool:
     mention = r'(((前引け)|(大引け)|(終値)|(午前終値))は)?'
     stock_value = r'(<yen val=(.+?)\/>)(高|安)の(<yen val=(.+?)\/>)'
     template = start + stock_change + mention + stock_value
+
     return re.fullmatch(template, text) is not None
 
 
@@ -147,7 +148,7 @@ def list_csv_filenames(dirname: str) -> List[str]:
 
 def is_interesting(headline: str) -> bool:
     """
-    >>> '日経平均続落'
+    >>> is_interesting('日経平均続落')
     True
     """
 
