@@ -2,20 +2,17 @@ import itertools
 from datetime import datetime, timedelta
 from decimal import Decimal
 from logging import Logger
-from multiprocessing import Pool
 from typing import Any, Dict, List, Tuple
 from xml.etree.ElementTree import fromstring
 
-import numpy
 from sqlalchemy import Integer, cast, extract, func, Date
-from sqlalchemy.orm import Session, scoped_session
-from sqlalchemy.orm.session import sessionmaker
+from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from reporter.core.operation import find_operation
 from reporter.database.misc import in_utc, in_jst
 from reporter.database.model import Headline, Price, PriceSeq
-from reporter.util.constant import REUTERS_DATETIME_FORMAT, Code, Phase, SeqType, UTC
+from reporter.util.constant import Code, Phase, SeqType, UTC
 from reporter.util.conversion import stringify_ric_seqtype
 
 
@@ -110,7 +107,7 @@ def fetch_latest_vals(session: Session,
 
 
 def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> List[Alignment]:
-    
+
     headlines = session \
         .query(Headline.article_id,
                Headline.tag_tokens,
@@ -130,9 +127,6 @@ def load_alignments_from_db(session: Session, phase: Phase, logger: Logger) -> L
                 SeqType.NormMovRefShort, SeqType.NormMovRefLong,
                 SeqType.StdShort, SeqType.StdLong]
     logger.info('start creating alignments between headlines and price sequences.')
-
-    ric_seqtype_to_keys = dict()
-    ric_seqtype_to_unixtimes = dict()
 
     for h in tqdm(headlines):
 

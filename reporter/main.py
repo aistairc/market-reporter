@@ -1,5 +1,4 @@
 import argparse
-import json
 import warnings
 from datetime import datetime
 from pathlib import Path

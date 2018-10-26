@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import List
 
 import http
@@ -43,8 +43,11 @@ predictor = Predictor(config,
 
 # TODO move to some util/misc module?
 EPOCH = datetime.fromtimestamp(0, tz=UTC)
+
+
 def epoch(dt: datetime) -> float:
     return (dt - EPOCH).total_seconds()
+
 
 class EvalTarget:
     def __init__(self, method_name: str, text: str, is_debug: bool):
@@ -376,17 +379,18 @@ def articles(page_name: str, article_id: str) -> flask.Response:
                               flask.request.method,
                               is_debug=page_name == 'debug')
 
+
 @app.route('/demo')
 def demo() -> flask.Response:
     min_date, max_date = fetch_date_range(db.session)
     rics = fetch_rics(db.session)
     return flask.render_template('demo.pug', title='demo',
-        min_date=min_date.timestamp(),
-        max_date=max_date.timestamp(),
-        rics=rics,
-        rics_json=flask.json.dumps(rics),
-        initial_date=flask.json.dumps(demo_initial_date),
-    )
+                                 min_date=min_date.timestamp(),
+                                 max_date=max_date.timestamp(),
+                                 rics=rics,
+                                 rics_json=flask.json.dumps(rics),
+                                 initial_date=flask.json.dumps(demo_initial_date))
+
 
 @app.route('/data_ts/<string:timestamp>')
 def data_ts(timestamp: str) -> flask.Response:
@@ -424,8 +428,9 @@ def data_ts(timestamp: str) -> flask.Response:
         'closes': closes,
     }
     return app.response_class(response=flask.json.dumps(data),
-                            status=http.HTTPStatus.OK,
-                            mimetype='application/json')
+                              status=http.HTTPStatus.OK,
+                              mimetype='application/json')
+
 
 @app.route('/predict/<string:ric>/<string:timestamp>')
 def predict(ric: str, timestamp: str) -> flask.Response:
