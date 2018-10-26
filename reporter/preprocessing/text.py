@@ -11,14 +11,14 @@ YEN_EXPRS = ['円', '円高', '円安']
 
 def is_template(text: str) -> bool:
     """
-    >>> is_template('日経平均前引け、続伸　<yen val=100/>高の<yen val=12000/>')
+    >>> is_template('日経平均前引け、続伸　100円高の1万2000円')
     True
     """
 
     start = r'(東証レビュー\([1-3]?[0-9]日\)( )?)?(日経平均)((前引け)|(大引け))?(、|　)'
     stock_change = r'([0-9]?日)?((小)|(大幅)|(小幅))?((続伸)|(続落)|(反発)|(反落))　'
     mention = r'(((前引け)|(大引け)|(終値)|(午前終値))は)?'
-    stock_value = r'(<yen val=(.+?)\/>)(高|安)の(<yen val=(.+?)\/>)'
+    stock_value = r'((.+?)円)(高|安)の((.+?)円)'
     template = start + stock_change + mention + stock_value
 
     return re.fullmatch(template, text) is not None
