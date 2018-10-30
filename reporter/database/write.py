@@ -317,7 +317,7 @@ def update_headlines(session: Session, user_dict: Path, logger: Logger) -> None:
         is_about_di = headline.categories is not None and \
             DOMESTIC_INDEX in headline.categories
 
-        # Do not use `is_template` because of the number of data reduces.
+        # We stopped using `is_template` because the size of the dataset decreased and the result got worse.
         # if is_template(h) or not is_interesting(h) or not is_about_di:
         if not is_interesting(h) or not is_about_di:            
             mappings.append({
