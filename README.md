@@ -42,50 +42,19 @@ This tool stores data to [Amazon S3](https://aws.amazon.com/s3/).
 Ask the manager to give you `AmazonS3FullAccess` and issue a credential file.
 For details, please read [AWS Identity and Access Management](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html).
 
-```bash
-mkdir -p "$HOME/.aws"
-chmod 700 "$HOME/.aws"
-touch "$HOME/.aws/credentials"
-chmod 600 "$HOME/.aws/credentials"
-# Change `PROFILE_NAME` to `default` or something.
-echo '[PROFILE_NAME]' >> credentials
-# Change `$HOME/Downloads/creadenticals.csv` according to your environment.
-downloaded_credentials="$HOME/Downloads/credentials.csv"
-cat $downloaded_credentials \
-    | awk 'BEGIN { FS = ","; } NR == 2 { print $3; }' \
-    | sed -e 's/^/aws_access_key_id=/' \
-    >> credentials
-cat $downloaded_credentials \
-    | awk 'BEGIN { FS = ","; } NR == 2 { print $4; }' \
-    | sed -e 's/^/aws_secret_access_key=/' \
-    >> credentials
-```
 
 ### Docker
-When you use Docker, refer this section.
-
-First, build Docker image of Market-reporter.
-```
+When you have a credentials file for AWS (default: `~/.aws/credetials`), please edit `config.toml` to set `profile_name` in the `s3` section.
+Otherwise, you need to type AWS access key ID and AWS secret access key when you launch the image.
+```bash
+cd envs
 docker build \
-    --build-arg GITHUB_ACCESS_TOKEN=your_github_access_token \
     -t market-reporter .
-```
-We use 'git clone' in Dockerfile. Please get the GitHub access token from your profile.
-
-Next, run Docker and create a container.
-```
 docker run -it \
     --name demo \
     -e AWS_ACCESS_KEY_ID=your_access_key_id \
     -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
     market-reporter
-```
-Please input AWS access key ID and AWS secret access key.
-If you use a credentials file of AWS (default: `~/.aws/credetials`), please edit `config.toml` to remove a comment out of `profile_name` at `[s3]`.
-```
-[s3]
--# profile_name = 'default'
-+profile_name = 'default'
 ```
 
 ### Anaconda
@@ -99,44 +68,16 @@ source activate NAME
 ```
 
 ### PostgreSQL
-PostgreSQL is installed by Ansible.
-When you install it manually, be sure you have `python3-psycopg2`.
-```bash
-sudo apt install python3-psycopg2
-```
-When you use your database named `master` on your local machine, edit `config.toml` as follows.
+Suppose you have a database named `master` on your local machine. Then, edit `config.toml` as the following.
 ```
 [postgres]
 - uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
 + uri = 'postgresql:///master'
 ```
-When you connect to a database server using SSH port forwarding,
-first add the configuration for the server to `~/.ssh/config`
-if you have not added it.
-
-```
-# ~/.ssh/config
-Host dbserver
-    HostName ec2-xxx-xxx-xxx-xxx.ap-northeast-1.compute.amazonaws.com
-    User kirito
-    IdentityFile ~/.ssh/kirito.pem
-    IdentitiesOnly yes
-    ForwardAgent yes
-    ServerAliveInterval 60
-```
-Then connect to the server on some port, say `2345`.
-```
-ssh -L 2345:localhost:5432 dbserver # `5432` is the default port of PostgreSQL 
-ssh -fNT -L 2345:localhost:5432 dbserver # `-fNT` options keep connection in the background
-```
-While keeping the connection above, you can access to the database on your local machine.
-```
-psql -h localhost -p 2345 -U kirito master
-```
-Then edit `config.toml`.
+While you are connecting to a server by SSH port forwarding by a command such as `ssh -fNT -L 2345:localhost:5432 kirito@dbserver`, edit `config.toml` as the following.
 ```
 - uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
-+ uri = 'postgresql://kirito:PNdWzhR2rzqUXW4n4GGRa7bN@localhost:2345/master'
++ uri = 'postgresql://kirito:PASSWORD@localhost:2345/master'
 ```
 
 ## Usage
