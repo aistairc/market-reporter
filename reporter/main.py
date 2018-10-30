@@ -14,6 +14,7 @@ from reporter.core.train import run
 from reporter.database.model import create_tables
 from reporter.database.read import load_alignments_from_db
 from reporter.postprocessing.bleu import calc_bleu
+from reporter.postprocessing.export import export_results_to_csv
 from reporter.preprocessing.dataset import create_dataset, prepare_resources
 from reporter.util.config import Config
 from reporter.util.constant import Phase, SpecialToken
@@ -172,6 +173,8 @@ def main() -> None:
                     'Test Loss: {:.2f}'.format(test_result.loss),
                     'Test BLEU: {:.10f}'.format(test_bleu)])
     logger.info(s)
+
+    export_results_to_csv(dest_dir, test_result)
 
 
 if __name__ == '__main__':
