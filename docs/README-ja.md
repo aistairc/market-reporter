@@ -39,7 +39,6 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 ### Amazon S3
 本ソフトウェアは[Amazon S3](https://aws.amazon.com/s3/)を使用します。
 使用前に`AmazonS3FullAccess`が付与されていることを確認してください。
-credential file.
 詳細については公式のドキュメント[AWS Identity and Access Management](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)をご覧ください。
 
 ### Docker
@@ -82,14 +81,9 @@ SSHポートフォワーディングを用いてリモートマシンのデー�
 
 ### 学習
 
-まず、以下のコマンドのように、 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) もしくは [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピーし、 `config.toml` を作成してください。その後、実行環境に応じてファイルを編集してください。
+設定ファイルの例 [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) または [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) をコピー・編集し、 `config.toml` を作成してください。
 
-```bash
-cp example.toml config.toml
-vi config.toml
-```
-
-モデルを学習するためは以下のコマンドを実行してください。GPU (CPU) を使用する場合は、 `--device` に `cuda:n` (`cpu`) を与えてください。 `n` は使用したい GPU デバイスの番号です。
+モデルを学習するためは以下のコマンドを実行してください。GPU (CPU) を使用する場合は、`--device` オプションで `cuda:n` (`cpu`) を指定してください。ここで `n` は使用する GPU デバイスの番号です。
 ```bash
 python -m reporter --device 'cuda:0'
 ```

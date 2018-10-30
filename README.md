@@ -68,7 +68,8 @@ source activate NAME
 ```
 
 ### PostgreSQL
-Suppose you have a database named `master` on your local machine. Then, edit `config.toml` as the following.
+Suppose you have a database named `master` on your local machine.
+Then, edit `config.toml` as the following.
 ```
 [postgres]
 - uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
@@ -84,15 +85,9 @@ While you are connecting to a server by SSH port forwarding by a command such as
 
 ### Training
 
-Create a configuration file (default: `config.toml`). Please copy [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) or [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml) and edit it according to your environment.
+Create `config.toml` based on [example.toml](https://github.com/aistairc/market-reporter/blob/master/example.toml) or [murakami-et-al-2017.example.toml](https://github.com/aistairc/market-reporter/blob/master/murakami-et-al-2017.example.toml).
 
-```bash
-cp example.toml config.toml
-vi config.toml
-```
-
-Execute the following command for the training of model. When you use GPU (CPU), you specify `cuda:n`(`cpu`) in `--device`, where n is device index to select.
-
+Execute the following command for the training of model. When you use GPU (CPU), you specify `cuda:n`(`cpu`) for `--device` option, where `n` is the device index to use.
 ```bash
 python -m reporter --device 'cuda:0'
 ```
