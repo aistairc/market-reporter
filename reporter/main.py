@@ -43,6 +43,10 @@ def parse_args() -> argparse.Namespace:
                         '--model',
                         type=str,
                         metavar='FILENAME')
+    parser.add_argument('-o',
+                        '--output-subdir',
+                        type=str,
+                        metavar='DIRNAME')
     return parser.parse_args()
 
 
@@ -58,7 +62,11 @@ def main() -> None:
     device = torch.device(args.device)
 
     now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
-    dest_log = config.dir_output / Path(now) / Path('reporter.log')
+    dest_dir = config.dir_output / Path(now) \
+        if args.output_subdir is None \
+        else config.dir_output / Path(args.output_subdir)
+
+    dest_log = dest_dir / Path('reporter.log')
 
     logger = create_logger(dest_log, is_debug=args.is_debug)
     config.write_log(logger)
@@ -93,7 +101,7 @@ def main() -> None:
     (vocab, train, valid, test) = create_dataset(config, device)
 
     vocab_size = len(vocab)
-    dest_vocab = config.dir_output / Path(now) / Path('reporter.vocab')
+    dest_vocab = dest_dir / Path('reporter.vocab')
     with dest_vocab.open(mode='wb') as f:
         torch.save(vocab, f)
     seqtypes = []
@@ -106,7 +114,7 @@ def main() -> None:
                                  ignore_index=vocab.stoi[SpecialToken.Padding.value])
 
     # === Train ===
-    dest_model = config.dir_output / Path(now) / Path('reporter.model')
+    dest_model = dest_dir / Path('reporter.model')
     prev_valid_bleu = 0.0
     max_bleu = 0.0
     best_epoch = 0
