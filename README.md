@@ -4,7 +4,7 @@
 <p align="center"><img src="docs/figures/logo.svg" width="600px"></p>
 
 __Market Reporter__ automatically generates short comments that describe time series data of stock prices, FX rates, etc.
-This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[PDF](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [PDF].
+This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[paper](http://www.aclweb.org/anthology/P17-1126)] and Aoki et al. (INLG 2018) [[bib](#reference)] [[paper]()] [[poster](figures/pdf/poster.pdf)].
 
 <p align="center"><img src="docs/figures/gloss.svg" width="100%"></p>
 
