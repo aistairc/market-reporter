@@ -1,33 +1,26 @@
-REPORTER := python -m reporter
-CP := cp
-OURS := ours
-BASE := base
-OURSCONF := config.toml
-BASECONF := murakami-et-al-2017.toml
-OURSOPTS := --config $(OURSCONF) --output-subdir $(OURS)
-BASEOPTS := --config $(BASECONF) --output-subdir $(BASE)
+OURS_CONF := config.toml
+BASE_CONF := murakami-et-al-2017.toml
+OURS_OPTS := --config $(OURS_CONF) --output-subdir ours
+BASE_OPTS := --config $(BASE_CONF) --output-subdir base
 
-OUTPUTDIR := output
-OURSSRC := $(OUTPUTDIR)/$(OURS)/reporter.csv
-OURSTRG := $(OUTPUTDIR)/$(OURS).csv
-BASESRC := $(OUTPUTDIR)/$(BASE)/reporter.csv
-BASETRG := $(OUTPUTDIR)/$(BASE).csv
-CPOURS := $(CP) $(OURSSRC) $(OURSTRG)
-CPBASE := $(CP) $(BASESRC) $(BASETRG)
+OURS_SRC := output/ours/reporter.csv
+OURS_TRG := output/ours.csv
+BASE_SRC := output/base/reporter.csv
+BASE_TRG := output/base.csv
 
 .PHONY: all
-all: $(OURS) $(BASE) $(OURSTRG) $(BASETRG)
+all: ours base $(OURS_TRG) $(BASE_TRG)
 
-${OURS}: $(OURSCONF)
-	$(REPORTER) $(OURSOPTS)
-${BASE}: $(BASECONF)
-	$(REPORTER) $(BASEOPTS)
+ours: $(OURS_CONF)
+	python -m reporter $(OURS_OPTS)
+base: $(BASE_CONF)
+	python -m reporter $(BASE_OPTS)
 
-$(OURSTRG): $(OURSSRC)
-	$(CPOURS)
+$(OURS_TRG): $(OURS_SRC)
+	cp $(OURS_SRC) $(OURS_TRG)
 
-$(BASETRG): $(BASESRC)
-	$(CPBASE)
+$(BASE_TRG): $(BASE_SRC)
+	cp $(BASE_SRC) $(BASE_TRG)
 
 clean:
-	rm -r $(OUTPUTDIR)/$(OURS) $(OUTPUTDIR)/$(BASE) $(OURSTRG) $(BASETRG)
+	rm -r output/ours* output/base*
