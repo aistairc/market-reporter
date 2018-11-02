@@ -114,6 +114,7 @@ python -m reporter.predict \
 Execute the following command and access `http://localhost:5000/` in a web browser.
 
 ```bash
+make  # for the first time
 python -m reporter.webapp
 ```
 

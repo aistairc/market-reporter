@@ -110,6 +110,7 @@ python -m reporter.predict \
 以下のコマンドを実行し、ブラウザで `http://localhost:5000/` にアクセスしてください。
 
 ```bash
+make  # for the first time
 python -m reporter.webapp
 ```
 

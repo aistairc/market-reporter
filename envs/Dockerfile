@@ -8,6 +8,7 @@ ENV DEBCONF_NOWARNINGS yes
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    make \
     nginx \
     postgresql-9.6 \
     sudo \

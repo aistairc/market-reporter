@@ -399,22 +399,17 @@ def data_ts(timestamp: str) -> flask.Response:
     end = start + one_day - timedelta(seconds=1)
     day_before = start - one_day
 
+    rics = config.rics
+
     # PostgreSQL-specific speedup (raw query)
     if db.session.bind.dialect.name == 'postgresql':
-        rics = config.rics
         prices = fetch_all_points_fast(db.session, rics, start, end)
         closes = fetch_all_closes_fast(db.session, rics, day_before, start)
-
     else:
-        # XXX Note that `fetch_rics` is super slow!
-        # `config.rics` is a better idea
-        rics = fetch_rics(db.session)
-
         prices = {}
         closes = {}
         for ric in rics:
             xs, ys = fetch_points(db.session, ric, start, end)
-
             prices[ric] = {
                 'xs': [epoch(x) for x in xs],
                 'ys': [float(y) if y is not None else None for y in ys],

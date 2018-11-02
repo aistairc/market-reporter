@@ -5,8 +5,7 @@ from pathlib import Path
 from reporter.core.train import RunResult
 
 
-def export_results_to_csv(dest_dir: Path,
-                          results: RunResult) -> None:
+def export_results_to_csv(dest_dir: Path, result: RunResult) -> None:
 
     header = ['article_id',
               'gold tokens (tag)',
@@ -19,14 +18,14 @@ def export_results_to_csv(dest_dir: Path,
     with output_file.open(mode='w') as w:
         writer = csv.writer(w, delimiter=',', quoting=csv.QUOTE_ALL)
         writer.writerow(header)
-        for article_id, tag_gold, num_gold, tag_pred, num_pred in \
-            zip(results.article_ids,
-                results.gold_sents,
-                results.gold_sents_num,
-                results.pred_sents,
-                results.pred_sents_num):
+        for (article_id, gold_sent, gold_sent_num, pred_sent, pred_sent_num) in \
+                zip(result.article_ids,
+                    result.gold_sents,
+                    result.gold_sents_num,
+                    result.pred_sents,
+                    result.pred_sents_num):
             writer.writerow([article_id,
-                             '|'.join(tag_gold),
-                             '|'.join(num_gold),
-                             '|'.join(tag_pred),
-                             '|'.join(num_pred)])
+                             '|'.join(gold_sent),
+                             '|'.join(gold_sent_num),
+                             '|'.join(pred_sent),
+                             '|'.join(pred_sent_num)])
