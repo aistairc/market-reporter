@@ -246,9 +246,9 @@ def article_evaluation(article_id: str,
             .session \
             .query(GenerationResult) \
             .filter(GenerationResult.article_id == article_id,
-                    GenerationResult.method_name == 'Extr') \
+                    GenerationResult.method_name == 'Ours') \
             .one()
-        e.correctness = form.get('correctness-{}'.format(nth['Extr']))
+        e.correctness = form.get('correctness-{}'.format(nth['Ours']))
 
         db.session.commit()
 
