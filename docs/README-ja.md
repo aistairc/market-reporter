@@ -51,9 +51,17 @@ docker build \
     -t market-reporter .
 docker run -it \
     --name demo \
+    --user root \
     -e AWS_ACCESS_KEY_ID=your_access_key_id \
     -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
     market-reporter /bin/bash
+```
+
+作成したコンテナをインタラクティブに使用するには、次のコマンドを実行してください。
+```bash
+docker exec -it \
+    --user plu \
+    demo /bin/bash
 ```
 
 ### Anaconda
