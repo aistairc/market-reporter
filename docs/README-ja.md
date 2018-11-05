@@ -3,7 +3,7 @@
 
 <p align="center"><img src="../docs/figures/logo.svg" width="600px"></p>
 
-__Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[paper](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [[PDF]()] [[poster](figures/pdf/poster.pdf)] のPythonによる実装です。
+__Market Reporter__ は株価等の時系列データから、それを要約した短いテキストを自動で生成します。これは論文 Murakami et al. (ACL 2017) [[bib](#reference)] [[paper](http://www.aclweb.org/anthology/P17-1126)] と Aoki et al. (INLG 2018) [[bib](#reference)] [[paper](http://aclweb.org/anthology/W18-6515)] [[poster](figures/pdf/poster.pdf)] のPythonによる実装です。
 
 <p align="center"><img src="../docs/figures/gloss.svg" width="100%"></p>
 
@@ -173,13 +173,12 @@ Market Reporterは以下のいずれかのライセンスで利用可能です�
             and Takamura, Hiroya
             and Miyao, Yusuke},
   }
-  title = {Generating Market Comments Referring to External Resources}
+  title = {Generating Market Comments Referring to External Resources},
   booktitle = {Proceedings of the 11th International Conference on Natural Language Generation},
   year = {2018},
   publisher = {Association for Computational Linguistics},
-  pages = {},
-  location = {},
-  doi = {},
-  url = {}
+  pages = {135--139},
+  location = {Tilburg University, The Netherlands},
+  url = {http://aclweb.org/anthology/W18-6515}
 }
 ```
