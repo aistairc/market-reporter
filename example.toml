@@ -38,8 +38,8 @@ n_items_per_page = 50
 result = [
     ['Base',
      'output/base.csv'],
-    ['Extr',
-     'output/extr.csv']
+    ['Ours',
+     'output/ours.csv']
 ]
 demo_initial_date = '2016-04-01'
 
