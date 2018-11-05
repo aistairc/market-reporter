@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 RUN useradd --create-home --shell /bin/bash plu
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf &
+ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
 USER postgres
 RUN /etc/init.d/postgresql start \

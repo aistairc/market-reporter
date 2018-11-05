@@ -49,11 +49,19 @@ AWS の認証プロファイル（通常は `~/.aws/credetials`）を使用す�
 cd envs
 docker build \
     -t market-reporter .
-docker run -it \
+docker run -d \
     --name demo \
+    --user root \
     -e AWS_ACCESS_KEY_ID=your_access_key_id \
     -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
-    market-reporter /bin/bash
+    market-reporter
+```
+
+作成したコンテナをインタラクティブに使用するには、次のコマンドを実行してください。
+```bash
+docker exec -it \
+    --user plu \
+    demo /bin/bash
 ```
 
 ### Anaconda
