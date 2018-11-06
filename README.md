@@ -48,21 +48,14 @@ When you have a credentials file for AWS (default: `~/.aws/credetials`), please 
 Otherwise, you need to type AWS access key ID and AWS secret access key when you launch the image.
 ```bash
 cd envs
-docker build \
-    -t market-reporter .
+docker build -t market-reporter .
 docker run -d \
     --name demo \
     --user root \
     -e AWS_ACCESS_KEY_ID=your_access_key_id \
     -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
     market-reporter
-```
-
-To use the created container in an interactive mode, execute the following command.
-```bash
-docker exec -it \
-    --user plu \
-    demo /bin/bash
+docker exec -it --user reporter demo /bin/bash
 ```
 
 ### Anaconda
