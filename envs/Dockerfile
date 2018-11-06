@@ -32,7 +32,7 @@ RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key \
     && rm nginx-selfsigned.csr    
 
-RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${HTTP_PASSWARD}
+RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${BASIC_AUTH_PASSWORD}
 
 USER postgres
 RUN /etc/init.d/postgresql start \
