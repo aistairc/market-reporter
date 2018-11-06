@@ -1,11 +1,13 @@
 FROM continuumio/anaconda3
 
 ARG GITHUB_ACCESS_TOKEN
-RUN test -n "$GITHUB_ACCESS_TOKEN"
+ARG BASIC_AUTH_PASSWORD
+RUN test -n "$GITHUB_ACCESS_TOKEN" && test -n "$HTTP_PASSWARD"
 
 ENV DEBCONF_NOWARNINGS yes
 
 RUN apt-get update && apt-get install -y \
+    apache2-utils \
     gcc \
     g++ \
     make \
@@ -17,10 +19,20 @@ RUN apt-get update && apt-get install -y \
 
 RUN useradd --create-home --shell /bin/bash reporter
 RUN mkdir -p /var/www/market-reporter \
-    && chown reporter:reporter -R market-reporter
+    && chown reporter:reporter -R /var/www/market-reporter
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
+
+RUN openssl genrsa 2048 > nginx-selfsigned.key \
+    && chmod 400 nginx-selfsigned.key \
+    && openssl req -batch -new -key nginx-selfsigned.key > nginx-selfsigned.csr \
+    && openssl x509 -in nginx-selfsigned.csr -days 30 -req -signkey nginx-selfsigned.key > nginx-selfsigned.crt \
+    && mv nginx-selfsigned.crt /etc/ssl/certs/nginx-selfsigned.crt \
+    && mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key \
+    && rm nginx-selfsigned.csr    
+
+RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${BASIC_AUTH_PASSWORD}
 
 USER postgres
 RUN /etc/init.d/postgresql start \
