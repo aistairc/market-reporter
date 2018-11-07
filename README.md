@@ -175,7 +175,6 @@ When you write a paper using this software, please cite either or both of the fo
             and Kobayashi, Ichiro
             and Takamura, Hiroya
             and Miyao, Yusuke},
-  }
   title = {Generating Market Comments Referring to External Resources},
   booktitle = {Proceedings of the 11th International Conference on Natural Language Generation},
   year = {2018},
