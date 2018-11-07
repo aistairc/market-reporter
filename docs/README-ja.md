@@ -175,7 +175,6 @@ Market Reporterは以下のいずれかのライセンスで利用可能です�
             and Kobayashi, Ichiro
             and Takamura, Hiroya
             and Miyao, Yusuke},
-  }
   title = {Generating Market Comments Referring to External Resources},
   booktitle = {Proceedings of the 11th International Conference on Natural Language Generation},
   year = {2018},
