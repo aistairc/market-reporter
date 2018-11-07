@@ -1,5 +1,6 @@
 FROM continuumio/anaconda3
 
+ARG HOME_DIR="/opt/aistairc"
 ARG GITHUB_ACCESS_TOKEN
 ARG BASIC_AUTH_PASSWORD
 RUN test -n "$GITHUB_ACCESS_TOKEN" && test -n "$BASIC_AUTH_PASSWORD"
@@ -17,10 +18,11 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     vim-tiny
 
-RUN useradd --create-home --shell /bin/bash reporter
-RUN mkdir -p /var/www/market-reporter \
-    && chown reporter:reporter -R /var/www/market-reporter
+RUN useradd --create-home --skel /etc/skel --home-dir ${HOME_DIR} --shell /bin/bash reporter
+RUN mkdir -p ${HOME_DIR}/market-reporter \
+    && chown reporter:reporter -R ${HOME_DIR}/market-reporter
 
+COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
@@ -42,6 +44,8 @@ RUN /etc/init.d/postgresql start \
     && /etc/init.d/postgresql stop
 
 USER reporter
-RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
-    && echo "conda activate base" >> ~/.bashrc
-RUN git clone https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/aistairc/market-reporter.git /var/www/market-reporter
+RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ${HOME_DIR}/.bashrc \
+    && echo "conda activate base" >> ${HOME_DIR}/.bashrc
+RUN git clone https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/aistairc/market-reporter.git ${HOME_DIR}/market-reporter
+
+WORKDIR ${HOME_DIR}/market-reporter

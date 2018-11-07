@@ -52,6 +52,8 @@ docker build -t market-reporter .
 docker run -d \
     --name demo \
     --user root \
+    --volume /opt/ \
+    --publish 443:443 \
     -e AWS_ACCESS_KEY_ID=your_access_key_id \
     -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
     market-reporter
