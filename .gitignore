@@ -1,4 +1,5 @@
 __pycache__
+*.pyc
 *.egg-info/
 .ipynb_checkpoints
 
@@ -9,4 +10,3 @@ resources/prices/*
 resources/headlines/*
 *.toml
 !*example.toml
-*.pyc
