@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('-r',
                         '--ric',
                         type=str,
-                        help='Reuters Insturument Code (e.g. `.N225`: Nikkei Stock Average)')
+                        help='Reuters Instrument Code (e.g. `.N225`: Nikkei Stock Average)')
 
     return parser.parse_args()
 
