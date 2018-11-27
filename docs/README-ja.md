@@ -47,7 +47,9 @@ AWS の認証プロファイル（通常は `~/.aws/credetials`）を使用す�
 
 ```bash
 cd envs
-docker build -t market-reporter .
+docker build \
+    --build-arg BASIC_AUTH_PASSWORD=your_basic_auth_password \
+    -t market-reporter .
 docker run -d \
     --name demo \
     --user root \

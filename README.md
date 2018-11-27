@@ -48,7 +48,9 @@ When you have a credentials file for AWS (default: `~/.aws/credetials`), please 
 Otherwise, you need to type AWS access key ID and AWS secret access key when you launch the image.
 ```bash
 cd envs
-docker build -t market-reporter .
+docker build \
+    --build-arg BASIC_AUTH_PASSWORD=your_basic_auth_password \
+    -t market-reporter .
 docker run -d \
     --name demo \
     --user root \
