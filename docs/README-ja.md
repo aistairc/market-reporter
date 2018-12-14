@@ -21,7 +21,8 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
     2. [予測](#予測)
 3. [Webインターフェース](#Webインターフェース)
 4. [テスト](#テスト)
-5. [参考文献](#参考文献)
+5. [ライセンスと参考文献](#ライセンスと参考文献)
+6. [著作権と謝辞](#著作権と謝辞)
 
 ## 準備
 ### 構成
@@ -186,3 +187,8 @@ Market Reporterは以下のいずれかのライセンスで利用可能です�
   url = {http://aclweb.org/anthology/W18-6515}
 }
 ```
+
+## 著作権と謝辞
+© 2018 AkiraMiyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
+
+この成果は、国立研究開発法人新エネルギー・産業技術総合開発機構(NEDO)の委託業務の結果得られたものです。

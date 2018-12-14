@@ -22,6 +22,7 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[pa
 3. [Web Interface](#web-interface)
 4. [Test](#test)
 5. [License and References](#license-and-references)
+6. [Copyright and Acknowledgment](#copyright-and-acknowledgment)
 
 
 ## Requirements
@@ -188,3 +189,8 @@ When you write a paper using this software, please cite either or both of the fo
   url = {http://aclweb.org/anthology/W18-6515}
 }
 ```
+
+## Copyright and Acknowledgment
+© 2018 AkiraMiyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
+
+This software is based on results obtained from a project commissioned by the New Energy and Industrial Technology Development Organization (NEDO).
