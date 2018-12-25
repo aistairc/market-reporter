@@ -24,7 +24,9 @@ class Price(Base):
 
     __tablename__ = 'prices'
 
-    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
     utc_offset = Column(Integer, nullable=False)
     val = Column(Numeric(15, 6), nullable=True)
@@ -51,7 +53,9 @@ class PriceSeq(Base):
 
     __tablename__ = 'price_seqs'
 
-    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     seqtype = Column(String, primary_key=True)
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
     vals = Column(postgresql.ARRAY(Float), nullable=True)
@@ -78,7 +82,9 @@ class Close(Base):
 
     __tablename__ = 'closes'
 
-    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
 
     def __init__(self, ric: str, t: datetime):
@@ -97,8 +103,9 @@ class Headline(Base):
     article_id = Column(String, primary_key=True)
     t = Column(TIMESTAMP(timezone=True), nullable=False)
     headline = Column(String, nullable=False)
-    # International Securities Identification Number
-    isins = Column(postgresql.ARRAY(String), nullable=True)
+    isins = Column(postgresql.ARRAY(String),
+                   nullable=True,
+                   comment='International Securities Identification Number')
     countries = Column(postgresql.ARRAY(String), nullable=True)
     categories = Column(postgresql.ARRAY(String), nullable=True)
     keywords_headline = Column(String, nullable=True)
@@ -146,7 +153,9 @@ class Instrument(Base):
 
     __tablename__ = 'instruments'
 
-    ric = Column(String, primary_key=True)
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     description = Column(String)
     currency = Column(String)
     type_ = Column('type', String)
