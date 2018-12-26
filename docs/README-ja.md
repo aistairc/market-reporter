@@ -130,7 +130,7 @@ nohup uwsgi --ini uwsgi.ini &
 
 <p align="center"><img src="../docs/figures/webapp.png"></p>
 Webインターフェースは評価等の目的で使うことができます。
-生成されたテキストと合わせて、生成の際に使われた値動きのグラフを出力することが可能です。
+生成されたテキストが、生成に使われた値動きとともに表示されます。
 <p align="center"><img src="../docs/figures/webapp-graph.png"></p>
 
 ## テスト
