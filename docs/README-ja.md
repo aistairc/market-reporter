@@ -129,6 +129,9 @@ nohup uwsgi --ini uwsgi.ini &
 正常に起動すると以下のような検索画面が表示されます。
 
 <p align="center"><img src="../docs/figures/webapp.png"></p>
+Webインターフェースは評価等の目的で使うことができます。
+生成されたテキストが、生成に使われた値動きとともに表示されます。
+<p align="center"><img src="../docs/figures/webapp-graph.png"></p>
 
 ## テスト
 
