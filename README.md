@@ -131,7 +131,7 @@ nohup uwsgi --ini uwsgi.ini &
 
 You can see a page as the following picture.
 <p align="center"><img src="docs/figures/webapp.png"></p>
-The web application can be used for annotation or evaluation.
+The web application can be used for evaluation.
 Along with the generated sentences, it also shows the movements of prices used in generation.
 <p align="center"><img src="docs/figures/webapp-graph.png"></p>
 
