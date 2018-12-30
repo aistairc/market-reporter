@@ -76,13 +76,16 @@ table caption {
   caption-side: top;
 }
 
+tr:last-child {
+  border-bottom: 1pt solid #dee2e6;
+}
+
 canvas {
   margin-top: 36px;
 }
 
 .is-finished {
   color: #3b699f;
-
 }
 
 .indicator {
