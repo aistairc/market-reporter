@@ -10,3 +10,5 @@ resources/prices/*
 resources/headlines/*
 *.toml
 !*example.toml
+
+reporter/webapp/static/css/*.css
