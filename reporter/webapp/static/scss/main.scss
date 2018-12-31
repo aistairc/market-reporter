@@ -1,3 +1,5 @@
+$base-color: #15188a;
+
 :lang(en) {
   font-family: 'Roboto', sans-serif;
 }
@@ -11,7 +13,7 @@ i.material-icons {
 }
 
 .navbar-dark {
-  background-color: #15188a;
+  background-color: $base-color;
 }
 
 a.navbar-brand {
@@ -25,6 +27,11 @@ td {
 
 main {
   padding-top: 50px;
+}
+
+.btn-primary {
+  background-color: $base-color;
+  border-color: $base-color;
 }
 
 label {

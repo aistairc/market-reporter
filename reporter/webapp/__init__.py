@@ -1,26 +1,28 @@
+import http
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import List
 
-import http
 import flask
+import sass
+import torch
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
 from reporter.database.misc import in_jst, in_utc
-from reporter.database.model import Headline, HumanEvaluation, GenerationResult
-from reporter.database.read import fetch_max_t_of_prev_trading_day, fetch_rics, fetch_date_range
-from reporter.util.config import Config
-from reporter.util.constant import UTC, JST, Code, NIKKEI_DATETIME_FORMAT
-from reporter.webapp.human_evaluation import populate_for_human_evaluation
-from reporter.webapp.table import load_ric_to_ric_info, create_ric_tables, Table
-from reporter.webapp.search import construct_constraint_query
-from reporter.webapp.chart import fetch_points, fetch_all_points_fast, fetch_close, fetch_all_closes_fast
+from reporter.database.model import GenerationResult, Headline, HumanEvaluation
+from reporter.database.read import fetch_date_range, fetch_max_t_of_prev_trading_day, fetch_rics
 from reporter.predict import Predictor
-
-import os
-import torch
-from pathlib import Path
-
+from reporter.util.config import Config
+from reporter.util.constant import JST, NIKKEI_DATETIME_FORMAT, UTC, Code
+from reporter.webapp.chart import (
+    fetch_all_closes_fast,
+    fetch_all_points_fast,
+    fetch_close, fetch_points)
+from reporter.webapp.human_evaluation import populate_for_human_evaluation
+from reporter.webapp.search import construct_constraint_query
+from reporter.webapp.table import Table, create_ric_tables, load_ric_to_ric_info
 
 config = Config('config.toml')
 app = flask.Flask(__name__)
@@ -28,6 +30,11 @@ app.config['TESTING'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = config.db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.jinja_env.add_extension('pypugjs.ext.jinja.PyPugJSExtension')
+
+dir_scss = Path('reporter/webapp/static/scss').resolve()
+dir_css = Path('reporter/webapp/static/css').resolve()
+sass.compile(dirname=(str(dir_scss), str(dir_css)), output_style='expanded')
+
 db = SQLAlchemy(app)
 
 ric_to_ric_info = load_ric_to_ric_info()
