@@ -192,6 +192,6 @@ Market Reporterは以下のいずれかのライセンスで利用可能です�
 ```
 
 ## 著作権と謝辞
-© 2018 AkiraMiyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
+© 2018 Akira Miyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
 
 この成果は、国立研究開発法人新エネルギー・産業技術総合開発機構(NEDO)の委託業務の結果得られたものです。

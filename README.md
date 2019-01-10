@@ -194,6 +194,6 @@ When you write a paper using this software, please cite either or both of the fo
 ```
 
 ## Copyright and Acknowledgment
-© 2018 AkiraMiyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
+© 2018 Akira Miyazawa, Tatsuya Aoki, Fumiya Yamamoto, Soichiro Murakami, and Akihiko Watanabe (National Institute of Advanced Industrial Science and Technology; AIST)
 
 This software is based on results obtained from a project commissioned by the New Energy and Industrial Technology Development Organization (NEDO).
