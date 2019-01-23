@@ -151,7 +151,9 @@ def main() -> None:
             max_bleu = valid_bleu
             best_epoch = epoch
 
-        early_stop_counter += int(prev_valid_bleu > valid_bleu)
+        early_stop_counter = early_stop_counter + 1 \
+            if prev_valid_bleu > valid_bleu \
+            else 0
         if early_stop_counter == config.patience:
             logger.info('EARLY STOPPING')
             break
