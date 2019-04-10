@@ -1,17 +1,20 @@
 import argparse
-import json
 import warnings
 from datetime import datetime
 from pathlib import Path
+from functools import reduce
 
 import jsonlines
 import torch
+from sqlalchemy.engine import create_engine
+from sqlalchemy.orm.session import sessionmaker
 
 from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
 from reporter.core.train import run
 from reporter.database.model import create_tables
 from reporter.database.read import load_alignments_from_db
 from reporter.postprocessing.bleu import calc_bleu
+from reporter.postprocessing.export import export_results_to_csv
 from reporter.preprocessing.dataset import create_dataset, prepare_resources
 from reporter.util.config import Config
 from reporter.util.constant import Phase, SpecialToken
@@ -41,6 +44,10 @@ def parse_args() -> argparse.Namespace:
                         '--model',
                         type=str,
                         metavar='FILENAME')
+    parser.add_argument('-o',
+                        '--output-subdir',
+                        type=str,
+                        metavar='DIRNAME')
     return parser.parse_args()
 
 
@@ -56,66 +63,59 @@ def main() -> None:
     device = torch.device(args.device)
 
     now = datetime.today().strftime('reporter-%Y-%m-%d-%H-%M-%S')
-    dest_log = config.dir_output / Path(now) / Path('reporter.log')
+    dest_dir = config.dir_output / Path(now) \
+        if args.output_subdir is None \
+        else config.dir_output / Path(args.output_subdir)
 
-    logger = create_logger(dest_log,  is_debug=args.is_debug)
+    dest_log = dest_dir / Path('reporter.log')
+
+    logger = create_logger(dest_log, is_debug=args.is_debug)
     config.write_log(logger)
 
     message = 'start main (is_debug: {}, device: {})'.format(args.is_debug, args.device)
     logger.info(message)
 
-    if not config.dest_dataset.is_file():
+    # === Alignment ===
+    has_all_alignments = \
+        reduce(lambda x, y: x and y,
+               [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
+                for phase in list(Phase)])
 
-        # === Alignment ===
-        is_any_alignment_missing = len(list(config.dir_output.glob('alignment-*.json'))) < 3
-        if is_any_alignment_missing:
+    if not has_all_alignments:
 
-            from sqlalchemy.engine import create_engine
-            from sqlalchemy.orm.session import sessionmaker
-            engine = create_engine(config.db_uri)
-            SessionMaker = sessionmaker(bind=engine)
-            pg_session = SessionMaker()
-            create_tables(engine)
+        engine = create_engine(config.db_uri)
+        SessionMaker = sessionmaker(bind=engine)
+        pg_session = SessionMaker()
+        create_tables(engine)
 
-            import redis
-            from redis.exceptions import ConnectionError
-            redis_db_index = config.redis['db']
-            print(redis_db_index)
-            if not isinstance(redis_db_index, int) or redis_db_index < 0:
-                raise ConnectionError('DB index is {}. Please specify a zero-based numeric index.'
-                                      .format(redis_db_index))
+        prepare_resources(config, pg_session, logger)
+        for phase in list(Phase):
+            config.dir_output.mkdir(parents=True, exist_ok=True)
+            dest_alignments = config.dir_output / Path('alignment-{}.json'.format(phase.value))
+            alignments = load_alignments_from_db(pg_session, phase, logger)
+            with dest_alignments.open(mode='w') as f:
+                writer = jsonlines.Writer(f)
+                writer.write_all(alignments)
+        pg_session.close()
 
-            connection_pool = redis.ConnectionPool(**config.redis)
-            redis_client = redis.StrictRedis(connection_pool=connection_pool)
+    # === Dataset ===
+    (vocab, train, valid, test) = create_dataset(config, device)
 
-            prepare_resources(config, pg_session, redis_client, logger)
-            for phase in list(Phase):
-                config.dir_output.mkdir(parents=True, exist_ok=True)
-                dest_alignments = config.dir_output / Path('alignment-{}.json'.format(phase.value))
-                alignments = load_alignments_from_db(pg_session, redis_client, phase, logger)
-                with dest_alignments.open(mode='w') as f:
-                    writer = jsonlines.Writer(f)
-                    writer.write_all(alignments)
-            pg_session.close()
-
-        # === Dataset ===
-        (vocab, train, valid, test) = create_dataset(config, device)
-
-        vocab_size = len(vocab)
-        dest_vocab = config.dir_output / Path(now) / Path('reporter.vocab')
-        with dest_vocab.open(mode='wb') as f:
-            torch.save(vocab, f)
-        seqtypes = []
-        attn = setup_attention(config, seqtypes)
-        encoder = Encoder(config, device)
-        decoder = Decoder(config, vocab_size, attn, device)
-        model = EncoderDecoder(encoder, decoder, device)
-        optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
-        criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
-                                     ignore_index=vocab.stoi[SpecialToken.Padding.value])
+    vocab_size = len(vocab)
+    dest_vocab = dest_dir / Path('reporter.vocab')
+    with dest_vocab.open(mode='wb') as f:
+        torch.save(vocab, f)
+    seqtypes = []
+    attn = setup_attention(config, seqtypes)
+    encoder = Encoder(config, device)
+    decoder = Decoder(config, vocab_size, attn, device)
+    model = EncoderDecoder(encoder, decoder, device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    criterion = torch.nn.NLLLoss(reduction='elementwise_mean',
+                                 ignore_index=vocab.stoi[SpecialToken.Padding.value])
 
     # === Train ===
-    dest_model = config.dir_output / Path(now) / Path('reporter.model')
+    dest_model = dest_dir / Path('reporter.model')
     prev_valid_bleu = 0.0
     max_bleu = 0.0
     best_epoch = 0
@@ -151,7 +151,9 @@ def main() -> None:
             max_bleu = valid_bleu
             best_epoch = epoch
 
-        early_stop_counter += int(prev_valid_bleu > valid_bleu)
+        early_stop_counter = early_stop_counter + 1 \
+            if prev_valid_bleu > valid_bleu \
+            else 0
         if early_stop_counter == config.patience:
             logger.info('EARLY STOPPING')
             break
@@ -173,6 +175,8 @@ def main() -> None:
                     'Test Loss: {:.2f}'.format(test_result.loss),
                     'Test BLEU: {:.10f}'.format(test_bleu)])
     logger.info(s)
+
+    export_results_to_csv(dest_dir, test_result)
 
 
 if __name__ == '__main__':

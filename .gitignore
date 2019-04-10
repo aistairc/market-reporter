@@ -1,4 +1,5 @@
 __pycache__
+*.pyc
 *.egg-info/
 .ipynb_checkpoints
 
@@ -6,5 +7,8 @@ envs/hosts
 envs/*.retry
 output/
 resources/prices/*
+resources/headlines/*
 *.toml
 !*example.toml
+
+reporter/webapp/static/css/*.css

@@ -5,7 +5,6 @@ from typing import Dict, List, Tuple
 
 import boto3
 import torch
-from redis import Redis
 from sqlalchemy.orm.session import Session
 from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
@@ -23,7 +22,7 @@ from reporter.util.constant import N_LONG_TERM, N_SHORT_TERM, Phase, SeqType, Sp
 from reporter.util.conversion import stringify_ric_seqtype
 
 
-def prepare_resources(config: Config, db_session: Session, r: Redis, logger: Logger) -> Dict[Phase, List[Alignment]]:
+def prepare_resources(config: Config, db_session: Session, logger: Logger) -> Dict[Phase, List[Alignment]]:
 
     existing_rics = fetch_rics(db_session)
     db_missing_rics = [ric for ric in config.rics if ric not in existing_rics]
@@ -31,7 +30,6 @@ def prepare_resources(config: Config, db_session: Session, r: Redis, logger: Log
     has_headlines = are_headlines_ready(db_session)
 
     dir_prices = Path(config.dir_resources, 'prices')
-
     boto3_session = boto3.session.Session(profile_name=config.aws_profile_name)
     bucket_name = config.s3_bucket_name
     s3 = boto3_session.resource('s3')
@@ -61,7 +59,7 @@ def prepare_resources(config: Config, db_session: Session, r: Redis, logger: Log
 
     download_prices_from_s3(bucket, dir_prices, remote_dir_prices, db_missing_rics, logger)
 
-    insert_prices(db_session, r, dir_prices, db_missing_rics, config.dir_resources, logger)
+    insert_prices(db_session, dir_prices, db_missing_rics, config.dir_resources, logger)
 
     insert_headlines(db_session,
                      dir_headlines,

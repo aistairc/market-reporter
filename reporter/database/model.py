@@ -1,11 +1,11 @@
 from datetime import datetime
-from decimal import Decimal
-from typing import List, Union
+from typing import Any, Dict, List, Union
 
 from sqlalchemy import (
     TIMESTAMP,
     Boolean,
     Column,
+    Float,
     Integer,
     Numeric,
     String,
@@ -13,6 +13,8 @@ from sqlalchemy import (
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
+
+from reporter.util.constant import SeqType
 
 
 Base = declarative_base()
@@ -22,7 +24,9 @@ class Price(Base):
 
     __tablename__ = 'prices'
 
-    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
     utc_offset = Column(Integer, nullable=False)
     val = Column(Numeric(15, 6), nullable=True)
@@ -38,18 +42,58 @@ class Price(Base):
         self.utc_offset = utc_offset
         self.val = val
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {'ric': self.ric,
+                't': self.t,
+                'utc_offset': self.utc_offset,
+                'val': self.val}
+
+
+class PriceSeq(Base):
+
+    __tablename__ = 'price_seqs'
+
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
+    seqtype = Column(String, primary_key=True)
+    t = Column(TIMESTAMP(timezone=True), primary_key=True)
+    vals = Column(postgresql.ARRAY(Float), nullable=True)
+
+    def __init__(self,
+                 ric: str,
+                 seqtype: SeqType,
+                 t: datetime,
+                 vals: Union[None, List[float]]):
+
+        self.ric = ric
+        self.t = t
+        self.seqtype = seqtype.value
+        self.vals = vals
+
+    def to_dict(self):
+        return {'ric': self.ric,
+                't': self.t,
+                'seqtype': self.seqtype,
+                'vals': self.vals}
+
 
 class Close(Base):
 
     __tablename__ = 'closes'
 
-    ric = Column(String, primary_key=True)  # Reuters Instrument Code
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     t = Column(TIMESTAMP(timezone=True), primary_key=True)
 
     def __init__(self, ric: str, t: datetime):
 
         self.ric = ric
         self.t = t
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {'ric': self.ric, 't': self.t}
 
 
 class Headline(Base):
@@ -59,8 +103,9 @@ class Headline(Base):
     article_id = Column(String, primary_key=True)
     t = Column(TIMESTAMP(timezone=True), nullable=False)
     headline = Column(String, nullable=False)
-    # International Securities Identification Number
-    isins = Column(postgresql.ARRAY(String), nullable=True)
+    isins = Column(postgresql.ARRAY(String),
+                   nullable=True,
+                   comment='International Securities Identification Number')
     countries = Column(postgresql.ARRAY(String), nullable=True)
     categories = Column(postgresql.ARRAY(String), nullable=True)
     keywords_headline = Column(String, nullable=True)
@@ -104,32 +149,13 @@ class Headline(Base):
         self.phase = phase
 
 
-class Stat(Base):
-
-    __tablename__ = 'stat'
-
-    ric = Column(String, primary_key=True)
-    y = Column(Integer, primary_key=True)
-    mean = Column(Numeric(15, 6), nullable=False)
-    std = Column(Numeric(15, 6), nullable=False)
-
-    def __init__(self,
-                 ric: str,
-                 y: int,
-                 mean: Decimal,
-                 std: Decimal):
-
-        self.ric = ric
-        self.y = y
-        self.mean = mean
-        self.std = std
-
-
 class Instrument(Base):
 
     __tablename__ = 'instruments'
 
-    ric = Column(String, primary_key=True)
+    ric = Column(String,
+                 primary_key=True,
+                 comment='Reuters Instrument Code')
     description = Column(String)
     currency = Column(String)
     type_ = Column('type', String)
@@ -197,8 +223,8 @@ class GenerationResult(Base):
 
 def create_tables(engine: Engine) -> None:
     Base.metadata.create_all(engine, tables=[Price.__table__,
+                                             PriceSeq.__table__,
                                              Headline.__table__,
-                                             Stat.__table__,
                                              Instrument.__table__,
                                              Close.__table__,
                                              HumanEvaluation.__table__,

@@ -1,8 +1,0 @@
----
-- name: reboot
-  command: shutdown -r 1
-  async: 0
-  poll: 0
-  become: yes
-  changed_when: False
-...

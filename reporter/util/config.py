@@ -46,19 +46,8 @@ class Config:
         self.db_uri = config.get('postgres', {}).get('uri')
         self.db_uri_test = config.get('postgres-test', {}).get('uri')
 
-        redis = config.get('redis', {})
-        self.redis = {'host': redis.get('host', 'localhost'),
-                      'port': int(redis.get('port', 6379)),
-                      'db': int(redis.get('db', -1)),
-                      'decode_responses': True}
-        redis = config.get('redis-test', {})
-        self.redis_test = {'host': redis.get('host', 'localhost'),
-                           'port': int(redis.get('port', 6379)),
-                           'db': int(redis.get('db', -1)),
-                           'decode_responses': True}
-
         s3 = config.get('s3', {})
-        self.aws_profile_name = s3.get('profile_name', 'default')
+        self.aws_profile_name = s3.get('profile_name')
         self.s3_bucket_name = s3.get('bucket_name')
         self.remote_dir_prices = s3.get('remote_dir_prices')
         self.remote_nikkei_headline_filenames = s3.get('remote_nikkei_headline_filenames', [])
@@ -83,6 +72,7 @@ class Config:
         self.dec_hidden_size = int(dec.get('dec_hidden_size', 256))
 
         self.n_items_per_page = config.get('webapp', {}).get('n_items_per_page', 20)
+        self.demo_initial_date = config.get('webapp', {}).get('demo_initial_date', None)
 
         self.result = dict([(m, Path(p)) for (m, p)
                             in config.get('webapp', {}).get('result', [])])
