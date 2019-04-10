@@ -65,7 +65,7 @@ def download_prices_from_reuters(username: str,
             'ric': ric,
             'uri': Reuters.extraction_raw_uri,
             'file': ric2filename(dest_dir, ric, 'csv.gz')
-        } for ric in rics]
+            } for ric in rics]
     todo = [item for item in todo if not item['file'].is_file()]
     for item in todo:
         logging.info('start downloading {} from Reuters'.format(item['ric']))
