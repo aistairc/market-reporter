@@ -76,12 +76,12 @@ def download_prices_from_reuters(username: str,
         for item in todo:
             if item['json']:
                 r = requests.post(item['uri'],
-                                data=None,
-                                json=item['json'],
-                                headers=header)
+                                  data=None,
+                                  json=item['json'],
+                                  headers=header)
             else:
                 r = requests.get(item['uri'],
-                                headers=header)
+                                 headers=header)
             if r.status_code == HTTPStatus.OK.value:
                 job_id = r.json().get('JobId')
                 results_uri = Reuters.raw_extraction_results_uri.format(job_id)
