@@ -49,52 +49,63 @@ def download_prices_from_reuters(username: str,
                                  password: str,
                                  dest_dir: Path,
                                  rics: List[str],
-                                 logger: Logger) -> None:
+                                 logger: Logger = None,
+                                 start: str = None,
+                                 end: str = None) -> None:
 
     logging.getLogger('urllib3').setLevel(logging.WARNING)
     logging.getLogger('requests').setLevel(logging.CRITICAL)
 
     dest_dir.mkdir(parents=True, exist_ok=True)
+    reqs = []
+    auth_token = get_auth_token(username, password)
+    header = make_extract_header(auth_token)
 
-    for ric in rics:
+    todo = [{
+            'ric': ric,
+            'uri': Reuters.extraction_raw_uri,
+            'file': ric2filename(dest_dir, ric, 'csv.gz')
+            } for ric in rics]
+    todo = [item for item in todo if not item['file'].is_file()]
+    for item in todo:
+        logging.info('start downloading {} from Reuters'.format(item['ric']))
+        item['json'] = make_payload(item['ric'], start=start, end=end)
 
-        filename = ric2filename(dest_dir, ric, 'csv.gz')
+    while todo:
+        future = []
+        for item in todo:
+            if item['json']:
+                r = requests.post(item['uri'],
+                                  data=None,
+                                  json=item['json'],
+                                  headers=header)
+            else:
+                r = requests.get(item['uri'],
+                                 headers=header)
+            if r.status_code == HTTPStatus.OK.value:
+                job_id = r.json().get('JobId')
+                results_uri = Reuters.raw_extraction_results_uri.format(job_id)
+                r = requests.get(results_uri, headers=header, stream=True)
 
-        if filename.is_file():
-            continue
+                with item['file'].open(mode='wb') as f:
+                    f.write(r.raw.read())
 
-        logging.info('start downloading {} from Reuters'.format(ric))
+                logging.info('end downloading {} from Reuters'.format(item['ric']))
 
-        auth_token = get_auth_token(username, password)
-        payload = make_payload(ric)
-        header = make_extract_header(auth_token)
+            elif r.status_code == HTTPStatus.ACCEPTED.value:
+                item['uri'] = r.headers['Location']
+                item['json'] = None
+                future.append(item)
 
-        r = requests.post(Reuters.extraction_raw_uri,
-                          data=None,
-                          json=payload,
-                          headers=header)
+                logging.debug('waiting for {} from Reuters'.format(item['ric']))
 
-        if r.status_code != HTTPStatus.OK.value:
+            else:
+                logging.error('error downloading {} from Reuters: {}'.format(item['ric'], r.status_code))
 
-            if r.status_code != HTTPStatus.ACCEPTED.value:
-                return
+        time.sleep(10)
+        todo = future
 
-            location = r.headers['Location']
-            while True:
-                r = requests.get(location, headers=header)
-                if r.status_code == HTTPStatus.OK.value:
-                    break
-                else:
-                    time.sleep(5)
-
-        job_id = r.json().get('JobId')
-        results_uri = Reuters.raw_extraction_results_uri.format(job_id)
-        r = requests.get(results_uri, headers=header, stream=True)
-
-        with filename.open(mode='wb') as f:
-                f.write(r.raw.read())
-
-        logging.info('end downloading {} from Reuters'.format(ric))
+    logging.info('all download requests finished')
 
 
 def get_auth_token(username: str, password: str) -> Union[None, str]:
@@ -114,6 +125,7 @@ def get_auth_token(username: str, password: str) -> Union[None, str]:
         auth_token = response.json()['value']
         return auth_token
     else:
+        logging.error('error authenticating with Reuters: {}'.format(response.status_code))
         return None
 
 
@@ -127,7 +139,7 @@ def make_extract_header(auth_token: str) -> Dict[str, str]:
         }
 
 
-def make_payload(ric: str) \
+def make_payload(ric: str, start: str = None, end: str = None) \
         -> Dict[str, Dict[str, Union[str, Dict[str, Union[str, bool]]]]]:
 
     content_field_names = \
@@ -181,8 +193,8 @@ def make_payload(ric: str) \
         {
             'MessageTimeStampIn': 'GmtUtc',
             'ReportDateRangeType': 'Range',
-            'QueryStartDate': Reuters.start,
-            'QueryEndDate': Reuters.end,
+            'QueryStartDate': start or Reuters.start,
+            'QueryEndDate': end or Reuters.end,
             'SummaryInterval': 'FiveMinutes',
             'ExtractBy': 'Entity',
             'TimebarPersistence': True,
