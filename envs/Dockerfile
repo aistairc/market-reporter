@@ -16,9 +16,9 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     vim-tiny
 
-RUN useradd --create-home --skel /etc/skel --home-dir ${HOME_DIR} --shell /bin/bash reporter
-RUN mkdir -p ${HOME_DIR}/market-reporter \
-    && chown reporter:reporter -R ${HOME_DIR}/market-reporter
+RUN useradd --create-home --skel /etc/skel --home-dir ${MARKET_REPORTER_HOME_DIR} --shell /bin/bash reporter
+RUN mkdir -p ${MARKET_REPORTER_HOME_DIR}/market-reporter \
+    && chown reporter:reporter -R ${MARKET_REPORTER_HOME_DIR}/market-reporter
 
 COPY nginx.conf /etc/nginx/conf.d/nginx.conf
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
@@ -32,7 +32,7 @@ RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key \
     && rm nginx-selfsigned.csr
 
-RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${BASIC_AUTH_PASSWORD}
+RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${MARKET_REPORTER_BASIC_AUTH_PASSWORD}
 
 USER postgres
 RUN /etc/init.d/postgresql start \
@@ -42,8 +42,8 @@ RUN /etc/init.d/postgresql start \
     && /etc/init.d/postgresql stop
 
 USER reporter
-RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ${HOME_DIR}/.bashrc \
-    && echo "conda activate base" >> ${HOME_DIR}/.bashrc
-RUN git clone https://github.com/aistairc/market-reporter.git ${HOME_DIR}/market-reporter
+RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ${MARKET_REPORTER_HOME_DIR}/.bashrc \
+    && echo "conda activate base" >> ${MARKET_REPORTER_HOME_DIR}/.bashrc
+RUN git clone https://github.com/aistairc/market-reporter.git ${MARKET_REPORTER_HOME_DIR}/market-reporter
 
-WORKDIR ${HOME_DIR}/market-reporter
+WORKDIR ${MARKET_REPORTER_HOME_DIR}/market-reporter
