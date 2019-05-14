@@ -1,5 +1,7 @@
 FROM continuumio/anaconda3
 
+SHELL ["/bin/bash", "-c"]
+
 ENV MARKET_REPORTER_HOME_DIR "/opt/aistairc"
 ENV MARKET_REPORTER_BASIC_AUTH_PASSWORD "market-reporter-basic-auth-password"
 
