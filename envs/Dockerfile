@@ -20,8 +20,34 @@ RUN useradd --create-home --skel /etc/skel --home-dir ${MARKET_REPORTER_HOME_DIR
 RUN mkdir -p ${MARKET_REPORTER_HOME_DIR}/market-reporter \
     && chown reporter:reporter -R ${MARKET_REPORTER_HOME_DIR}/market-reporter
 
-COPY nginx.conf /etc/nginx/conf.d/nginx.conf
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN echo $'server {\n\
+    listen 443 ssl default_server;\n\
+    charset utf-8;\n\
+    client_max_body_size 80M;\n\
+\n\
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;\n\
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;\n\
+\n\
+    location / {\n\
+        auth_basic "Restricted";\n\
+        auth_basic_user_file /etc/nginx/.htpasswd;\n\
+        try_files $uri @webapp;\n\
+    }\n\
+\n\
+    location @webapp {\n\
+        include uwsgi_params;\n\
+        uwsgi_pass unix:/opt/aistairc/market-reporter/uwsgi.sock;\n\
+    }\n}' > /etc/nginx/conf.d/nginx.conf
+RUN echo $'[supervisord]\n\
+user=root\n\
+nodaemon=false\n\
+\n\
+[program:postgresql]\n\
+user=postgres\n\
+command=/usr/lib/postgresql/9.6/bin/postgres --config_file=/etc/postgresql/9.6/main/postgresql.conf\n\
+\n\
+[program:nginx]\n\
+command=/usr/sbin/nginx -g "daemon off;"\n' > /etc/supervisor/conf.d/supervisord.conf
 ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
 RUN openssl genrsa 2048 > nginx-selfsigned.key \
