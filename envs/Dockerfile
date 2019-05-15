@@ -1,9 +1,6 @@
-FROM continuumio/anaconda3
+FROM continuumio/anaconda3:5.3.0
 
 SHELL ["/bin/bash", "-c"]
-
-ENV MARKET_REPORTER_HOME_DIR "/opt/aistairc"
-ENV MARKET_REPORTER_BASIC_AUTH_PASSWORD "market-reporter-basic-auth-password"
 
 ENV DEBCONF_NOWARNINGS yes
 
@@ -18,9 +15,14 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     vim-tiny
 
-RUN useradd --create-home --skel /etc/skel --home-dir ${MARKET_REPORTER_HOME_DIR} --shell /bin/bash reporter
-RUN mkdir -p ${MARKET_REPORTER_HOME_DIR}/market-reporter \
-    && chown reporter:reporter -R ${MARKET_REPORTER_HOME_DIR}/market-reporter
+ENV MARKET_REPORTER_USER "reporter"
+
+RUN useradd --create-home --skel /etc/skel \
+    --home-dir /opt/${MARKET_REPORTER_USER} \
+    --shell /bin/bash ${MARKET_REPORTER_USER}
+RUN echo $'source /opt/conda/etc/profile.d/conda.sh\n\
+conda activate base' >> /opt/${MARKET_REPORTER_USER}/.bashrc
+RUN chown ${MARKET_REPORTER_USER} /opt/${MARKET_REPORTER_USER}/.bashrc
 
 RUN echo $'server {\n\
     listen 443 ssl default_server;\n\
@@ -40,17 +42,6 @@ RUN echo $'server {\n\
         include uwsgi_params;\n\
         uwsgi_pass unix:/opt/aistairc/market-reporter/uwsgi.sock;\n\
     }\n}' > /etc/nginx/conf.d/nginx.conf
-RUN echo $'[supervisord]\n\
-user=root\n\
-nodaemon=false\n\
-\n\
-[program:postgresql]\n\
-user=postgres\n\
-command=/usr/lib/postgresql/9.6/bin/postgres --config_file=/etc/postgresql/9.6/main/postgresql.conf\n\
-\n\
-[program:nginx]\n\
-command=/usr/sbin/nginx -g "daemon off;"\n' > /etc/supervisor/conf.d/supervisord.conf
-ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
 RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && chmod 400 nginx-selfsigned.key \
@@ -60,7 +51,22 @@ RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key \
     && rm nginx-selfsigned.csr
 
+ENV MARKET_REPORTER_BASIC_AUTH_PASSWORD "market-reporter-basic-auth-password"
+
 RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${MARKET_REPORTER_BASIC_AUTH_PASSWORD}
+
+RUN echo $'[supervisord]\n\
+user=root\n\
+nodaemon=false\n\
+\n\
+[program:postgresql]\n\
+user=postgres\n\
+command=/usr/lib/postgresql/9.6/bin/postgres --config_file=/etc/postgresql/9.6/main/postgresql.conf\n\
+\n\
+[program:nginx]\n\
+command=/usr/sbin/nginx -g "daemon off;"' > /etc/supervisor/conf.d/supervisord.conf
+
+ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
 USER postgres
 RUN /etc/init.d/postgresql start \
@@ -69,9 +75,4 @@ RUN /etc/init.d/postgresql start \
     && createdb test_db reporter \
     && /etc/init.d/postgresql stop
 
-USER reporter
-RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ${MARKET_REPORTER_HOME_DIR}/.bashrc \
-    && echo "conda activate base" >> ${MARKET_REPORTER_HOME_DIR}/.bashrc
-RUN git clone https://github.com/aistairc/market-reporter.git ${MARKET_REPORTER_HOME_DIR}/market-reporter
-
-WORKDIR ${MARKET_REPORTER_HOME_DIR}/market-reporter
+WORKDIR /opt/${MARKET_REPORTER_USER}/market-reporter
