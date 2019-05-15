@@ -22,7 +22,7 @@ RUN useradd --create-home --skel /etc/skel \
     --shell /bin/bash ${MARKET_REPORTER_USER}
 RUN echo $'source /opt/conda/etc/profile.d/conda.sh\n\
 conda activate base' >> /opt/${MARKET_REPORTER_USER}/.bashrc
-RUN chown ${MARKET_REPORTER_USER} /opt/${MARKET_REPORTER_USER}/.bashrc
+RUN chown -R ${MARKET_REPORTER_USER}:${MARKET_REPORTER_USER} /opt/${MARKET_REPORTER_USER}
 
 RUN echo $'server {\n\
     listen 443 ssl default_server;\n\
@@ -75,4 +75,4 @@ RUN /etc/init.d/postgresql start \
     && createdb test_db reporter \
     && /etc/init.d/postgresql stop
 
-WORKDIR /opt/${MARKET_REPORTER_USER}/market-reporter
+WORKDIR /opt/${MARKET_REPORTER_USER}
