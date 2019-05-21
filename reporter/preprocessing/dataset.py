@@ -30,7 +30,13 @@ def prepare_resources(config: Config, db_session: Session, logger: Logger) -> Di
     has_headlines = are_headlines_ready(db_session)
 
     dir_prices = Path(config.dir_resources, 'prices')
-    boto3_session = boto3.session.Session(profile_name=config.aws_profile_name)
+    boto3_session = \
+        boto3.session.Session(aws_access_key_id=config.aws_access_key_id,
+                              aws_secret_access_key=config.aws_secret_access_key,
+                              region_name=config.aws_region) \
+        if config.use_aws_env_variables \
+        else boto3.session.Session(profile_name=config.aws_profile_name)
+
     bucket_name = config.s3_bucket_name
     s3 = boto3_session.resource('s3')
     s3.meta.client.head_bucket(Bucket=bucket_name)
