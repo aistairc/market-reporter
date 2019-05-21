@@ -80,7 +80,11 @@ def prepare_resources(config: Config, db_session: Session, logger: Logger) -> Di
 def create_dataset(config: Config, device: torch.device) -> Tuple[Vocab, Iterator, Iterator, Iterator]:
 
     fields = dict()
-    fields[SeqType.ArticleID.value] = (SeqType.ArticleID.value, RawField())
+    raw_field = RawField()
+    # torchtext 0.3.1
+    # AttributeError: 'RawField' object has no attribute 'is_target'
+    raw_field.is_target = False
+    fields[SeqType.ArticleID.value] = (SeqType.ArticleID.value, raw_field)
 
     time_field = Field(use_vocab=False, batch_first=True, sequential=False)
     fields['jst_hour'] = (SeqType.Time.value, time_field)
@@ -104,7 +108,6 @@ def create_dataset(config: Config, device: torch.device) -> Tuple[Vocab, Iterato
                 SeqType.NormMovRefShort, SeqType.NormMovRefLong,
                 SeqType.StdShort, SeqType.StdLong]
 
-    tensor_type = torch.FloatTensor if device.type == 'cpu' else torch.cuda.FloatTensor
     for (ric, seqtype) in itertools.product(config.rics, seqtypes):
         n = N_LONG_TERM \
             if seqtype.value.endswith('long') \
@@ -114,7 +117,7 @@ def create_dataset(config: Config, device: torch.device) -> Tuple[Vocab, Iterato
                             batch_first=True,
                             pad_token=0.0,
                             preprocessing=lambda xs: [float(x) for x in xs],
-                            tensor_type=tensor_type)
+                            dtype=torch.float)
         key = stringify_ric_seqtype(ric, seqtype)
         fields[key] = (key, price_field)
 
