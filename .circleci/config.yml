@@ -3,9 +3,7 @@ jobs:
   build:
     docker:
       - image: pecorarista/market-reporter
-        environment:
-            MARKET_REPORTER_USER: circleci
-        user: circleci
+        user: reporter
     steps:
       - checkout
       - run:
@@ -26,4 +24,4 @@ jobs:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
             - /opt/conda
-            - /opt/circleci/.conda
+            - /opt/reporter/.conda
