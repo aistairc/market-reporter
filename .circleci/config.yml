@@ -3,6 +3,9 @@ jobs:
   build:
     docker:
       - image: pecorarista/market-reporter
+        environment:
+            MARKET_REPORTER_USER: circleci
+        user: circleci
     steps:
       - checkout
       - run:
@@ -17,10 +20,10 @@ jobs:
       - run:
           name: Create an environment
           command: |
-              conda env create -f environment-fixed.yaml -n circleci
+              conda env create -f environment-fixed.yaml -n circleci --quiet
               conda activate circleci
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
             - /opt/conda
-            - /opt/reporter/.conda
+            - /opt/circleci/.conda
