@@ -10,7 +10,7 @@ jobs:
           name: Print the working directory
           command: pwd
       - run:
-          name: Show who am I
+          name: Show who I am
           command: whoami
       - restore_cache:
           keys:
@@ -20,8 +20,15 @@ jobs:
           command: |
               conda env create -f environment-fixed.yaml -n circleci --quiet
               conda activate circleci
+              source /opt/conda/etc/profile.d/conda.sh
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
             - /opt/conda
             - /opt/reporter/.conda
+      - run:
+          name: Check formats
+          command: flake8
+      - run:
+          name: Run unit tests
+          command: python setup.py test
