@@ -19,13 +19,16 @@ jobs:
           name: Create an environment
           command: |
               conda env create -f environment-fixed.yaml -n circleci --quiet
-              conda activate circleci
-              source /opt/conda/etc/profile.d/conda.sh
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
             - /opt/conda
             - /opt/reporter/.conda
+      - run:
+          name:
+          command: Activate an environment
+              source /opt/conda/etc/profile.d/conda.sh
+              conda activate circleci
       - run:
           name: Check formats
           command: flake8
