@@ -1,10 +1,6 @@
-FROM continuumio/anaconda3
+FROM continuumio/anaconda3:5.3.0
 
-ARG HOME_DIR="/opt/aistairc"
-# ARG GITHUB_ACCESS_TOKEN
-# RUN test -n "$GITHUB_ACCESS_TOKEN"
-ARG BASIC_AUTH_PASSWORD
-RUN test -n "$BASIC_AUTH_PASSWORD"
+SHELL ["/bin/bash", "-c"]
 
 ENV DEBCONF_NOWARNINGS yes
 
@@ -19,13 +15,33 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     vim-tiny
 
-RUN useradd --create-home --skel /etc/skel --home-dir ${HOME_DIR} --shell /bin/bash reporter
-RUN mkdir -p ${HOME_DIR}/market-reporter \
-    && chown reporter:reporter -R ${HOME_DIR}/market-reporter
+ENV MARKET_REPORTER_USER "reporter"
 
-COPY nginx.conf /etc/nginx/conf.d/nginx.conf
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
+RUN useradd --create-home --skel /etc/skel \
+    --home-dir /opt/${MARKET_REPORTER_USER} \
+    --shell /bin/bash ${MARKET_REPORTER_USER}
+RUN echo $'source /opt/conda/etc/profile.d/conda.sh\n\
+conda activate base' >> /opt/${MARKET_REPORTER_USER}/.bashrc
+RUN chown -R ${MARKET_REPORTER_USER}:${MARKET_REPORTER_USER} /opt/${MARKET_REPORTER_USER}
+
+RUN echo $'server {\n\
+    listen 443 ssl default_server;\n\
+    charset utf-8;\n\
+    client_max_body_size 80M;\n\
+\n\
+    ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;\n\
+    ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;\n\
+\n\
+    location / {\n\
+        auth_basic "Restricted";\n\
+        auth_basic_user_file /etc/nginx/.htpasswd;\n\
+        try_files $uri @webapp;\n\
+    }\n\
+\n\
+    location @webapp {\n\
+        include uwsgi_params;\n\
+        uwsgi_pass unix:/opt/aistairc/market-reporter/uwsgi.sock;\n\
+    }\n}' > /etc/nginx/conf.d/nginx.conf
 
 RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && chmod 400 nginx-selfsigned.key \
@@ -35,7 +51,22 @@ RUN openssl genrsa 2048 > nginx-selfsigned.key \
     && mv nginx-selfsigned.key /etc/ssl/private/nginx-selfsigned.key \
     && rm nginx-selfsigned.csr
 
-RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${BASIC_AUTH_PASSWORD}
+ENV MARKET_REPORTER_BASIC_AUTH_PASSWORD "market-reporter-basic-auth-password"
+
+RUN htpasswd -b -c /etc/nginx/.htpasswd reporter ${MARKET_REPORTER_BASIC_AUTH_PASSWORD}
+
+RUN echo $'[supervisord]\n\
+user=root\n\
+nodaemon=false\n\
+\n\
+[program:postgresql]\n\
+user=postgres\n\
+command=/usr/lib/postgresql/9.6/bin/postgres --config_file=/etc/postgresql/9.6/main/postgresql.conf\n\
+\n\
+[program:nginx]\n\
+command=/usr/sbin/nginx -g "daemon off;"' > /etc/supervisor/conf.d/supervisord.conf
+
+ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
 
 USER postgres
 RUN /etc/init.d/postgresql start \
@@ -44,13 +75,4 @@ RUN /etc/init.d/postgresql start \
     && createdb test_db reporter \
     && /etc/init.d/postgresql stop
 
-USER reporter
-RUN echo "source /opt/conda/etc/profile.d/conda.sh" >> ${HOME_DIR}/.bashrc \
-    && echo "conda activate base" >> ${HOME_DIR}/.bashrc
-# if (the repository is private) {
-# RUN git clone https://${GITHUB_ACCESS_TOKEN}:x-oauth-basic@github.com/aistairc/market-reporter.git ${HOME_DIR}/market-reporter
-# } else {
-RUN git clone https://github.com/aistairc/market-reporter.git ${HOME_DIR}/market-reporter
-# }
-
-WORKDIR ${HOME_DIR}/market-reporter
+WORKDIR /opt/${MARKET_REPORTER_USER}

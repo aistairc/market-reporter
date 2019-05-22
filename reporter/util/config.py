@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from logging import Logger
 from pathlib import Path
@@ -47,7 +48,11 @@ class Config:
         self.db_uri_test = config.get('postgres-test', {}).get('uri')
 
         s3 = config.get('s3', {})
-        self.aws_profile_name = s3.get('profile_name')
+        self.use_aws_env_variables = s3.get('use_aws_env_variables', True)
+        self.aws_access_key_id = os.environ.get('AWS_ACCESS_KEY_ID')
+        self.aws_secret_access_key = os.environ.get('AWS_SECRET_ACCESS_KEY')
+        self.aws_region = os.environ.get('AWS_REGION')
+        self.aws_profile_name = s3.get('profile_name', 'default')
         self.s3_bucket_name = s3.get('bucket_name')
         self.remote_dir_prices = s3.get('remote_dir_prices')
         self.remote_nikkei_headline_filenames = s3.get('remote_nikkei_headline_filenames', [])
