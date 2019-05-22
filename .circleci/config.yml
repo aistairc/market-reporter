@@ -18,7 +18,10 @@ jobs:
       - run:
           name: Create an environment
           command: |
-              conda env create -f environment-fixed.yaml -n circleci --quiet
+              if [ ! -d /opt/conda/.conda/circleci ]
+              then
+                  conda env create -f environment-fixed.yaml -n circleci --quiet
+              fi
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
