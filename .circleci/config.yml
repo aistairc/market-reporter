@@ -24,13 +24,14 @@ jobs:
           paths:
             - /opt/reporter/.conda
       - run:
-          name: Activate an environment
+          name: Check formats
           command: |
               source /opt/conda/etc/profile.d/conda.sh
               conda activate circleci
-      - run:
-          name: Check formats
-          command: flake8 reporter
+              flake8 reporter
       - run:
           name: Run unit tests
-          command: python setup.py test
+          command: |
+              source /opt/conda/etc/profile.d/conda.sh
+              conda activate circleci
+              python setup.py test
