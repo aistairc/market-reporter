@@ -6,8 +6,21 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Greeting
-          command: echo Hello, world.
+          name: Print the working directory
+          command: pwd
       - run:
-          name: Print the Current Time
-          command: date
+          name: Show who am I
+          command: whoami
+      - restore_cache:
+          keys:
+            - market-reporter-{{ checksum "environment-fixed.yaml" }}
+      - run:
+          name: Create an environment
+          command: |
+              conda env create -f environment-fixed.yaml -n circleci
+              conda activate circleci
+      - save_cache:
+          key: market-reporter-{{ checksum "environment-fixed.yaml" }}
+          paths:
+            - /opt/conda
+            - /opt/reporter/.conda
