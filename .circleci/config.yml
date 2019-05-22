@@ -14,15 +14,14 @@ jobs:
           command: whoami
       - restore_cache:
           keys:
-            - market-reporter-{{ checksum "environment-fixed.yaml" }}
+            - market-reporter-conda-{{ checksum "environment-fixed.yaml" }}
       - run:
           name: Create an environment
           command: |
               conda env create -f environment-fixed.yaml -n circleci --quiet
       - save_cache:
-          key: market-reporter-{{ checksum "environment-fixed.yaml" }}
+          key: market-reporter-conda-{{ checksum "environment-fixed.yaml" }}
           paths:
-            - /opt/conda
             - /opt/reporter/.conda
       - run:
           name: Activate an environment
