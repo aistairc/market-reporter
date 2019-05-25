@@ -57,7 +57,6 @@ def download_prices_from_reuters(username: str,
     logging.getLogger('requests').setLevel(logging.CRITICAL)
 
     dest_dir.mkdir(parents=True, exist_ok=True)
-    reqs = []
     auth_token = get_auth_token(username, password)
     header = make_extract_header(auth_token)
 

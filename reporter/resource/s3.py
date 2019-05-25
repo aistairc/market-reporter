@@ -38,7 +38,7 @@ def download_nikkei_headlines_from_s3(bucket: ServiceResource,
                     logger.info('{} is not found'.format(remote_filename))
             logger.debug('end downloading {}'.format(basename))
 
-        infl_filename = re.sub('\.zip$', '.csv',
+        infl_filename = re.sub(r'\.zip$', '.csv',
                                basename,
                                flags=re.IGNORECASE)
         match = re.search(r'_([12][0-9]{3})_', infl_filename)
