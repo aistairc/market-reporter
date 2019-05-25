@@ -10,8 +10,6 @@ jobs:
           POSTGRES_DB: test_db
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - run:
           name: Print the working directory
           command: pwd
@@ -36,8 +34,8 @@ jobs:
           name: Create `config.toml`
           command: |
             cat example.toml \
-            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql:///test_db'#" \
-            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql:///test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
             | tee config.toml
       - run:
           name: Check formats
