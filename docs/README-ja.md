@@ -1,4 +1,7 @@
 # Market Reporter
+
+[![CircleCI](https://circleci.com/gh/aistairc/market-reporter.svg?style=svg)](https://circleci.com/gh/aistairc/market-reporter)
+
 [English](../README.md)
 
 <p align="center"><img src="../docs/figures/logo.svg" width="600px"></p>
