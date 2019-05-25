@@ -12,7 +12,6 @@ dependencies:
   - bz2file=0.98=py_0
   - bzip2=1.0.6=h14c3975_1002
   - ca-certificates=2019.3.9=hecc5488_0
-  - certifi=2019.3.9=py37_0
   - cffi=1.12.3=py37h8022711_0
   - chardet=3.0.4=py37_1003
   - click=7.0=py_0
@@ -100,11 +99,17 @@ dependencies:
   - xz=5.2.4=h14c3975_1001
   - yaml=0.1.7=h14c3975_1001
   - zlib=1.2.11=h14c3975_1004
+  - certifi=2019.3.9=py37_0
+  - entrypoints=0.3=py37_0
+  - flake8=3.7.7=py37_0
   - intel-openmp=2019.3=199
   - libgcc-ng=8.2.0=hdf63c60_1
   - libgfortran-ng=7.3.0=hdf63c60_0
   - libstdcxx-ng=8.2.0=hdf63c60_1
+  - mccabe=0.6.1=py37_1
   - mkl=2019.3=199
+  - pycodestyle=2.5.0=py37_0
+  - pyflakes=2.1.1=py37_0
   - pytorch=0.4.1=py37_py36_py35_py27__9.0.176_7.1.2_2
   - pip:
     - ansible==2.7.10
@@ -126,3 +131,4 @@ dependencies:
     - torch==0.4.1.post2
     - torchtext==0.3.1
     - tqdm==4.32.1
+

@@ -72,11 +72,13 @@ class TestPreprocessing(TestCase):
 
     def test_is_template(self):
 
-        true = '日経平均前引け、小反発　<yen val="100"/>高の<yen val="10000"/>'
-        self.assertTrue(is_template(true))
+        t = '日経平均前引け、小反発　100円高の10000円'
+        self.assertTrue(is_template(t))
 
-        false = '日経平均前引け、反発　こんにちは'
-        self.assertFalse(is_template(false))
+    def test_is_not_template(self):
+
+        t = '日経平均前引け、反発　こんにちは'
+        self.assertFalse(is_template(t))
 
     def test_replace_prices_with_tags(self):
 

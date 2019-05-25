@@ -189,10 +189,10 @@ class HumanEvaluation(Base):
     def __init__(self,
                  article_id: str,
                  ordering: List[str],
-                 fluency: Union[None, str]=None,
-                 informativeness: Union[None, str]=None,
-                 note: Union[None, str]=None,
-                 is_target: Union[bool, None]=None):
+                 fluency: Union[None, str] = None,
+                 informativeness: Union[None, str] = None,
+                 note: Union[None, str] = None,
+                 is_target: Union[bool, None] = None):
 
         self.article_id = article_id
         self.ordering = ordering
@@ -214,7 +214,7 @@ class GenerationResult(Base):
     def __init__(self,
                  article_id: str,
                  method_name: str,
-                 result: Union[str, None]=None):
+                 result: Union[str, None] = None):
 
         self.article_id = article_id
         self.method_name = method_name

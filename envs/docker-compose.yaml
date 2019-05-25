@@ -1,0 +1,15 @@
+version: '3'
+services:
+  market-reporter-db:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_USER=reporter
+      - POSTGRES_DB=test_db
+    ports:
+      - 5432:5432
+  market-reporter:
+    image: pecorarista/market-reporter
+    ports:
+      - 443:443
+    links:
+      - market-reporter-db

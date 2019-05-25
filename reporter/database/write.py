@@ -18,7 +18,6 @@ from reporter.database.misc import in_jst
 from reporter.database.model import Close, Headline, Instrument, Price, PriceSeq
 from reporter.preprocessing.text import (
     is_interesting,
-    is_template,
     kansuuzi2number,
     replace_prices_with_tags,
     simplify_headline)

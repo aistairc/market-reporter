@@ -1,0 +1,51 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: pecorarista/market-reporter
+        user: reporter
+      - image: postgres:9.6
+        environment:
+          POSTGRES_USER: reporter
+          POSTGRES_DB: test_db
+    steps:
+      - checkout
+      - run:
+          name: Print the working directory
+          command: pwd
+      - run:
+          name: Show who I am
+          command: whoami
+      - restore_cache:
+          keys:
+            - market-reporter-{{ checksum "environment-fixed.yaml" }}
+      - run:
+          name: Create an environment
+          command: |
+            if [ ! -d /opt/reporter/.conda/envs/circleci ]
+            then
+                conda env create -f environment-fixed.yaml -n circleci --quiet
+            fi
+      - save_cache:
+          key: market-reporter-{{ checksum "environment-fixed.yaml" }}
+          paths:
+            - /opt/reporter/.conda
+      - run:
+          name: Create `config.toml`
+          command: |
+            cat example.toml \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
+            | tee config.toml
+      - run:
+          name: Check formats
+          command: |
+            source /opt/conda/etc/profile.d/conda.sh
+            conda activate circleci
+            flake8 reporter
+      - run:
+          name: Run unit tests
+          command: |
+            source /opt/conda/etc/profile.d/conda.sh
+            conda activate circleci
+            python setup.py test
