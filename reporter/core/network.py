@@ -293,8 +293,8 @@ class MLP(nn.Module):
                  input_size: int,
                  mid_size: int,
                  output_size: int,
-                 n_layers: int=3,
-                 activation_function: str='tanh'):
+                 n_layers: int = 3,
+                 activation_function: str = 'tanh'):
         '''Multi-Layer Perceptron
         '''
 

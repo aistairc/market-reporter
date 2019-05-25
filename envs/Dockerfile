@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     make \
     nginx \
-    postgresql-9.6 \
+    postgresql-client-9.6 \
     sudo \
     supervisor \
     vim-tiny
@@ -59,20 +59,9 @@ RUN echo $'[supervisord]\n\
 user=root\n\
 nodaemon=false\n\
 \n\
-[program:postgresql]\n\
-user=postgres\n\
-command=/usr/lib/postgresql/9.6/bin/postgres --config_file=/etc/postgresql/9.6/main/postgresql.conf\n\
-\n\
 [program:nginx]\n\
 command=/usr/sbin/nginx -g "daemon off;"' > /etc/supervisor/conf.d/supervisord.conf
 
 ENTRYPOINT /usr/bin/supervisord --nodaemon --user root --configuration /etc/supervisor/supervisord.conf
-
-USER postgres
-RUN /etc/init.d/postgresql start \
-    && createuser reporter\
-    && createdb master reporter \
-    && createdb test_db reporter \
-    && /etc/init.d/postgresql stop
 
 WORKDIR /opt/${MARKET_REPORTER_USER}

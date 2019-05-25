@@ -7,7 +7,7 @@ from pytz import UTC
 
 
 def convert_24h_to_12h(h: int) -> int:
-        return h if h < 23 else h - 24
+    return h if h < 23 else h - 24
 
 
 class ClosingTime:

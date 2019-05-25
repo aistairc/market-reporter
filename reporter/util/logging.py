@@ -3,7 +3,7 @@ import logging.config
 from pathlib import Path
 
 
-def create_logger(dest_log: Path, is_debug: bool, is_temporary: bool=False) -> logging.Logger:
+def create_logger(dest_log: Path, is_debug: bool, is_temporary: bool = False) -> logging.Logger:
 
     DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
     FORMAT = '%(asctime)s %(levelname)s %(message)s'
