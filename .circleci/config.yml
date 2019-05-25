@@ -4,8 +4,14 @@ jobs:
     docker:
       - image: pecorarista/market-reporter
         user: reporter
+      - image: postgres:9.6
+        environment:
+          POSTGRES_USER: reporter
+          POSTGRES_DB: test_db
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Print the working directory
           command: pwd
