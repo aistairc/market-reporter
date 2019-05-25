@@ -18,23 +18,29 @@ jobs:
       - run:
           name: Create an environment
           command: |
-              if [ ! -d /opt/reporter/.conda/envs/circleci ]
-              then
-                  conda env create -f environment-fixed.yaml -n circleci --quiet
-              fi
+            if [ ! -d /opt/reporter/.conda/envs/circleci ]
+            then
+                conda env create -f environment-fixed.yaml -n circleci --quiet
+            fi
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
           paths:
             - /opt/reporter/.conda
       - run:
+          name: Create `config.toml`
+          command: |
+            cat example.toml \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql:///test_db'#"
+            > config.toml
+      - run:
           name: Check formats
           command: |
-              source /opt/conda/etc/profile.d/conda.sh
-              conda activate circleci
-              flake8 reporter
+            source /opt/conda/etc/profile.d/conda.sh
+            conda activate circleci
+            flake8 reporter
       - run:
           name: Run unit tests
           command: |
-              source /opt/conda/etc/profile.d/conda.sh
-              conda activate circleci
-              python setup.py test
+            source /opt/conda/etc/profile.d/conda.sh
+            conda activate circleci
+            python setup.py test
