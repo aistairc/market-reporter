@@ -30,8 +30,11 @@ jobs:
           name: Create `config.toml`
           command: |
             cat example.toml \
-            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql:///test_db'#"
-            > config.toml
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql:///test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql:///test_db'#" \
+            | sed -e "s/'.SPX'/# '.SPX'" \
+            | sed -e "s/'.DJI'/# '.DJI'" \
+            | tee config.toml
       - run:
           name: Check formats
           command: |
