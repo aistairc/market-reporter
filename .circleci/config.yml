@@ -18,7 +18,7 @@ jobs:
       - run:
           name: Create an environment
           command: |
-              if [ ! -d /opt/reporter/.conda/circleci ]
+              if [ ! -d /opt/reporter/.conda/envs/circleci ]
               then
                   conda env create -f environment-fixed.yaml -n circleci --quiet
               fi
