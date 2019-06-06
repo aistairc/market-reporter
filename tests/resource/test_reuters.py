@@ -1,5 +1,4 @@
 from unittest import TestCase
-import os
 from pathlib import Path
 
 import toml

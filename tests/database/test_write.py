@@ -49,8 +49,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.RawLong.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.RawLong.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -59,8 +59,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.StdLong.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.StdLong.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -69,8 +69,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.MovRefLong.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.MovRefLong.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -79,8 +79,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.NormMovRefLong.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.NormMovRefLong.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -101,8 +101,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.RawShort.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.RawShort.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -123,8 +123,8 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.StdShort.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.StdShort.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
@@ -145,13 +145,12 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.MovRefShort.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.MovRefShort.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
 
     def test_normalized_moving_reference_short(self):
-        key = ".TEST__normalized_moving_reference_short__2011-01-14T06:00:00.000000000+0000"
         expected = [-0.960784, -0.963725, -0.964052, -0.964379, -0.964706,
                     -0.965033, -0.965359, -0.965686, -0.966013, -0.966340,
                     -0.966667, -0.966993, -0.967320, -0.970261, -0.970588,
@@ -168,7 +167,7 @@ class TestWrite(unittest.TestCase):
         result = self.session \
             .query(PriceSeq.vals) \
             .filter(PriceSeq.ric == '.TEST',
-                   PriceSeq.t == '2011-01-14T06:00:00+0000',
-                   PriceSeq.seqtype == SeqType.NormMovRefShort.value) \
+                    PriceSeq.t == '2011-01-14T06:00:00+0000',
+                    PriceSeq.seqtype == SeqType.NormMovRefShort.value) \
             .scalar()
         self.assertTrue(allclose(expected, result))
