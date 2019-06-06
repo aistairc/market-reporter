@@ -43,6 +43,7 @@ jobs:
             source /opt/conda/etc/profile.d/conda.sh
             conda activate circleci
             flake8 reporter
+            flake8 tests
       - run:
           name: Run unit tests
           command: |
