@@ -8,7 +8,7 @@ from typing import Dict
 from sqlalchemy.orm.session import Session
 from tqdm import tqdm
 
-from reporter.database.model import HumanEvaluation, GenerationResult
+from reporter.database.model import GenerationResult, HumanEvaluation
 from reporter.postprocessing.text import number2kansuuzi
 
 

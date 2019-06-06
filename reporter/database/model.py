@@ -9,13 +9,13 @@ from sqlalchemy import (
     Integer,
     Numeric,
     String,
-    Table)
+    Table
+)
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.ext.declarative import declarative_base
 
 from reporter.util.constant import SeqType
-
 
 Base = declarative_base()
 

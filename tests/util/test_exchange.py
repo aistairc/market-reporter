@@ -1,9 +1,10 @@
+from datetime import time
 from pathlib import Path
 from unittest import TestCase
-from datetime import time
+
 import pytz
 
-from reporter.util.constant import EST, EDT
+from reporter.util.constant import EDT, EST
 from reporter.util.exchange import ClosingTime
 
 

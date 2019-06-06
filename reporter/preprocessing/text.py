@@ -3,8 +3,8 @@ import re
 from typing import List
 
 import mojimoji
-from reporter.util.constant import IDEOGRAPHIC_SPACE
 
+from reporter.util.constant import IDEOGRAPHIC_SPACE
 
 YEN_EXPRS = ['円', '円高', '円安']
 

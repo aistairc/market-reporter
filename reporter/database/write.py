@@ -15,12 +15,19 @@ from sqlalchemy.sql.expression import extract
 from tqdm import tqdm
 
 from reporter.database.misc import in_jst
-from reporter.database.model import Close, Headline, Instrument, Price, PriceSeq
+from reporter.database.model import (
+    Close,
+    Headline,
+    Instrument,
+    Price,
+    PriceSeq
+)
 from reporter.preprocessing.text import (
     is_interesting,
     kansuuzi2number,
     replace_prices_with_tags,
-    simplify_headline)
+    simplify_headline
+)
 from reporter.resource.reuters import ric2filename
 from reporter.util.config import Span
 from reporter.util.constant import (
@@ -34,7 +41,8 @@ from reporter.util.constant import (
     REUTERS_DATETIME_FORMAT,
     Code,
     Phase,
-    SeqType)
+    SeqType
+)
 from reporter.util.exchange import ClosingTime
 
 

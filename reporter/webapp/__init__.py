@@ -5,24 +5,34 @@ from pathlib import Path
 from typing import List
 
 import flask
-import sass
 import torch
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
+import sass
 from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import GenerationResult, Headline, HumanEvaluation
-from reporter.database.read import fetch_date_range, fetch_max_t_of_prev_trading_day, fetch_rics
+from reporter.database.read import (
+    fetch_date_range,
+    fetch_max_t_of_prev_trading_day,
+    fetch_rics
+)
 from reporter.predict import Predictor
 from reporter.util.config import Config
 from reporter.util.constant import JST, NIKKEI_DATETIME_FORMAT, UTC, Code
 from reporter.webapp.chart import (
     fetch_all_closes_fast,
     fetch_all_points_fast,
-    fetch_close, fetch_points)
+    fetch_close,
+    fetch_points
+)
 from reporter.webapp.human_evaluation import populate_for_human_evaluation
 from reporter.webapp.search import construct_constraint_query
-from reporter.webapp.table import Table, create_ric_tables, load_ric_to_ric_info
+from reporter.webapp.table import (
+    Table,
+    create_ric_tables,
+    load_ric_to_ric_info
+)
 
 config = Config('config.toml')
 app = flask.Flask(__name__)

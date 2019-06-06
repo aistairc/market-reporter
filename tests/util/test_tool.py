@@ -1,5 +1,5 @@
-from unittest import TestCase
 from types import GeneratorType
+from unittest import TestCase
 
 from reporter.util.tool import takeuntil
 

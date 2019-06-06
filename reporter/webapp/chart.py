@@ -1,16 +1,15 @@
-from typing import List, Tuple, Dict, Iterable
 from datetime import datetime, timedelta
 from itertools import groupby
+from typing import Dict, Iterable, List, Tuple
 
+from sqlalchemy import Date, cast
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql import text
 
+from reporter.database.misc import in_jst
+from reporter.database.model import Close, Price
 from reporter.database.read import fetch_prices_of_a_day
 from reporter.util.constant import UTC
-
-from reporter.database.model import Price, Close
-from sqlalchemy import cast, Date
-from reporter.database.misc import in_jst
 
 
 def fetch_points(session: Session, ric: str, start: datetime, end: datetime) -> Tuple[List[int], List[str]]:

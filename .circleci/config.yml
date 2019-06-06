@@ -44,6 +44,8 @@ jobs:
             conda activate circleci
             flake8 reporter
             flake8 tests
+            isort --recursive --check-only reporter
+            isort --recursive --check-only tests
       - run:
           name: Run unit tests
           command: |

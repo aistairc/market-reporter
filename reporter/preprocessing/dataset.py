@@ -10,15 +10,26 @@ from torchtext.data import Field, Iterator, RawField, TabularDataset
 from torchtext.vocab import Vocab
 
 from reporter.database.read import Alignment, are_headlines_ready, fetch_rics
-from reporter.database.write import insert_headlines, insert_prices, update_headlines
+from reporter.database.write import (
+    insert_headlines,
+    insert_prices,
+    update_headlines
+)
 from reporter.resource.reuters import download_prices_from_reuters
 from reporter.resource.s3 import (
     download_nikkei_headlines_from_s3,
     download_prices_from_s3,
     list_rics_in_s3,
-    upload_prices_to_s3)
+    upload_prices_to_s3
+)
 from reporter.util.config import Config
-from reporter.util.constant import N_LONG_TERM, N_SHORT_TERM, Phase, SeqType, SpecialToken
+from reporter.util.constant import (
+    N_LONG_TERM,
+    N_SHORT_TERM,
+    Phase,
+    SeqType,
+    SpecialToken
+)
 from reporter.util.conversion import stringify_ric_seqtype
 
 

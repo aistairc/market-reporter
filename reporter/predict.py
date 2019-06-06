@@ -8,13 +8,21 @@ from typing import List
 
 import jsonlines
 import torch
-from torchtext.data import Field, Iterator, RawField, TabularDataset
-from torchtext.vocab import Vocab
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import Session, sessionmaker
+from torchtext.data import Field, Iterator, RawField, TabularDataset
+from torchtext.vocab import Vocab
 
-from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
-from reporter.core.operation import get_latest_closing_vals, replace_tags_with_vals
+from reporter.core.network import (
+    Decoder,
+    Encoder,
+    EncoderDecoder,
+    setup_attention
+)
+from reporter.core.operation import (
+    get_latest_closing_vals,
+    replace_tags_with_vals
+)
 from reporter.database.read import Alignment, fetch_latest_vals
 from reporter.postprocessing.text import remove_bos
 from reporter.util.config import Config
@@ -25,7 +33,8 @@ from reporter.util.constant import (
     Code,
     Phase,
     SeqType,
-    SpecialToken)
+    SpecialToken
+)
 from reporter.util.conversion import stringify_ric_seqtype
 from reporter.util.tool import takeuntil
 

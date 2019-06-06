@@ -1,6 +1,5 @@
 from typing import Generator, Iterable, TypeVar
 
-
 A = TypeVar('A')
 
 

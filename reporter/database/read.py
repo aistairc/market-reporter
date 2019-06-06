@@ -5,14 +5,14 @@ from logging import Logger
 from typing import Any, Dict, List, Tuple
 from xml.etree.ElementTree import fromstring
 
-from sqlalchemy import Integer, cast, extract, func, Date
+from sqlalchemy import Date, Integer, cast, extract, func
 from sqlalchemy.orm import Session
 from tqdm import tqdm
 
 from reporter.core.operation import find_operation
-from reporter.database.misc import in_utc, in_jst
+from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import Headline, Price, PriceSeq
-from reporter.util.constant import Code, Phase, SeqType, UTC
+from reporter.util.constant import UTC, Code, Phase, SeqType
 from reporter.util.conversion import stringify_ric_seqtype
 
 

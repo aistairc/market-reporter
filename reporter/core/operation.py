@@ -3,11 +3,10 @@ from decimal import Decimal
 from math import ceil
 from typing import List
 from xml.etree.ElementTree import fromstring
-from torch import Tensor
-from torchtext.data import Batch
 
 import numpy
-
+from torch import Tensor
+from torchtext.data import Batch
 
 FORMULAE = OrderedDict({
     'Δ': lambda diff, _: int(diff),

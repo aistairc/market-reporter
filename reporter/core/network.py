@@ -13,7 +13,8 @@ from reporter.util.constant import (
     N_SHORT_TERM,
     TIMESLOT_SIZE,
     Phase,
-    SeqType)
+    SeqType
+)
 from reporter.util.conversion import stringify_ric_seqtype
 
 

@@ -1,13 +1,14 @@
-from unittest import TestCase
 import tempfile
+from unittest import TestCase
 
 from janome.tokenizer import Tokenizer
 
 from reporter.preprocessing.text import (
-    simplify_headline,
     is_template,
+    kansuuzi2number,
     replace_prices_with_tags,
-    kansuuzi2number)
+    simplify_headline
+)
 from reporter.util.constant import IDEOGRAPHIC_SPACE
 
 

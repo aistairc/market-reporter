@@ -8,12 +8,16 @@ dependencies:
   - uwsgi
   - beautifulsoup4
   - flask
+  - isort
   - nltk
   - numpy
   - pandas
   - psycopg2
   - pytz
+  - python=3.7
   - pyyaml=3.13
+  - sqlalchemy
+  - tqdm
   - urllib3
   - pytorch=0.4.1
   - pip:
@@ -26,7 +30,5 @@ dependencies:
     - psycopg2-binary
     - pypugjs
     - s3transfer
-    - sqlalchemy
     - toml
-    - torchtext
-    - tqdm
+    - torchtext==0.3.1

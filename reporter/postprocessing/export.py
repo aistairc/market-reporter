@@ -1,5 +1,4 @@
 import csv
-
 from pathlib import Path
 
 from reporter.core.train import RunResult

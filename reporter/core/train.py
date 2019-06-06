@@ -8,11 +8,14 @@ from torchtext.data import Iterator
 from torchtext.vocab import Vocab
 
 from reporter.core.network import Attention, EncoderDecoder
-from reporter.core.operation import replace_tags_with_vals, get_latest_closing_vals
+from reporter.core.operation import (
+    get_latest_closing_vals,
+    replace_tags_with_vals
+)
+from reporter.postprocessing.text import remove_bos
 from reporter.util.constant import SEED, Code, Phase, SeqType, SpecialToken
 from reporter.util.conversion import stringify_ric_seqtype
 from reporter.util.tool import takeuntil
-from reporter.postprocessing.text import remove_bos
 
 
 class RunResult:

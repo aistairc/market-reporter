@@ -1,9 +1,13 @@
-from unittest import TestCase
 from pathlib import Path
+from unittest import TestCase
 
 import toml
 
-from reporter.resource.reuters import get_auth_token, filename2ric, ric2filename
+from reporter.resource.reuters import (
+    filename2ric,
+    get_auth_token,
+    ric2filename
+)
 
 
 class TestReuters(TestCase):

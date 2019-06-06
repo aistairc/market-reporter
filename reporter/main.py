@@ -1,15 +1,20 @@
 import argparse
 import warnings
 from datetime import datetime
-from pathlib import Path
 from functools import reduce
+from pathlib import Path
 
 import jsonlines
 import torch
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
 
-from reporter.core.network import Decoder, Encoder, EncoderDecoder, setup_attention
+from reporter.core.network import (
+    Decoder,
+    Encoder,
+    EncoderDecoder,
+    setup_attention
+)
 from reporter.core.train import run
 from reporter.database.model import create_tables
 from reporter.database.read import load_alignments_from_db
