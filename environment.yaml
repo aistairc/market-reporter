@@ -8,6 +8,7 @@ dependencies:
   - uwsgi
   - beautifulsoup4
   - flask
+  - flake8
   - isort
   - nltk
   - numpy

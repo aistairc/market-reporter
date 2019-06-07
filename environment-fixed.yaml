@@ -1,4 +1,4 @@
-name: reporter3
+name: reporter4
 channels:
   - pytorch
   - conda-forge
@@ -23,7 +23,9 @@ dependencies:
   - cycler=0.10.0=py_1
   - dbus=1.13.6=he372182_0
   - docutils=0.14=py37_1001
+  - entrypoints=0.3=py37_1000
   - expat=2.2.5=hf484d3e_1002
+  - flake8=3.7.7=py37_0
   - flask=1.0.3=py_0
   - fontconfig=2.13.1=he4413a7_1000
   - freetype=2.10.0=he983fc9_0
@@ -67,6 +69,7 @@ dependencies:
   - markupsafe=1.1.1=py37h14c3975_0
   - matplotlib=3.1.0=py37_1
   - matplotlib-base=3.1.0=py37hfd891ef_1
+  - mccabe=0.6.1=py_1
   - mkl=2019.4=243
   - ncurses=6.1=hf484d3e_1002
   - ninja=1.9.0=h6bb024c_0
@@ -82,7 +85,9 @@ dependencies:
   - pixman=0.34.0=h14c3975_1003
   - psycopg2=2.7.7=py37hb7f436b_0
   - pthread-stubs=0.4=h14c3975_1001
+  - pycodestyle=2.5.0=py_0
   - pycparser=2.19=py37_1
+  - pyflakes=2.1.1=py_0
   - pyjwt=1.7.1=py_0
   - pyopenssl=19.0.0=py37_0
   - pyparsing=2.4.0=py_0
