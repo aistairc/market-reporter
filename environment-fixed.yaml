@@ -1,23 +1,25 @@
-name: reporter2
+name: reporter3
 channels:
   - pytorch
   - conda-forge
   - defaults
 dependencies:
   - asn1crypto=0.24.0=py37_1003
+  - atk=2.25.90=hb9dd440_1002
   - beautifulsoup4=4.7.1=py37_1001
   - blinker=1.4=py_1
   - boto=2.49.0=py_0
-  - boto3=1.9.162=py_0
-  - botocore=1.12.162=py_0
+  - boto3=1.9.163=py_0
+  - botocore=1.12.163=py_0
   - bz2file=0.98=py_0
   - bzip2=1.0.6=h14c3975_1002
   - ca-certificates=2019.3.9=hecc5488_0
+  - cairo=1.16.0=ha4e643d_1000
   - certifi=2019.3.9=py37_0
   - cffi=1.12.3=py37h8022711_0
   - chardet=3.0.4=py37_1003
   - click=7.0=py_0
-  - cryptography=2.7=py37h72c5cf5_0
+  - cryptography=2.5=py37hb7f436b_1
   - cycler=0.10.0=py_1
   - dbus=1.13.6=he372182_0
   - docutils=0.14=py37_1001
@@ -25,11 +27,15 @@ dependencies:
   - flask=1.0.3=py_0
   - fontconfig=2.13.1=he4413a7_1000
   - freetype=2.10.0=he983fc9_0
+  - gdk-pixbuf=2.36.12=h49783d7_1002
   - gensim=3.7.3=py37he1b5a44_0
   - gettext=0.19.8.1=hc5be6a0_1002
   - glib=2.58.3=hf63aee3_1001
-  - gst-plugins-base=1.14.4=hdf3bae2_1001
-  - gstreamer=1.14.4=h66beb1c_1001
+  - gobject-introspection=1.58.2=py37h2da5eee_1000
+  - graphite2=1.3.13=hf484d3e_1000
+  - gstreamer=1.14.5=h36ae1b5_0
+  - gtk2=2.24.31=hb68c50a_1001
+  - harfbuzz=2.4.0=h37c48d4_0
   - icu=58.2=hf484d3e_1000
   - idna=2.8=py37_1000
   - intel-openmp=2019.4=243
@@ -41,7 +47,7 @@ dependencies:
   - joblib=0.13.2=py_0
   - jpeg=9c=h14c3975_1001
   - kiwisolver=1.1.0=py37hc9558a2_0
-  - krb5=1.16.3=h05b26f9_1001
+  - krb5=1.16.3=hc83ff2d_1000
   - libblas=3.8.0=7_openblas
   - libcblas=3.8.0=7_openblas
   - libedit=3.1.20170329=hf8c457e_1001
@@ -51,11 +57,13 @@ dependencies:
   - libiconv=1.15=h516909a_1005
   - liblapack=3.8.0=7_openblas
   - libpng=1.6.37=hed695b0_0
-  - libpq=11.3=h4e4e079_0
+  - libpq=10.6=h13b8bad_1000
   - libstdcxx-ng=8.2.0=hdf63c60_1
+  - libtiff=4.0.10=h57b8799_1003
   - libuuid=2.32.1=h14c3975_1000
   - libxcb=1.13=h14c3975_1002
   - libxml2=2.9.9=h13577e0_0
+  - lz4-c=1.8.3=he1b5a44_1001
   - markupsafe=1.1.1=py37h14c3975_0
   - matplotlib=3.1.0=py37_1
   - matplotlib-base=3.1.0=py37hfd891ef_1
@@ -66,25 +74,27 @@ dependencies:
   - numpy=1.16.4=py37h95a1406_0
   - oauthlib=3.0.1=py_0
   - openblas=0.3.5=h9ac9557_1001
-  - openssl=1.1.1b=h14c3975_1
+  - openssl=1.0.2r=h14c3975_0
   - pandas=0.24.2=py37hb3f55d8_0
+  - pango=1.40.14=h4ea9474_1004
   - pcre=8.41=hf484d3e_1003
   - pip=19.1.1=py37_0
-  - psycopg2=2.8.2=py37h72c5cf5_0
+  - pixman=0.34.0=h14c3975_1003
+  - psycopg2=2.7.7=py37hb7f436b_0
   - pthread-stubs=0.4=h14c3975_1001
   - pycparser=2.19=py37_1
   - pyjwt=1.7.1=py_0
   - pyopenssl=19.0.0=py37_0
   - pyparsing=2.4.0=py_0
-  - pyqt=5.9.2=py37hcca6a23_0
+  - pyqt=5.6.0=py37h13b7fb3_1008
   - pysocks=1.7.0=py37_0
-  - python=3.7.3=h5b0a415_0
+  - python=3.7.0=hd21baee_1006
   - python-crfsuite=0.9.6=py37h6bb024c_1000
   - python-dateutil=2.8.0=py_0
   - pytorch=0.4.1=py37_py36_py35_py27__9.0.176_7.1.2_2
   - pytz=2019.1=py_0
   - pyyaml=3.13=py37h14c3975_1001
-  - qt=5.9.7=h52cfd70_2
+  - qt=5.6.2=hce4f676_1013
   - readline=7.0=hf8c457e_1001
   - requests=2.22.0=py37_0
   - requests-oauthlib=1.2.0=py_0
@@ -92,7 +102,7 @@ dependencies:
   - scikit-learn=0.21.2=py37h627018c_0
   - scipy=1.3.0=py37h921218d_0
   - setuptools=41.0.1=py37_0
-  - sip=4.19.8=py37hf484d3e_1000
+  - sip=4.18.1=py37hf484d3e_1000
   - six=1.12.0=py37_1000
   - smart_open=1.8.4=py_0
   - soupsieve=1.9.1=py37_0
@@ -103,27 +113,36 @@ dependencies:
   - tqdm=4.32.1=py_0
   - twython=3.7.0=py_0
   - urllib3=1.24.3=py37_0
-  - uwsgi=2.0.18=py37h4472670_1
+  - uwsgi=2.0.18=py37hf36b3d6_0
   - werkzeug=0.15.4=py_0
   - wheel=0.33.4=py37_0
+  - xorg-kbproto=1.0.7=h14c3975_1002
+  - xorg-libice=1.0.9=h516909a_1004
+  - xorg-libsm=1.2.3=h84519dc_1000
+  - xorg-libx11=1.6.7=h14c3975_1000
   - xorg-libxau=1.0.9=h14c3975_0
   - xorg-libxdmcp=1.1.3=h516909a_0
+  - xorg-libxext=1.3.4=h516909a_0
+  - xorg-libxrender=0.9.10=h516909a_1002
+  - xorg-libxt=1.1.5=h14c3975_1002
+  - xorg-renderproto=0.11.1=h14c3975_1002
+  - xorg-xextproto=7.3.0=h14c3975_1002
+  - xorg-xproto=7.0.31=h14c3975_1007
   - xz=5.2.4=h14c3975_1001
   - yaml=0.1.7=h14c3975_1001
   - zlib=1.2.11=h14c3975_1004
+  - zstd=1.4.0=h3b9ef0a_0
   - pip:
-    - ansible==2.8.0
-    - awscli==1.16.172
+    - ansible==2.8.1
+    - awscli==1.16.173
     - colorama==0.3.9
     - flask-sqlalchemy==2.4.0
     - janome==0.3.9
     - jsonlines==1.2.0
-    - mojimoji==0.0.9
+    - mojimoji==0.0.8
     - psycopg2-binary==2.8.2
     - pyasn1==0.4.5
     - pypugjs==5.8.1
     - rsa==3.4.2
     - toml==0.10.0
     - torchtext==0.3.1
-prefix: /home/miyazawa/anaconda3/envs/reporter2
-

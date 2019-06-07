@@ -14,19 +14,19 @@ dependencies:
   - pandas
   - psycopg2
   - pytz
-  - python=3.7
-  - pyyaml=3.13
+  - python==3.7
+  - pyyaml==3.13
   - sqlalchemy
   - tqdm
   - urllib3
-  - pytorch=0.4.1
+  - pytorch==0.4.1
   - pip:
     - ansible
     - awscli
     - flask-sqlalchemy
     - janome
     - jsonlines
-    - mojimoji
+    - mojimoji==0.0.8
     - psycopg2-binary
     - pypugjs
     - s3transfer
