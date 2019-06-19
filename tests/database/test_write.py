@@ -17,27 +17,29 @@ class TestWrite(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
 
-        cls.config = Config('config.toml')
-        if cls.config.db_uri_test is None:
-            raise unittest.SkipTest('Database URI is None')
-        engine = create_engine(cls.config.db_uri_test)
-        SessionMaker = sessionmaker(bind=engine)
-        cls.session = SessionMaker()
+        try:
+            cls.config = Config('config.toml')
+            engine = create_engine(cls.config.db_uri_test)
+            SessionMaker = sessionmaker(bind=engine)
+            cls.session = SessionMaker()
 
-        create_tables(engine)
+            create_tables(engine)
 
-        cls.session.query(Close).delete()
-        cls.session.query(Price).delete()
-        cls.session.query(PriceSeq).delete()
-        cls.session.commit()
+            cls.session.query(Close).delete()
+            cls.session.query(Price).delete()
+            cls.session.query(PriceSeq).delete()
+            cls.session.commit()
 
-        dir_resources = Path(cls.config.dir_resources)
-        dir_prices = dir_resources / Path('pseudo-data') / Path('prices')
-        missing_rics = ['.TEST']
-        logger = create_logger(Path('test.log'), is_debug=False, is_temporary=True)
+            dir_resources = Path(cls.config.dir_resources)
+            dir_prices = dir_resources / Path('pseudo-data') / Path('prices')
+            missing_rics = ['.TEST']
+            logger = create_logger(Path('test.log'), is_debug=False, is_temporary=True)
 
-        # insert database
-        insert_prices(cls.session, dir_prices, missing_rics, dir_resources, logger)
+            # insert database
+            insert_prices(cls.session, dir_prices, missing_rics, dir_resources, logger)
+
+        except:  # noqa: E722
+            raise unittest.SkipTest('Cannot establish connection')
 
     @classmethod
     def tearDownClass(cls):
