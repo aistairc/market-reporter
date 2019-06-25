@@ -27,6 +27,7 @@ dependencies:
     - flask-sqlalchemy
     - janome
     - jsonlines
+    - libsass
     - mojimoji==0.0.8
     - psycopg2-binary
     - pypugjs
