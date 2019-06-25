@@ -52,11 +52,11 @@ populate_for_human_evaluation(db.session, config.result)
 demo_initial_date = config.demo_initial_date
 
 device = os.environ.get('DEVICE', 'cpu')
-output = os.environ.get('OUTPUT', 'output')
+output = os.environ.get('OUTPUT')
 
-predictor = Predictor(config,
-                      torch.device(device),
-                      Path(output))
+predictor = Predictor(config, torch.device(device), Path(output)) \
+    if output is not None and Path(output).exists() \
+    else None
 
 # TODO move to some util/misc module?
 EPOCH = datetime.fromtimestamp(0, tz=UTC)
