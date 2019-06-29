@@ -48,22 +48,11 @@ For details, please read [AWS Identity and Access Management](http://docs.aws.am
 
 
 ### Docker
-When you have a credentials file for AWS (default: `~/.aws/credetials`), please edit `config.toml` to set `profile_name` in the `s3` section.
-Otherwise, you need to type AWS access key ID and AWS secret access key when you launch the image.
+Edit [envs/docker-compose.yaml](envs/docker-compose.yaml) according to your environment.
+Then, launch containers by `docker-compose`.
 ```bash
 cd envs
-docker build \
-    --build-arg BASIC_AUTH_PASSWORD=your_basic_auth_password \
-    -t market-reporter .
-docker run -d \
-    --name demo \
-    --user root \
-    --volume /opt/ \
-    --publish 443:443 \
-    -e AWS_ACCESS_KEY_ID=your_access_key_id \
-    -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
-    market-reporter
-docker exec -it --user reporter demo /bin/bash
+docker-compose up
 ```
 
 ### Anaconda

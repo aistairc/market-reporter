@@ -46,23 +46,11 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 詳細については公式のドキュメント[AWS Identity and Access Management](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)をご覧ください。
 
 ### Docker
-AWS の認証プロファイル（通常は `~/.aws/credetials`）を使用する場合は `config.toml` の `s3` セクションにある `profile_name` を設定してください。
-認証プロファイルを使用しない場合、Docker イメージ起動時に AWS access key ID と AWS secret access key を入力する必要があります。
-
+環境に合わせて[envs/docker-compose.yaml](envs/docker-compose.yaml)を編集します。
+その後 `docker-compose` コマンドを実行してコンテナを起動してください。
 ```bash
 cd envs
-docker build \
-    --build-arg BASIC_AUTH_PASSWORD=your_basic_auth_password \
-    -t market-reporter .
-docker run -d \
-    --name demo \
-    --user root \
-    --volume /opt/ \
-    --publish 443:443 \
-    -e AWS_ACCESS_KEY_ID=your_access_key_id \
-    -e AWS_SECRET_ACCESS_KEY=your_secret_access_key \
-    market-reporter
-docker exec -it --user reporter demo /bin/bash
+docker-compose up
 ```
 
 ### Anaconda
