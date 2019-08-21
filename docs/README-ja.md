@@ -50,7 +50,7 @@ DockerとDocker Composeをインストールします.
 環境に合わせて[envs/docker-compose.yaml](envs/docker-compose.yaml)を編集してください。
 その後 `docker-compose` コマンドを実行してコンテナを起動します。
 ```bash
-# Install Docker
+# Docker のインストール
 sudo apt-get update
 sudo apt-get install -y \
     apt-transport-https \
@@ -69,12 +69,12 @@ sudo apt-get install -y \
     docker-ce-cli \
     containerd.io
 
-# Install Docker Compose
+# Docker Compose のインストール
 sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-# Start Docker and log in
+# Docker の起動とログイン
 cd envs
 sudo service docker start
 sudo docker-compose up -d
