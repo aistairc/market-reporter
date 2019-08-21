@@ -46,11 +46,39 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
 詳細については公式のドキュメント[AWS Identity and Access Management](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html)をご覧ください。
 
 ### Docker
-環境に合わせて[envs/docker-compose.yaml](envs/docker-compose.yaml)を編集します。
-その後 `docker-compose` コマンドを実行してコンテナを起動してください。
+DockerとDocker Composeをインストールします.
+環境に合わせて[envs/docker-compose.yaml](envs/docker-compose.yaml)を編集してください。
+その後 `docker-compose` コマンドを実行してコンテナを起動します。
 ```bash
+# Install Docker
+sudo apt-get update
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+sudo apt-get update
+sudo apt-get install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io
+
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Start Docker and log in
 cd envs
-docker-compose up
+sudo service docker start
+sudo docker-compose up -d
+sudo exec -it CONTAINER /bin/bash  # `docker ps` でコンテナの一覧が表示されます
 ```
 
 ### Anaconda
@@ -67,11 +95,6 @@ source activate NAME
 [postgres]
 - uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
 + uri = 'postgresql:///master'
-```
-SSHポートフォワーディングを用いてリモートマシンのデータベースを利用している場合（例：`ssh -fNT -L 2345:localhost:5432 kirito@dbserver`）、以下のように編集します。
-```
-- uri = 'postgresql://USERNAME:PASSWORD@SERVER:PORT/DATABASE'
-+ uri = 'postgresql://kirito:PASSWORD@localhost:2345/master'
 ```
 
 ## 使い方
