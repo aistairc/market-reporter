@@ -80,7 +80,7 @@ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 cd envs
 sudo service docker start
 sudo docker-compose up -d
-sudo exec -it CONTAINER /bin/bash  # You can find CONTAINER by `docker ps`
+sudo exec --user reporter -it CONTAINER /bin/bash
 ```
 
 ### Anaconda

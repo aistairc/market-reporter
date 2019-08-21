@@ -78,7 +78,7 @@ sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 cd envs
 sudo service docker start
 sudo docker-compose up -d
-sudo exec -it CONTAINER /bin/bash  # `docker ps` でコンテナの一覧が表示されます
+sudo exec --user reporter -it CONTAINER /bin/bash  # `docker ps` でコンテナの一覧が表示されます
 ```
 
 ### Anaconda
