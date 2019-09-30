@@ -1,30 +1,26 @@
-from unittest import TestCase
-
 from reporter.core.operation import find_operation, perform_operation
 
 
-class TestOperation(TestCase):
+def test_find_operation():
 
-    def test_find_operation(self):
+    ref_token = 100
+    prev_trading_day_close = 10000
+    latest = 10120
+    result = find_operation(ref_token, prev_trading_day_close, latest)
+    assert result == '<yen val="Δ-round-down-100"/>'
 
-        ref_token = 100
-        prev_trading_day_close = 10000
-        latest = 10120
-        result = find_operation(ref_token, prev_trading_day_close, latest)
-        self.assertEqual(result, '<yen val="Δ-round-down-100"/>')
+def test_find_operation_reverse():
 
-    def test_find_operation_reverse(self):
+    ref_token = 100
+    prev_trading_day_close = 10120
+    latest = 10000
+    result = find_operation(ref_token, prev_trading_day_close, latest)
+    assert result == '<yen val="Δ-round-down-100"/>'
 
-        ref_token = 100
-        prev_trading_day_close = 10120
-        latest = 10000
-        result = find_operation(ref_token, prev_trading_day_close, latest)
-        self.assertEqual(result, '<yen val="Δ-round-down-100"/>')
+def test_perform_operation():
 
-    def test_perform_operation(self):
-
-        token = '<yen val="Δ-round-down-100"/>'
-        prev_trading_day_close = 10000
-        latest = 10120
-        result = perform_operation(token, prev_trading_day_close, latest)
-        self.assertEqual(result, '100円')
+    token = '<yen val="Δ-round-down-100"/>'
+    prev_trading_day_close = 10000
+    latest = 10120
+    result = perform_operation(token, prev_trading_day_close, latest)
+    assert result == '100円'

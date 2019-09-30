@@ -1,0 +1,14 @@
+[run]
+omit =
+    reporter/__init__.py
+    reporter/__main__.py
+    reporter/main.py
+    reporter/database/model.py
+    reporter/util/constant.py
+    reporter/util/config.py
+    reporter/webapp/__init__.py
+    reporter/webapp/__main__.py
+    reporter/webapp/chart.py
+    reporter/webapp/human_evaluation.py
+    reporter/webapp/search.py
+    reporter/webapp/table.py
