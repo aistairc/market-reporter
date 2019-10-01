@@ -24,7 +24,7 @@ jobs:
           command: |
             if [ ! -d /opt/reporter/.conda/envs/circleci ]
             then
-                conda env create -f environment-fixed.yaml -n circleci --quiet
+                conda env create -f environment.yaml -n circleci --quiet
             fi
       - save_cache:
           key: market-reporter-{{ checksum "environment-fixed.yaml" }}
