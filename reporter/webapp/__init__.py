@@ -4,12 +4,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List
 
+import flask
 import sass
 import torch
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
-import flask
 from reporter.database.misc import in_jst, in_utc
 from reporter.database.model import GenerationResult, Headline, HumanEvaluation
 from reporter.database.read import (
