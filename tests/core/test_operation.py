@@ -9,6 +9,7 @@ def test_find_operation():
     result = find_operation(ref_token, prev_trading_day_close, latest)
     assert result == '<yen val="Δ-round-down-100"/>'
 
+
 def test_find_operation_reverse():
 
     ref_token = 100
@@ -16,6 +17,7 @@ def test_find_operation_reverse():
     latest = 10000
     result = find_operation(ref_token, prev_trading_day_close, latest)
     assert result == '<yen val="Δ-round-down-100"/>'
+
 
 def test_perform_operation():
 

@@ -1,6 +1,6 @@
-import pytest
 from pathlib import Path
 
+import pytest
 from numpy import allclose
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
