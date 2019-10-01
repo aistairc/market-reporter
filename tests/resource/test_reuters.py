@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import pytest
-import toml
 
+import toml
 from reporter.resource.reuters import (
     filename2ric,
     get_auth_token,

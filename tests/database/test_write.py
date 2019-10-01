@@ -5,7 +5,7 @@ from numpy import allclose
 from sqlalchemy.engine import create_engine
 from sqlalchemy.orm.session import sessionmaker
 
-from reporter.database.model import Base, Close, Price, PriceSeq
+from reporter.database.model import Base, Close, Instrument, Price, PriceSeq
 from reporter.database.write import insert_prices
 from reporter.util.config import Config
 from reporter.util.constant import SeqType
@@ -24,7 +24,11 @@ def engine(config):
 
 @pytest.fixture(scope='session')
 def db_session(config, engine):
-    tables = [Close.__table__, Price.__table__, PriceSeq.__table__]
+    tables = [
+        Close.__table__,
+        Instrument.__table__,
+        Price.__table__,
+        PriceSeq.__table__]
     Base.metadata.drop_all(engine, tables)
     Base.metadata.create_all(engine, tables)
 
