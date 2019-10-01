@@ -1,6 +1,7 @@
 __pycache__
 *.pyc
 *.egg-info/
+.coverage
 .ipynb_checkpoints
 
 envs/hosts

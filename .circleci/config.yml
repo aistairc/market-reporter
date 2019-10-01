@@ -51,4 +51,4 @@ jobs:
           command: |
             source /opt/conda/etc/profile.d/conda.sh
             conda activate circleci
-            python setup.py test
+            pytest

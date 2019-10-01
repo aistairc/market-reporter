@@ -17,6 +17,8 @@ dependencies:
   - pytz
   - python==3.7
   - pyyaml==3.13
+  - pytest
+  - pytest-cov
   - sqlalchemy
   - tqdm
   - urllib3
