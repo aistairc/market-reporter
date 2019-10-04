@@ -150,7 +150,7 @@ Webインターフェースは評価等の目的で使うことができます�
 ## テスト
 
 ```bash
-python setup.py test
+pytest
 ```
 
 ## ライセンスと参考文献

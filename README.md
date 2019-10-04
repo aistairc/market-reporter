@@ -153,7 +153,7 @@ Along with the generated sentences, it also shows the movements of prices used i
 ## Test
 
 ```bash
-python setup.py test
+pytest
 ```
 
 ## License and References
