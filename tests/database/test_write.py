@@ -44,6 +44,8 @@ def db_session(config, engine):
 
     yield session
 
+    session.close()
+
 
 def test_raw_long(db_session) -> None:
     expected = [140600.0, 130600.0, 120600.0, 110600.0, 70600.0, 60600.0, 50600.0]
