@@ -3,6 +3,7 @@ __pycache__
 *.egg-info/
 .coverage
 .ipynb_checkpoints
+.venv/
 
 envs/hosts
 envs/*.retry

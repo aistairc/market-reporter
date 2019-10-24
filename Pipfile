@@ -1,0 +1,40 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+awscli = "*"
+flake8 = "*"
+isort = "*"
+pytest = "*"
+pytest-cov = "*"
+
+[packages]
+boto3 = "*"
+botocore = "*"
+beautifulsoup4 = "*"
+nltk = "*"
+numpy = "*"
+pandas = "*"
+psycopg2 = "*"
+pytz = "*"
+tqdm = "*"
+urllib3 = "*"
+torch = "*"
+torchvision = "*"
+jsonlines = "*"
+libsass = "*"
+mojimoji = "*"
+pypugjs = "*"
+s3transfer = "*"
+toml = "*"
+torchtext = "*"
+uWSGI = "*"
+Flask = "*"
+SQLAlchemy = "*"
+Flask-SQLAlchemy = "*"
+janome = "*"
+
+[requires]
+python_version = "3.7"

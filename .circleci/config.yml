@@ -2,53 +2,40 @@ version: 2
 jobs:
   build:
     docker:
-      - image: pecorarista/market-reporter
-        user: reporter
-      - image: postgres:9.6
+      - image: pecorarista/pipenv
+        user: circleci
+      - image: postgres:10
         environment:
-          POSTGRES_USER: reporter
+          POSTGRES_USER: circleci
           POSTGRES_DB: test_db
     steps:
       - checkout
-      - run:
-          name: Print the working directory
-          command: pwd
-      - run:
-          name: Show who I am
-          command: whoami
       - restore_cache:
           keys:
-            - market-reporter-{{ checksum "environment-fixed.yaml" }}
+            - market-reporter-{{ checksum "Pipfile.lock" }}
       - run:
           name: Create an environment
-          command: |
-            if [ ! -d /opt/reporter/.conda/envs/circleci ]
-            then
-                conda env create -f environment-fixed.yaml -n circleci --quiet
-            fi
+          command: pipenv sync --dev
+          environment:
+            PIPENV_VENV_IN_PROJECT: 1
       - save_cache:
-          key: market-reporter-{{ checksum "environment-fixed.yaml" }}
+          key: market-reporter-{{ checksum "Pipfile.lock" }}
           paths:
-            - /opt/reporter/.conda
+            - /home/circleci/project/.venv
+            - /home/circleci/.cache/pipenv
       - run:
           name: Create `config.toml`
           command: |
             cat example.toml \
-            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
-            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql://reporter@localhost:5432/test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/DBNAME'\$#uri = 'postgresql://circleci@localhost:5432/test_db'#" \
+            | sed -e "s#^uri = 'postgresql://ubuntu@localhost:5432/TESTDBNAME'\$#uri = 'postgresql://circleci@localhost:5432/test_db'#" \
             | tee config.toml
       - run:
           name: Check formats
           command: |
-            source /opt/conda/etc/profile.d/conda.sh
-            conda activate circleci
-            flake8 reporter
-            flake8 tests
-            isort --recursive --check-only reporter
-            isort --recursive --check-only tests
+            pipenv run flake8 mypkg tests
+            pipenv run isort --recursive --check-only mypkg tests
       - run:
           name: Run unit tests
           command: |
-            source /opt/conda/etc/profile.d/conda.sh
-            conda activate circleci
-            pytest
+            pipenv run pytest
