@@ -2,7 +2,7 @@ import os
 import re
 from typing import List
 
-import mojimoji
+import neologdn
 
 from reporter.util.constant import IDEOGRAPHIC_SPACE
 
@@ -31,8 +31,7 @@ def simplify_headline(headline_text: str) -> str:
     """
     PLACE_HOLDER = '<space/>'
     t = headline_text.strip().replace(IDEOGRAPHIC_SPACE, PLACE_HOLDER)
-    t = mojimoji.han_to_zen(t, kana=True, digit=False, ascii=False)
-    t = mojimoji.zen_to_han(t, kana=False, digit=True, ascii=True)
+    t = neologdn.normalize(t)
     t = re.sub(r'<\w+?>', '', t)
     t = re.sub(r'【\w+?】', '', t)
 
