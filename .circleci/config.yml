@@ -15,7 +15,7 @@ jobs:
             - market-reporter-{{ checksum "Pipfile.lock" }}
       - run:
           name: Create an environment
-          command: pipenv install --dev
+          command: pipenv sync --dev
           environment:
             PIPENV_VENV_IN_PROJECT: 1
       - save_cache:
