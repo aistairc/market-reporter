@@ -17,7 +17,7 @@ This is an implementation of Murakami et al. (ACL 2017) [[bib](#reference)] [[pa
     2. [Resources](#resources)
     3. [S3](#s3)
     4. [Docker](#docker)
-    5. [Anaconda](#anaconda)
+    5. [Pipenv](#pipenv)
     6. [PostgreSQL](#postgresql)
 2. [Usage](#usage)
     1. [Training](#training)
@@ -83,14 +83,13 @@ sudo docker-compose up -d
 sudo exec --user reporter -it CONTAINER /bin/bash
 ```
 
-### Anaconda
-We recommend <a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a>.
-The code never runs on Python 2.
-After you install Anaconda, create a new environment from `environment.yaml`.
+### Pipenv
+We recommend to use [pipenv](https://pipenv.kennethreitz.org/en/latest/) to make a Python environment for this project.
 
 ```bash
-conda env create -f environment.yaml -n NAME
-source activate NAME
+brew install pipenv  # Linuxbrew and Homebrew
+pipenv install --dev
+pipenv shell
 ```
 
 ### PostgreSQL
