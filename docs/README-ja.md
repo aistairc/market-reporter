@@ -17,7 +17,7 @@ __Market Reporter__ は株価等の時系列データから、それを要約し
     2. [資源](#資源)
     3. [S3](#s3)
     4. [Docker](#docker)
-    5. [Anaconda](#anaconda)
+    5. [Pipenv](#pipenv)
     6. [PostgreSQL](#postgresql)
 2. [使い方](#使い方)
     1. [学習](#学習)
@@ -81,12 +81,13 @@ sudo docker-compose up -d
 sudo exec --user reporter -it CONTAINER /bin/bash  # `docker ps` でコンテナの一覧が表示されます
 ```
 
-### Anaconda
-必須ではありませんが<a href="https://www.anaconda.com/download/" target="_blank">Anaconda</a>を利用することをお薦めします。AnacondaはPython 3用のものを使用してください。Python 2用のものでは動きません。インストール後`environment.yaml`を読み込んで新規の環境を作成します。
+### Pipenv
+このプロジェクトに必要となるPythonライブラリをインストールには、<a href="https://pipenv.kennethreitz.org/en/latest/" target="_blank">Pipenv</a>を利用することをお薦めします。
 
 ```bash
-conda env create -f environment.yaml -n NAME
-source activate NAME
+brew install pipenv  # Linuxbrew and Homebrew
+pipenv install --dev
+pipenv shell
 ```
 
 ### PostgreSQL
