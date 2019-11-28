@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: pecorarista/pipenv
+      - image: circleci/python:3.7.4-buster
         user: circleci
       - image: postgres:10
         environment:
