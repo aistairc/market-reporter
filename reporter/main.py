@@ -1,7 +1,6 @@
 import argparse
 import warnings
 from datetime import datetime
-from functools import reduce
 from pathlib import Path
 
 import jsonlines
@@ -82,9 +81,8 @@ def main() -> None:
 
     # === Alignment ===
     has_all_alignments = \
-        reduce(lambda x, y: x and y,
-               [(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
-                for phase in list(Phase)])
+        all([(config.dir_output / Path('alignment-{}.json'.format(phase.value))).exists()
+             for phase in list(Phase)])
 
     if not has_all_alignments:
 
